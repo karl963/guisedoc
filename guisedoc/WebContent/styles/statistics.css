@@ -1,0 +1,117 @@
+/*
+* hide and show button (div)
+*/
+#hideOrShowStatisticsOptionDiv{
+	text-align:center;
+	font-weight:bold;
+	width:100%;
+	
+	background: #dde4e4; /* Old browsers */
+	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2RkZTRlNCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5Y2JmYmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top,  #dde4e4 0%, #9cbfbf 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dde4e4), color-stop(100%,#9cbfbf)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #dde4e4 0%,#9cbfbf 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #dde4e4 0%,#9cbfbf 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #dde4e4 0%,#9cbfbf 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #dde4e4 0%,#9cbfbf 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dde4e4', endColorstr='#9cbfbf',GradientType=0 ); /* IE6-8 */
+}
+#hideOrShowStatisticsOptionDiv:hover{
+	cursor:default;
+	background: #9cbfbf; /* Old browsers */
+	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzljYmZiZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkZGU0ZTQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top,  #9cbfbf 0%, #dde4e4 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#9cbfbf), color-stop(100%,#dde4e4)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #9cbfbf 0%,#dde4e4 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #9cbfbf 0%,#dde4e4 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #9cbfbf 0%,#dde4e4 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #9cbfbf 0%,#dde4e4 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#9cbfbf', endColorstr='#dde4e4',GradientType=0 ); /* IE6-8 */
+}
+
+/*
+* options div
+*/
+#statisticsOptionsDiv{
+	padding:5px;
+	background-color:#DDE4E4;
+	overflow: hidden;
+}
+.separateOptionDiv{
+	padding:5px;
+	float:left;
+	display:inline-block;
+}
+
+#searchForStatistics, #createPDFOfStatistics{
+	width:100px;
+}
+
+/*
+* table
+*/
+
+#statisticsTable {
+	width:100%;
+}
+
+.statisticsCodeTd{
+	width:15%;
+	min-width:120px;
+}
+.statisticsUnitTd{
+	width:10%;
+	min-width:70px;
+}
+.statisticsTotalPriceTd{
+	width:10%;
+	min-width:100px;
+}
+.statisticsAmountTd{
+	width:10%;
+	min-width:70px;
+}
+.statisticsNameTd{
+	width:20%;
+	min-width:150px;
+}
+.statisticsDateTd{
+	width:100px;
+	min-width:100px;
+}
+.statisticsClientNameTd{
+	width:10%;
+	min-width:100px;
+}
+.statisticsDeleteCheckboxLabel{
+	width:100%;
+	display:block;
+	height:auto !important;
+	height:100%;
+	min-height:100%;
+}
+.statisticsDeleteTd{
+	text-align:center;
+
+	width:1%;
+	min-width:115px;
+	max-width:115px;
+	overflow: hidden;
+}
+
+/*
+* detailed row
+*/
+.statisticDetailedDataDiv{
+	background:#DDE4E4;
+}
+.statisticsDetailedInput{
+	width:30%;
+	min-width:150px;
+}
+.statisticsDetailedNameDiv{
+	display:inline-block;
+	width:100px;
+}

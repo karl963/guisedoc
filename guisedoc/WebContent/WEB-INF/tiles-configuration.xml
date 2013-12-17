@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+<!-- default page includes -->
+
+<definition name="defaultTemplate" template="/WEB-INF/jsp/other/defaultTemplate.jsp">
+    <put-attribute name="header" value="/WEB-INF/jsp/must/header.jsp" />
+    <put-attribute name="menu" value="/WEB-INF/jsp/menu/menu.jsp" />
+	<put-attribute name="footer" value="/WEB-INF/jsp/must/footer.jsp" />
+</definition>
+
+<!-- login page -->
+
+<definition name="login" extends="defaultTemplate">
+    <put-attribute name="title" value="Guisedoc login"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/login/login.jsp" />
+</definition>
+ 
+ <!-- user data management -->
+ 
+<definition name="manage-user-data" extends="defaultTemplate">
+    <put-attribute name="title" value="Manage user's data"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/manageUserData/manage-user-data.jsp" />
+</definition>
+ 
+ <!-- product management -->
+ 
+<definition name="manage-products" extends="defaultTemplate">
+	<put-attribute name="title" value="Manage products"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/manageProducts/manage-products.jsp" />
+</definition>
+
+ <!-- client management -->
+ 
+<definition name="clients" extends="defaultTemplate">
+	<put-attribute name="title" value="Clients"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/manageClients/clients.jsp" />
+</definition>
+
+ <!-- statistics management -->
+ 
+<definition name="statistics" extends="defaultTemplate">
+	<put-attribute name="title" value="Statistics"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/statistics/statistics.jsp" />
+</definition>
+
+</tiles-definitions>

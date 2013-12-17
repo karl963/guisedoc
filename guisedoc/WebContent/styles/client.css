@@ -1,0 +1,59 @@
+/*
+* table
+*/
+
+#clientsTable{
+	width:90%;
+}
+
+.clientNameTd{
+	min-width: 100px;
+}
+
+.clientContactPersonTd{
+	min-width: 100px;
+}
+
+.clientTotalBoughtForTd{
+	min-width: 100px;
+	width:10%;
+}
+
+/*
+* SEARCH
+*/
+#clientSearchNameInput, #clientSearchContactPersonInput{
+	left:1%;
+	width:98%;
+}
+
+/*
+* Detailed data row
+*/
+.clientDetailNameDiv{
+	display: inline-block;
+	min-width:150px;
+}
+.clientDetailDataPieceDiv{
+	left: 10px;
+	padding:5px;
+}
+.clientDetailInputDiv input{
+	width:30%;
+	min-width:120px;
+}
+.clientDetailedDataRow{
+	background-color:#DDE4E4;
+}
+.clientDetailValueDiv{
+	min-width:100px;
+}
+
+/*
+* INPUT FIELDS
+*/
+.clientSearchInputField{
+	margin-left:1%;
+	margin-right:1%;
+	width:98%;
+}

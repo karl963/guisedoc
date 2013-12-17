@@ -1,0 +1,14 @@
+.userDataDescription {
+	display: inline-block;
+	min-width:120px;
+}
+
+.userDataInput input[type="text"]{
+	min-width:200px;
+	width:50%;
+	maxlength:45;
+}
+
+.userDataDiv {
+	width:90%;
+}
