@@ -1,13 +1,9 @@
 <div id="mainMenuDiv">
 	<ul id="mainMenu">
-		<li class="topMenu defaultMenuLink" id="1">
-			<a>Tehingud</a>
-			<ul>
-				<li id="documents" class="mainMenuLink"><a>Koosta tehing</a></li>
-				<li id="documents" class="mainMenuLink"><a>essa tessa</a></li>
-			</ul>
+		<li class="topMenu defaultMenuLink mainMenuBigLink" id="menuBigLink1">
+			<a id="documents">Tehingud</a>
 		</li>
-		<li class="topMenu defaultMenuLink" id="2">
+		<li class="topMenu defaultMenuLink" id="menuBigLink2">
 			<a>Ladu/andmed</a>
 			<ul>
 				<li id="manage-products" class="mainMenuLink"><a >Tooted</a></li>
@@ -15,7 +11,7 @@
 				<li id="manage-user-data" class="mainMenuLink"><a>Minu andmed</a></li>
 			</ul>
 		</li>
-		<li class="topMenu defaultMenuLink mainMenuBigLink" id="3">
+		<li class="topMenu defaultMenuLink mainMenuBigLink" id="menuBigLink3">
 			<a id="statistics">Statistika</a>
 		</li>
 	</ul>

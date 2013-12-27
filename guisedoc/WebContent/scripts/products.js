@@ -84,10 +84,9 @@ $(document).ready(function(){
 	/*
 	 * Get the detailed data about the client from server, animate the row insert
 	 */
-	function showDetailProductView(clickedRow){
+	function showDetailProductView(clickedRow,rowIndex){
 
 		var id = clickedRow.children(".productCodeTd").children(".productID").html();
-		var rowIndex = clickedRow.index();
 
 		$.ajax({
 	        type : "POST",
@@ -133,6 +132,7 @@ $(document).ready(function(){
 		showLoadingDiv();
 		
 		var clickedRow = $(this); // the row we clicked on
+		var rowIndex = clickedRow.index();
 		
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
 			
@@ -142,13 +142,18 @@ $(document).ready(function(){
 			 	.parent()
 			 	.find('td > div')
 			 	.slideUp(200, function(){
-				 
+				
+			 	if($(".detailedTr").index() < rowIndex){ // clicked after the opened row
+			 		rowIndex--; // we deleted the current row, which means we have 1 less row
+			 	}
+
 			 	$(".detailedTr").remove(); // remove the old row
-			 	showDetailProductView(clickedRow); // make a new detailed product data row
+			 	
+			 	showDetailProductView(clickedRow,rowIndex); // make a new detailed product data row
 			});
 		}
 		else{
-			showDetailProductView(clickedRow); // make the detailed product data row
+			showDetailProductView(clickedRow,rowIndex); // make the detailed product data row
 		}
 		
 	});
@@ -186,7 +191,7 @@ $(document).ready(function(){
 	        		addNewProductToTable(id,productJSON.code,productJSON.name,
 	        				productJSON.e_name,productJSON.unit,
 	        				productJSON.e_unit,productJSON.price,
-	        				productJSON.o_price);
+	        				productJSON.o_price,productJSON.storage);
 	        		
 	        		$("#productCodeSearchInput").val(null);
 	        		$("#productNameSearchInput").val(null);
@@ -203,12 +208,16 @@ $(document).ready(function(){
 	        		if(!productsInEstonian){
 	        			$("#productsInEnglish").trigger("click");
 	        		}
+
 	        	}
 	        	else{
 	        		showErrorNotification(response.split(";")[1]);
 	        	}
+	        	
+	        	hideLoadingDiv();
 	        },
 	        error : function(e) {
+	        	hideLoadingDiv();
 	        	showErrorNotification("Viga serveriga ühendumisel");
 	        }
 	    });
@@ -221,10 +230,10 @@ $(document).ready(function(){
 		
 		if(!searchIsBeingProcessed){
 
+			showLoadingDiv();
+			
 			searchIsBeingProcessed = true;
 			$(".productTableRow").remove();
-
-			showLoadingDiv();
 			
 			var searchProductJSON = makeSearchProductJSON();
 			if(searchProductJSON == null){
@@ -251,8 +260,11 @@ $(document).ready(function(){
 	        		if(!productsInEstonian){
 	        			$("#productsInEnglish").trigger("click");
 	        		}
+	        		
+	        		hideLoadingDiv();
 		        },
 		        error : function(e) {
+		        	hideLoadingDiv();
 		        	showErrorNotification(e);
 		        	searchIsBeingProcessed = false;
 		        }
@@ -286,8 +298,11 @@ $(document).ready(function(){
 	        	else{
 	        		showErrorNotification(response.split(";")[1]);
 	        	}
+	        	
+	        	hideLoadingDiv();
 	        },
 	        error : function(e) {
+	        	hideLoadingDiv();
 	        	showErrorNotification("Error serveriga ühendumisel");
 	        }
 	    });
@@ -404,7 +419,8 @@ $(document).ready(function(){
 			'"e_unit":"'+e_unit+'",'+
 			'"price":"'+price+'",'+
 			'"o_price":"'+o_price+'",'+
-			'"code":"'+code+'"'+
+			'"code":"'+code+'",'+
+			'"storage":'+0.0+''+
 		'}';
 		
 		return newProductJSON;
@@ -562,11 +578,11 @@ function addAllProductsIntoTable(productsJSON){
 function addProductDetailedDataRow(rowIndex,productJSON){
 	
 	var table = document.getElementById("productsTable");
-	
+
 	var row = table.insertRow(rowIndex+1);
 	var cell=row.insertCell(0);
 	
-	cell.innerHTML = "<div class='productDetailedDataDiv'>" +
+	cell.innerHTML =
 	
 		"<div class='leftSideProductDetailViewDiv'>"+
 		
@@ -661,9 +677,7 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 				"<input type='text' maxlength='20' class='productDetailEUnitInput' value='"+productJSON.e_unit+"' />" +
 			"</div>"+
 	
-		"</div>"+
-			
-	"</div>";
+		"</div>";
 			
 	cell.colSpan = "5";
 	cell.className = "productDetailedDataRow";

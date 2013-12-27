@@ -27,6 +27,7 @@ public class UserDataController {
 		
 		model.addAttribute("firm",new Firm());
 		model.addAttribute("user",new User());
+		model.addAttribute("pageRequest","manage-user-data");
 		
 		return "manage-user-data";
 	}

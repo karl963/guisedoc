@@ -2,7 +2,7 @@
 
 <c:choose>
 	<c:when test="${postResult==null}">
-		<div id="notificationDiv" class="noNotification"></div>
+		<div id="notificationDiv" class="noNotification hidden"></div>
 	</c:when>
 	<c:when  test="${postResult=='success'}" >
 		<div id="notificationDiv" class="positiveNotification">${message}</div>
@@ -11,5 +11,6 @@
 		<div id="notificationDiv" class="negativeNotification">${message}</div>
 	</c:otherwise>
 </c:choose>
+
 </body>
 </html>

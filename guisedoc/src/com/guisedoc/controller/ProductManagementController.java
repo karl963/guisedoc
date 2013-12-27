@@ -45,6 +45,8 @@ public class ProductManagementController {
 	@RequestMapping(value="manage-products", method = RequestMethod.GET)
 	public String productManageView(Model model){
 		
+		model.addAttribute("pageRequest","manage-products");
+		
 		return "manage-products";
 	}
 	

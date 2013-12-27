@@ -69,10 +69,10 @@ $(document).ready(function() {
 	        success : function(jsonString) {
 	        	
 	        	var statisticsJSON = jQuery.parseJSON(jsonString);
-	        	addNewStatisticsTableWithData(statisticsJSON);
 	        	
 	        	if(statisticsJSON.response=="success"){
 	        		showSuccessNotification(statisticsJSON.message);
+	        		addNewStatisticsTableWithData(statisticsJSON);
 	        	}
 	        	else{
 	        		showErrorNotification(statisticsJSON.message);
@@ -91,6 +91,8 @@ $(document).ready(function() {
 	 * delete selected statistics objects
 	 */
 	$(document).on("click","#deleteSelectedStatistics", function(){
+		
+		showLoadingDiv();
 		
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
 			
@@ -152,7 +154,12 @@ $(document).ready(function() {
 			 	.find('td > div')
 			 	.slideUp(200, function(){
 				 
+			 	if($(".detailedTr").index() < rowIndex){ // clicked after the opened row
+			 		rowIndex--; // we deleted the current row, which means we have 1 less row
+			 	}
+				 	
 			 	$(".detailedTr").remove(); // remove the old row
+			 	
 			 	showDetailStatisticsView(rowIndex,id); // make a new detailed product data row
 			});
 		}
@@ -172,20 +179,22 @@ $(document).ready(function() {
 	        url : contextPath+"/statistics",
 	        data : {ID: ID},
 	        success : function(jsonString) {
-
-	        	var statObjJSON = jQuery.parseJSON(jsonString);
-	        	addDetailedStatisticsDataRow(rowIndex,statObjJSON);
 	        	
-	        	// make the animation
-	        	$('#statisticsTable > tbody > tr.detailedTr')
-	        	 .find('td')
-	        	 .wrapInner('<div style="display: none;" />')
-	        	 .parent()
-	        	 .find('td > div')
-	        	 .slideDown(600, function(){
-	        	 });
+	        	var statObjJSON = jQuery.parseJSON(jsonString);
 	        	
 	        	if(statObjJSON.response=="success"){
+	        		
+		        	addDetailedStatisticsDataRow(rowIndex,statObjJSON);
+		        	
+		        	// make the animation
+		        	$('#statisticsTable > tbody > tr.detailedTr')
+		        	 .find('td')
+		        	 .wrapInner('<div style="display: none;" />')
+		        	 .parent()
+		        	 .find('td > div')
+		        	 .slideDown(600, function(){
+		        	 });
+		        	
 	        		showSuccessNotification(statObjJSON.message);
 	        	}
 	        	else{
@@ -216,6 +225,8 @@ $(document).ready(function() {
 	 * saving the changed detailed statistics data
 	 */
 	$(document).on("click", ".saveStatisticDetailDataButton", function(){
+		
+		showLoadingDiv();
 		
 		var changedStatisticsJSON = makeChangedStatisticsJSON();
 		if(changedStatisticsJSON == null){

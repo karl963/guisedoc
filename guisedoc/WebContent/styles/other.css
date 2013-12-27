@@ -4,7 +4,6 @@
 
 body {
 	font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	padding-bottom: 70px;
 	color:#47423F;
 }
 
@@ -14,7 +13,6 @@ body {
 	left:1%;
 	margin-right:1%;
 	
-	padding-bottom:20px;
 	width:98%;
 }
 
@@ -31,16 +29,18 @@ body {
 */
 
 input[type="text"], input[type="password"], input[type="checkbox"], 
-input[type="date"], input[type="radio"], input[type="search"]{
+input[type="date"], input[type="radio"], input[type="search"],
+textarea{
 	border:1px dotted #47423F;
 }
 input[type="text"]:hover, input[type="password"]:hover, 
 input[type="checkbox"]:hover, input[type="date"]:hover,
-input[type="search"]:hover{
+input[type="search"]:hover, textarea:hover{
 	outline:1px solid #47423F;
 }
 input[type="text"]:focus, input[type="password"]:focus,
-input[type="date"]:focus, input[type="search"]:focus{
+input[type="date"]:focus, input[type="search"]:focus,
+textarea:focus{
 	outline:1px solid #527578;
 }
 

@@ -48,6 +48,7 @@ public class ClientsController {
 		}
 		
 		model.addAttribute("clients",clients);
+		model.addAttribute("pageRequest","clients");
 		
 		return "clients";
 	}

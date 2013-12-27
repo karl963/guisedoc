@@ -29,7 +29,11 @@ public class Product {
 	private Double o_price;
 	@SerializedName("storage")
 	private Double storage;
-
+	@SerializedName("discount")
+	private Double discount;
+	@SerializedName("amount")
+	private Double amount;
+	
 	@SerializedName("ID")
 	private long ID;
 	
@@ -49,11 +53,17 @@ public class Product {
 		this.price = Product.DEFAULT_DOUBLE;
 		this.o_price = Product.DEFAULT_DOUBLE;
 		this.storage = Product.DEFAULT_DOUBLE;
+		this.discount = Product.DEFAULT_DOUBLE;
+		this.amount = Product.DEFAULT_DOUBLE;
 		
 		this.ID = Product.DEFAULT_LONG;
 	}
 	
-	public Product(String code, String name, String e_name, String unit, String e_unit, Double price, Double o_price,Double storage, int ID){
+	public Product(String code, String name, String e_name, 
+			String unit, String e_unit, Double price,
+			Double o_price,Double storage,Double discount,
+			Double amount, int ID){
+		
 		this.code = code;
 		this.name = name;
 		this.e_name = e_name;
@@ -63,6 +73,8 @@ public class Product {
 		this.price =price;
 		this.o_price = o_price;
 		this.storage = storage;
+		this.discount = discount;
+		this.amount = amount;
 		
 		this.ID = ID;
 	}
@@ -147,6 +159,22 @@ public class Product {
 
 	public void setStorage(Double storage) {
 		this.storage = storage;
+	}
+	
+	public Double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Double discount) {
+		this.discount = discount;
+	}
+	
+	public Double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Double amount) {
+		this.amount = amount;
 	}
 
 	public String getComment() {

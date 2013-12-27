@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	
+
 	/*
 	 * Put default value for each input field
 	 */

@@ -26,6 +26,8 @@ public class StatisticsController {
 	@RequestMapping(value="/statistics", method = RequestMethod.GET)
 	public String statisticsView(Model model){
 		
+		model.addAttribute("pageRequest","statistics");
+		
 		return "statistics";
 	}
 	
