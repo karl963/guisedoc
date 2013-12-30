@@ -7,4 +7,7 @@
 <tiles:insertAttribute name="documentsBody" />
 <tiles:insertAttribute name="searchResults" />
 
+<tiles:insertAttribute name="clientSelect" />
+<tiles:insertAttribute name="importDocument"  />
+
 </div>

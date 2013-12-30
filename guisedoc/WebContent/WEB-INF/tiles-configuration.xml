@@ -56,6 +56,8 @@
 			<put-attribute name="searchResults" value="/WEB-INF/jsp/documents/searchResults.jsp" />
 			<put-attribute name="options" value="/WEB-INF/jsp/documents/options.jsp" />
 			<put-attribute name="documentsBody" value="/WEB-INF/jsp/documents/documents.jsp" />
+			<put-attribute name="clientSelect" value="/WEB-INF/jsp/documents/clientSelect.jsp" />
+			<put-attribute name="importDocument" value="/WEB-INF/jsp/documents/importDocument.jsp" />
 		</definition>
 	</put-attribute>
 </definition>

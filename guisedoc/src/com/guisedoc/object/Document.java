@@ -17,7 +17,9 @@ public class Document {
 	@SerializedName("ID")
 	private long ID;
 	@SerializedName("number")
-	private String number;
+	private long number;
+	@SerializedName("prefix")
+	private String prefix;
 	@SerializedName("name")
 	private String name;
 	@SerializedName("address")
@@ -36,8 +38,6 @@ public class Document {
 	private String shipmentTime;
 	@SerializedName("shipmentAddress")
 	private String shipmentAddress;
-	@SerializedName("shipmentPlace")
-	private String shipmentPlace;
 	@SerializedName("validDue")
 	private Double validDue;
 	@SerializedName("advance")
@@ -61,7 +61,8 @@ public class Document {
 	 */
 	
 	public Document(){
-		this.number = Document.DEFAULT_STRING;
+		this.number = Document.DEFAULT_LONG;
+		this.prefix = Document.DEFAULT_STRING;
 		this.name = Document.DEFAULT_STRING;
 		this.address = Document.DEFAULT_STRING;
 		this.additionalAddress = Document.DEFAULT_STRING;
@@ -71,7 +72,6 @@ public class Document {
 		this.email = Document.DEFAULT_STRING;
 		this.shipmentTime = Document.DEFAULT_STRING;
 		this.shipmentAddress = Document.DEFAULT_STRING;
-		this.shipmentPlace = Document.DEFAULT_STRING;
 		this.validDue = Document.DEFAULT_DOUBLE;
 		this.advance = Document.DEFAULT_DOUBLE;
 		this.paymentRequirement = Document.DEFAULT_LONG;
@@ -87,7 +87,9 @@ public class Document {
 	 * Methods
 	 */
 	
-	
+	public String getFullNumber(){
+		return prefix+number;
+	}
 	
 	
 	/*
@@ -110,11 +112,11 @@ public class Document {
 		ID = iD;
 	}
 
-	public String getNumber() {
+	public long getNumber() {
 		return number;
 	}
 
-	public void setNumber(String number) {
+	public void setNumber(long number) {
 		this.number = number;
 	}
 
@@ -190,14 +192,6 @@ public class Document {
 		this.shipmentAddress = shipmentAddress;
 	}
 
-	public String getShipmentPlace() {
-		return shipmentPlace;
-	}
-
-	public void setShipmentPlace(String shipmentPlace) {
-		this.shipmentPlace = shipmentPlace;
-	}
-
 	public Double getValidDue() {
 		return validDue;
 	}
@@ -260,6 +254,14 @@ public class Document {
 
 	public void setProducts(List<Product> products) {
 		this.products = products;
+	}
+
+	public String getPrefix() {
+		return prefix;
+	}
+
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
 	}
 	
 }

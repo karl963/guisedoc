@@ -259,6 +259,8 @@ $(document).ready(function() {
 			"'address':'"+address+"'";
 		
 		clientJSONString += "}";
+		
+		return clientJSONString;
 	};
 	
 	var addClientSearchHistory = function(){

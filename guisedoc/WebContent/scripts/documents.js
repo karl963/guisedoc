@@ -3,26 +3,55 @@ var isEstonian = true;
 $(document).ready(function() {
 	
 	/*
-	 * Animation for hiding the options div
+	 * loading saved options from localstorage
 	 */
-	$(document).on("click","#hideOrShowDocumentsOptionDiv",function(){
+
+	/*************************************************************
+	 * MAKING NEW DOCUMENT
+	 *************************************************************/
+	/*
+	 * making a new document by selecting the type from selectBox
+	 */
+	$(document).on("change", "#newDocumentSelect", function(){
 		
-		if($("#hideOrShowDocumentsOptionDiv").hasClass("isHidden")){
-			$('#documentsOptionsDiv').slideDown(600, function(){
-				
-				$("#hideOrShowDocumentsOptionDiv").html("Peida dokumendi andmed");
-				$("#hideOrShowDocumentsOptionDiv").removeClass("isHidden");
-			});
+		var type = $(this).val();
+		
+		if(type == "existing"){ // selected the old/existing document
+			showSelectExistingDocumentDiv();
 		}
-		else{
-			$('#documentsOptionsDiv').slideUp(200, function(){
-				
-				$("#hideOrShowDocumentsOptionDiv").html("Ava dokumendi andmed");
-				$("#hideOrShowDocumentsOptionDiv").addClass("isHidden");
-			});
+		else if(type != "-" && type != "default"){ // selected new document
+			
+			showLoadingDiv();
+			
+			$.ajax({
+		        type : "POST",
+		        url : contextPath+"/documents",
+		        data : {newDocumentType: type},
+		        success : function(response) {
+		        	
+		        	if(response.split(";")[0]=="success"){
+		        		clearFieldsAndMakeVisible(type,response.split(";")[2]);
+		        	}
+		        	else{
+		        		showErrorNotification(response.split(";")[1]);
+		        	}
+		        	
+		        	hideLoadingDiv();
+		        },
+		        error : function(e) {
+		        	hideLoadingDiv();
+		        	showErrorNotification("Viga serveriga ühendumisel");
+		        }
+		    });
 		}
+		
+		$(this).val("default");
 	});
 	
+	
+	/*************************************************************
+	 * PRODUCTS HANDLING
+	 *************************************************************/
 	/*
 	 * adding a new product to list by clicking add button
 	 */
@@ -284,8 +313,36 @@ $(document).ready(function() {
 	 */
 	$(document).on("click", ".saveDocumentsDetailDataButton", function(){
 		
+		showLoadingDiv();
 		
+		var productJSON = checkInputAndMakeProductJSON();
+		if(productJSON == null){
+			return;
+		}
 		
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/documents",
+	        data : {savedProductJSON:productJSON},
+	        success : function(response) {
+	        	
+	        	if(response.split(";")[0]=="success"){
+	        		showSuccessNotification(response.split(";")[1]);
+	        		
+	        		var product = jQuery.parseJSON(productJSON.replace(/\n/g,"\\n")); // replace newline with newline
+	        		
+	        		changeTableRowData(product);
+	        	}
+	        	else{
+	        		showErrorNotification(response.split(";")[1]);
+	        	}
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
 	});
 	
 	/*
@@ -298,7 +355,7 @@ $(document).ready(function() {
 	        data : {detailedProductID:id},
 	        success : function(responseJSONString) {
 	        	
-	        	var responseJSON = jQuery.parseJSON(responseJSONString);
+	        	var responseJSON = jQuery.parseJSON(responseJSONString.replace(/\n/g,"\\n")); // replace newline with newline
 	        	
 	        	if(responseJSON.response=="success"){
 	        		addDetailedDocumentsProductDataRow(rowIndex,responseJSON.product);
@@ -324,6 +381,94 @@ $(document).ready(function() {
 	        	showErrorNotification("Viga serveriga ühendumisel");
 	        }
 	    });
+	};
+	
+	/*
+	 * makes JSON out of detailed changed product 
+	 */
+	var checkInputAndMakeProductJSON = function(){
+		
+		var ID = $("#documentsDetailIDDiv").html();
+		var code = $("#documentsDetailCodeInput").val();
+		var name = $("#documentsDetailNameInput").val();
+		var e_name = $("#documentsDetailENameInput").val();
+		var unit = $("#documentsDetailUnitInput").val();
+		var e_unit = $("#documentsDetailEUnitInput").val();
+		var price = $("#documentsDetailPriceInput").val();
+		var o_price = $("#documentsDetailOPriceInput").val();
+		var amount = $("#documentsDetailAmountInput").val();
+		var discount = $("#documentsDetailDiscountInput").val();
+		var sum = $("#documentsDetailSumInput").val();
+		var additional_info = $("#documentsDetailInfoInput").val();
+		var comments = $("#documentsDetailCommentInput").val();
+		
+		/*
+		 * check for incorrect input
+		 */
+		if(checkForInvalidStringCharacters(new Array(
+				new Array(code,"documentsDetailCodeInput"),
+				new Array(name,"documentsDetailNameInput"),
+				new Array(unit,"documentsDetailUnitInput"),
+				new Array(e_name,"documentsDetailENameInput"),
+				new Array(e_unit,"documentsDetailEUnitInput"),
+				new Array(additional_info,"documentsDetailInfoInput"),
+				new Array(comments,"documentsDetailCommentInput")
+				))){
+			return;
+		}
+		if(checkForInvalidNumberCharacters(new Array(
+				new Array(amount,"documentsDetailAmountInput"),
+				new Array(price,"documentsDetailPriceInput"),
+				new Array(o_price,"documentsDetailOPriceInput"),
+				new Array(discount,"documentsDetailDiscountInput"),
+				new Array(sum,"documentsDetailSumInput")
+				))){
+			return;
+		}
+		
+		var productJSON = '{'+
+			'"ID":'+ID+','+
+			'"code":"'+code+'",'+
+			'"name":"'+name+'",'+
+			'"e_name":"'+e_name+'",'+
+			'"unit":"'+unit+'",'+
+			'"e_unit":"'+e_unit+'",'+
+			'"price":'+price+','+
+			'"o_price":'+o_price+','+
+			'"amount":'+amount+','+
+			'"discount":'+discount+','+
+			'"sum":'+sum+','+
+			'"additional_info":"'+additional_info+'",'+
+			'"commencts":"'+comments+'"'+
+			'}';
+
+		return productJSON;
+	};
+	
+	/*
+	 * changes table row data according to product changed
+	 */
+	var changeTableRowData = function(product){
+		
+		var productRow = $("#documentsProduct"+product.ID);
+		
+		productRow.children(".documentsCodeTd").html(product.code);
+		productRow.children(".documentsAmountTd").html(product.amount);
+		productRow.children(".documentsDiscountTd").html(product.discount);
+		productRow.children(".documentsSumTd").html(product.sum);
+		
+		var name = product.name;
+		var unit = product.unit;
+		var price = product.price;
+		if(!isEstonian){
+			name = product.e_name;
+			unit = product.e_unit;
+			price = product.o_price;
+		}
+
+		productRow.children(".documentsNameTd").html(name);
+		productRow.children(".documentsPriceTd").html(price);
+		productRow.children(".documentsUnitTd").html(unit);
 	};
 	
 	/*
@@ -409,12 +554,12 @@ $(document).ready(function() {
 			
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<div>Lisainfo</div>" +
-					"<textarea id='documentsDetailInfoInput' >"+product.additionalInfo+"</textarea>" +
+					"<textarea id='documentsDetailInfoInput' >"+product.additional_info+"</textarea>" +
 				"</div>" +
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<div>Märkused</div>" +
-					"<div><textarea id='documentsDetailCommentInput' >"+product.comment+"</textarea></div>" +
+					"<div><textarea id='documentsDetailCommentInput' >"+product.comments+"</textarea></div>" +
 				"</div>" +
 			
 			"</div>";
@@ -691,4 +836,39 @@ $(document).ready(function() {
 		
 		document.getElementById("documentsSearchResultsDiv").appendChild(productDiv);
 	};
+	
+	/*
+	 * makes input fields empty, clears table,
+	 * shows the right fields accoring to document type
+	 */
+	var clearFieldsAndMakeVisible = function(type, number){
+		
+		var tabHTML = "<span class='documentsTab'>"+number+"</span>";
+		$(tabHTML).insertBefore("#newDocumentTab"); // insert it before the newTab span
+		
+	};
+	
+	/*************************************************************
+	 * OTHER
+	 *************************************************************/
+	/*
+	 * Animation for hiding the options div
+	 */
+	$(document).on("click","#hideOrShowDocumentsOptionDiv",function(){
+		
+		if($("#hideOrShowDocumentsOptionDiv").hasClass("isHidden")){
+			$('#documentsOptionsDiv').slideDown(600, function(){
+				
+				$("#hideOrShowDocumentsOptionDiv").html("Peida dokumendi andmed");
+				$("#hideOrShowDocumentsOptionDiv").removeClass("isHidden");
+			});
+		}
+		else{
+			$('#documentsOptionsDiv').slideUp(200, function(){
+				
+				$("#hideOrShowDocumentsOptionDiv").html("Ava dokumendi andmed");
+				$("#hideOrShowDocumentsOptionDiv").addClass("isHidden");
+			});
+		}
+	});
 });

@@ -17,6 +17,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.guisedoc.object.Client;
+import com.guisedoc.object.Document;
 import com.guisedoc.object.Firm;
 import com.guisedoc.object.Product;
 import com.guisedoc.object.User;
@@ -28,8 +30,11 @@ public class DocumentsController {
 	public static String PRODUCT_DELETE_SUCCESS = "Toodete eemaldamine õnnestus";
 	public static String PRODUCT_SEARCH_SUCCESS = "Toodete otsimine õnnestus";
 	public static String PRODUCT_DETAILED_SUCCESS = "Toote täpsemate andmete kuvamine õnnestus";
+	public static String PRODUCT_SAVE_SUCCESS = "Toote salvestamine õnnestus";
+	public static String CLIENT_SEARCH_SUCCESS = "Klientide otsimine õnnestus";
 	
 	List<Product> mainProducts = new ArrayList<Product>();
+	List<Document> documents = new ArrayList<Document>();
 	
 	@RequestMapping(value="/documents", method = RequestMethod.GET)
 	public String documentsView(Model model){
@@ -55,6 +60,8 @@ public class DocumentsController {
 				mainProducts.add(p);
 			}
 		}
+		
+		model.addAttribute("documents",documents);
 		
 		return "documents";
 	}
@@ -122,6 +129,8 @@ public class DocumentsController {
 			}
 		}
 		
+		p.setAdditional_Info("asd\ndddddasdasd");
+		
 		resultJSON += ""+
 			"'ID':"+p.getID()+","+
 			"'code':'"+p.getCode()+"',"+
@@ -132,8 +141,8 @@ public class DocumentsController {
 			"'price':"+p.getPrice()+","+
 			"'o_price':"+p.getO_price()+","+
 			"'discount':"+p.getDiscount()+","+
-			"'comment':'"+p.getComment()+"',"+
-			"'additionalInfo':'"+p.getAdditionalInfo()+"',"+
+			"'comments':'"+p.getComments()+"',"+
+			"'additional_info':'"+p.getAdditional_Info()+"',"+
 			"'storage':"+p.getStorage()+","+
 			"'amount':"+p.getAmount()+
 		"}}";
@@ -253,4 +262,79 @@ public class DocumentsController {
 		return productsJSON;
 	}
 	
+	@RequestMapping(value="/documents", method = RequestMethod.POST, params={"savedProductJSON"})
+	@ResponseBody
+	public String saveDetailedProduct(@RequestParam("savedProductJSON")String productJSON){
+
+		Gson gson = new Gson();
+	    
+		Product product = gson.fromJson(productJSON, Product.class);
+	    
+		return "success;"+DocumentsController.PRODUCT_SAVE_SUCCESS;
+	}
+	
+	@RequestMapping(value="/documents", method = RequestMethod.POST, params={"newDocumentType"})
+	@ResponseBody
+	public String makeNewDocument(@RequestParam("newDocumentType")String type){
+
+		Document d = new Document();
+		d.setNumber(documents.size());
+		d.setPrefix(type);
+		documents.add(d);
+		
+		if(documents.size()>5){
+			documents.removeAll(documents);
+		}
+		
+		return "success;"+DocumentsController.PRODUCT_ADD_SUCCESS+";"+d.getFullNumber();
+	}
+	
+	
+	/*********************************************************
+	 * CLIENT SELECTION
+	 *********************************************************/
+	@RequestMapping(value="/documents", method = RequestMethod.POST, params={"clientType"})
+	@ResponseBody
+	public String getClientsByType(@RequestParam("clientType")String type){
+
+		String clientsJSON = "{'clients':[";
+		
+		List<Client> clients = new ArrayList<Client>();
+		
+		for(int i = 0; i< 500 ; i++){
+			Client c = new Client();
+			c.setName("name"+i);
+			c.setTotalBoughtFor(i*1.0);
+			c.setContactPerson("contasf"+i);
+			c.setTotalDeals(i);
+			clients.add(c);
+		}
+		
+		boolean wasClient = false;
+		for(Client c : clients){
+			
+			if(wasClient){
+				clientsJSON += ",";
+			}
+			
+			clientsJSON += "{"+
+	    		"'ID':"+c.getID()+","+
+	    		"'contactPerson':'"+c.getContactPerson()+"',"+
+		    	"'name':'"+c.getName()+"',"+
+		    	"'totalDeals':"+c.getTotalDeals()+","+
+		    	"'totalSum':"+c.getTotalBoughtFor()+
+		    "}";
+
+			wasClient = true;
+	    }
+		
+		
+		
+		clientsJSON += "],'message':'"+DocumentsController.CLIENT_SEARCH_SUCCESS+"',"
+	    		+ "'response':'success'}";
+	    
+		clientsJSON = clientsJSON.replaceAll("'", "\"");
+	    
+		return clientsJSON;
+	}
 }

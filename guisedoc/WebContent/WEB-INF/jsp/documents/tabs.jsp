@@ -1,7 +1,21 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <div id="documentsTabsDiv">
-	<span class="documentsTab" id="newDocumentTab">+ Uus dokument</span>
-	<span class="documentsTab" id="newDocumentTab">Uus dokument</span>
-	<span class="documentsTab" id="newDocumentTab">Uus dokument</span>
-	<span class="documentsTab" id="newDocumentTab">Uus dokument</span>
-	<span class="documentsTab" id="newDocumentTab">Uus dokument</span>
+	<c:forEach items="${documents}" var="document">
+		<span class="documentsTab">${document.fullNumber}</span>
+	</c:forEach>
+	<span class="documentsTab" id="newDocumentTab">
+		Uus dokument: 
+		<select id="newDocumentSelect">
+			<option value="default" selected="selected" disabled="disabled">-- valige tüüp --</option>
+			<option value="Quotation" >Hinnapakkumine</option>
+			<option value="Invoice" >Arve</option>
+			<option value="Advance_invoice" >Ettemaksu Arve</option>
+			<option value="Order_confirmation" >Tellimuse kinnitus</option>
+			<option value="Delivery_note" >Saateleht</option>
+			<option value="Order" >Order</option>
+			<option value="-" disabled >----------------</option>
+			<option value="existing">Vana dokument</option>
+		</select>
+	</span>
 </div>

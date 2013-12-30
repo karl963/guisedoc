@@ -13,7 +13,8 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/other.css" type="text/css" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/styles/menu.css" type="text/css" />
 
-<script>var contextPath = "${pageContext.request.contextPath}";</script>
+<script>var contextPath = "${pageContext.request.contextPath}";
+		var activeLink = "${pageRequest}"</script>
 <script src="${pageContext.request.contextPath}/scripts/jquery-1.10.2.min.js" type="text/javascript" ></script>
 <script src="${pageContext.request.contextPath}/scripts/other.js" type="text/javascript" ></script>
 <script src="${pageContext.request.contextPath}/scripts/menu.js" type="text/javascript" ></script>
@@ -24,7 +25,11 @@
 <c:choose>
 	<c:when test="${pageRequest == 'documents'}">
 		<script src="${pageContext.request.contextPath}/scripts/documents.js" type="text/javascript" ></script>
+		<script src="${pageContext.request.contextPath}/scripts/clientSelect.js" type="text/javascript" ></script>
+		<script src="${pageContext.request.contextPath}/scripts/importDocument.js" type="text/javascript" ></script>
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/documents.css" type="text/css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/clientSelect.css" type="text/css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/importDocument.css" type="text/css" />
 	</c:when>
 	<c:when test="${pageRequest == 'manage-products'}">
 		<script src="${pageContext.request.contextPath}/scripts/products.js" type="text/javascript" ></script>

@@ -18,10 +18,10 @@ public class Product {
 	private String unit;
 	@SerializedName("e_unit")
 	private String e_unit;
-	@SerializedName("comment")
-	private String comment;
-	@SerializedName("additionalInfo")
-	private String additionalInfo;
+	@SerializedName("comments")
+	private String comments;
+	@SerializedName("additional_info")
+	private String additional_info;
 
 	@SerializedName("price")
 	private Double price;
@@ -47,8 +47,8 @@ public class Product {
 		this.e_name = Product.DEFAULT_STRING;
 		this.unit = Product.DEFAULT_STRING;
 		this.e_unit = Product.DEFAULT_STRING;
-		this.comment = Product.DEFAULT_STRING;
-		this.additionalInfo = Product.DEFAULT_STRING;
+		this.comments = Product.DEFAULT_STRING;
+		this.additional_info = Product.DEFAULT_STRING;
 		
 		this.price = Product.DEFAULT_DOUBLE;
 		this.o_price = Product.DEFAULT_DOUBLE;
@@ -83,7 +83,20 @@ public class Product {
 	 * methods
 	 */
 	
-	
+	public String toString(){
+		return "ID:"+ID+","+
+				"code:"+code+","+
+				"name:"+name+","+
+				"e_name:"+e_name+","+
+				"unit:"+unit+","+
+				"e_unit:"+e_unit+","+
+				"price:"+price+","+
+				"o_price:"+o_price+","+
+				"amount:"+amount+","+
+				"discount:"+discount+","+
+				"additional_info:"+additional_info+","+
+				"comments:"+comments;
+	}
 	
 	/*
 	 * GETTERS AND SETTERS
@@ -177,19 +190,20 @@ public class Product {
 		this.amount = amount;
 	}
 
-	public String getComment() {
-		return comment;
+	public String getComments() {
+		return comments;
 	}
 
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 	
-	public String getAdditionalInfo() {
-		return additionalInfo;
+	public String getAdditional_Info() {
+		return additional_info;
 	}
 
-	public void setAdditionalInfo(String additionalInfo) {
-		this.additionalInfo = additionalInfo;
+	public void setAdditional_Info(String additional_info) {
+		this.additional_info = additional_info;
 	}
+
 }

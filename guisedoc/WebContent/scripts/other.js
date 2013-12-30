@@ -10,7 +10,7 @@ $(document).ready(function(){
 	/*
 	 * On click, if there was an error in input field, it's invalid class notifier would be removed
 	 */
-	$(document).on("focus","input", function(){
+	$(document).on("focus","input, textarea", function(){
 		if($(this).hasClass("invalidInputCharacter")){
 			$(this).removeClass("invalidInputCharacter");
 		}
@@ -114,7 +114,7 @@ function checkForInvalidStringCharacters(array){
 			
 			var char = string.charAt(j);
 
-			if(validStringCharacters.indexOf(char) < 0){ // doesn't find a character in valid list
+			if(validStringCharacters.indexOf(char) < 0 && char != "\n"){ // doesn't find a character in valid list nad isn't newLine
 				hadInvalidCharacter = true;
 				
 				giveInvalidInputMessage(elementId,"Sisendväli sisaldab keelatud või üleliigset karakterit: "+char);
