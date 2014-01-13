@@ -38,7 +38,19 @@
 	overflow:auto;
 }
 
+#clientNameInputDiv{
+	width:150px;
+	display:inline-block;
+}
+
 #clientSelectTableDiv{
 	height:80%;
 	overflow-y:auto;
+}
+#clientSelectTable{
+	width:100%;
+}
+.clientTableRow:hover{
+	cursor:default;
+	background-color:#9cbfbf;
 }

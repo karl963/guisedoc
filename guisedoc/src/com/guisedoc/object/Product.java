@@ -7,6 +7,7 @@ public class Product {
 	public static String DEFAULT_STRING = "";
 	public static Double DEFAULT_DOUBLE = 0.0;
 	public static long DEFAULT_LONG = 0;
+	public static boolean DEFAULT_BOOLEAN = true;
 	
 	@SerializedName("code")
 	private String code;
@@ -33,14 +34,23 @@ public class Product {
 	private Double discount;
 	@SerializedName("amount")
 	private Double amount;
-	
+	@SerializedName("totalSum")
+	private Double totalSum;
+
 	@SerializedName("ID")
 	private long ID;
+	@SerializedName("unitID")
+	private long unitID;
+	@SerializedName("queueNumber")
+	private long queueNumber;
+	
+	@SerializedName("calculateSum")
+	private boolean calculateSum;
 	
 	/*
 	 * CONSTRUCTORS
 	 */
-	
+
 	public Product(){
 		this.code = Product.DEFAULT_STRING;
 		this.name = Product.DEFAULT_STRING;
@@ -55,14 +65,18 @@ public class Product {
 		this.storage = Product.DEFAULT_DOUBLE;
 		this.discount = Product.DEFAULT_DOUBLE;
 		this.amount = Product.DEFAULT_DOUBLE;
+		this.totalSum = Product.DEFAULT_DOUBLE;
+		this.queueNumber = Product.DEFAULT_LONG;
 		
 		this.ID = Product.DEFAULT_LONG;
+		this.unitID = Product.DEFAULT_LONG;
+		this.calculateSum = Product.DEFAULT_BOOLEAN;
 	}
 	
 	public Product(String code, String name, String e_name, 
 			String unit, String e_unit, Double price,
 			Double o_price,Double storage,Double discount,
-			Double amount, int ID){
+			Double amount,Double totalSum, int ID){
 		
 		this.code = code;
 		this.name = name;
@@ -75,14 +89,27 @@ public class Product {
 		this.storage = storage;
 		this.discount = discount;
 		this.amount = amount;
+		this.totalSum = totalSum;
+		this.queueNumber = Product.DEFAULT_LONG;
+		
+		this.calculateSum = Product.DEFAULT_BOOLEAN;
 		
 		this.ID = ID;
+		this.unitID = Product.DEFAULT_LONG;
 	}
 	
 	/*
 	 * methods
 	 */
 	
+	public boolean isCalculateSum() {
+		return calculateSum;
+	}
+
+	public void setCalculateSum(boolean calculateSum) {
+		this.calculateSum = calculateSum;
+	}
+
 	public String toString(){
 		return "ID:"+ID+","+
 				"code:"+code+","+
@@ -96,6 +123,10 @@ public class Product {
 				"discount:"+discount+","+
 				"additional_info:"+additional_info+","+
 				"comments:"+comments;
+	}
+	
+	public boolean hasAdditionalInformation(){
+		return (!additional_info.replaceAll("\\s","").equals(""));
 	}
 	
 	/*
@@ -163,7 +194,15 @@ public class Product {
 	}
 
 	public void setID(long iD) {
-		ID = iD;
+		this.ID = iD;
+	}
+	
+	public long getUnitID() {
+		return unitID;
+	}
+
+	public void setUnitID(long unitiD) {
+		this.unitID = unitiD;
 	}
 	
 	public Double getStorage() {
@@ -206,4 +245,20 @@ public class Product {
 		this.additional_info = additional_info;
 	}
 
+	public Double getTotalSum() {
+		return totalSum;
+	}
+
+	public void setTotalSum(Double totalSum) {
+		this.totalSum = totalSum;
+	}
+
+	public long getQueueNumber() {
+		return queueNumber;
+	}
+
+	public void setQueueNumber(long queueNumber) {
+		this.queueNumber = queueNumber;
+	}
+	
 }

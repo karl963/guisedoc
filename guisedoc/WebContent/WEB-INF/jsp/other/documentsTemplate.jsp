@@ -1,13 +1,15 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%> 
-
-<div class="contentBody">
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <tiles:insertAttribute name="tabs" />
-<tiles:insertAttribute name="options" />
-<tiles:insertAttribute name="documentsBody" />
-<tiles:insertAttribute name="searchResults" />
 
-<tiles:insertAttribute name="clientSelect" />
-<tiles:insertAttribute name="importDocument"  />
-
-</div>
+<c:choose>
+<c:when test="${howManyDocuments > 0}" >
+	<tiles:insertAttribute name="options" />
+	<tiles:insertAttribute name="documentsBody" />
+	<tiles:insertAttribute name="searchResults" />
+	
+	<tiles:insertAttribute name="clientSelect" />
+	<tiles:insertAttribute name="importDocument"  />
+</c:when>
+</c:choose>

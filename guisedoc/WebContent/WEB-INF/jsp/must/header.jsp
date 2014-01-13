@@ -15,7 +15,7 @@
 
 <script>var contextPath = "${pageContext.request.contextPath}";
 		var activeLink = "${pageRequest}"</script>
-<script src="${pageContext.request.contextPath}/scripts/jquery-1.10.2.min.js" type="text/javascript" ></script>
+<script src="${pageContext.request.contextPath}/scripts/jquery/jquery-1.10.2.js" type="text/javascript" ></script>
 <script src="${pageContext.request.contextPath}/scripts/other.js" type="text/javascript" ></script>
 <script src="${pageContext.request.contextPath}/scripts/menu.js" type="text/javascript" ></script>
 
@@ -24,6 +24,9 @@
  -->
 <c:choose>
 	<c:when test="${pageRequest == 'documents'}">
+		<script src="${pageContext.request.contextPath}/scripts/jquery/jquery-ui-1.10.3.js" type="text/javascript" ></script>
+		<script src="${pageContext.request.contextPath}/scripts/jquery/jquery.cookie.js" type="text/javascript" ></script>
+		<script src="${pageContext.request.contextPath}/scripts/jquery/jquery.tablesorter.min.js" type="text/javascript" ></script>
 		<script src="${pageContext.request.contextPath}/scripts/documents.js" type="text/javascript" ></script>
 		<script src="${pageContext.request.contextPath}/scripts/clientSelect.js" type="text/javascript" ></script>
 		<script src="${pageContext.request.contextPath}/scripts/importDocument.js" type="text/javascript" ></script>
@@ -46,6 +49,10 @@
 	<c:when test="${pageRequest == 'manage-user-data'}">
 		<script src="${pageContext.request.contextPath}/scripts/user.js" type="text/javascript" ></script>
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/user.css" type="text/css" />
+	</c:when>
+	<c:when test="${pageRequest == 'settings'}">
+		<script src="${pageContext.request.contextPath}/scripts/settings.js" type="text/javascript" ></script>
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/settings.css" type="text/css" />
 	</c:when>
 </c:choose>
 

@@ -1,25 +1,40 @@
 <div id="documentsTableDiv">
 
-<table id="documentsTable">
 
+<table id="searchTable">
 <tr>
-	<th class="documentsCodeTd"><input type="search" class="searchInputField defaultInputField productSearchField" id="documentsCodeInput" value="Kood" /></th>
-	<th class="documentsNameTd" colspan=2><input type="search" class="searchInputField defaultInputField productSearchField" id="documentsNameInput" value="Nimetus" /></th>
-	<th class="documentsAmountTd"><input type="search" class="searchInputField defaultInputField" id="documentsAmountInput" value="Kogus" /></th>
-	<th class="documentsPriceTd"><input type="search" class="searchInputField defaultInputField productSearchField" id="documentsPriceInput" value="Hind" /></th>
-	<th class="documentsUnitTd"><input type="search" class="searchInputField defaultInputField productSearchField" id="documentsUnitInput" value="Ühik" /></th>
-	<th class="documentsSumTd" colspan=2><input type="Button" class="defaultButton" value="Lisa" id="addProductToDocument"/></th>
+	<td class="documentsCodeTd"><input type="search" class="searchInputField defaultInputField productSearchField" id="documentsCodeInput" value="Kood" /></td>
+	<td class="documentsNameTd" colspan=2><input type="search" class="searchInputField defaultInputField productSearchField" id="documentsNameInput" value="Nimetus" /></td>
+	<td class="documentsAmountTd"><input type="search" class="searchInputField defaultInputField" id="documentsAmountInput" value="Kogus" /></td>
+	<td class="documentsPriceTd"><input type="search" class="searchInputField defaultInputField productSearchField" id="documentsPriceInput" value="Hind" /></td>
+	<td class="documentsUnitTd"><input type="search" class="searchInputField defaultInputField productSearchField" id="documentsUnitInput" value="Ühik" /></td>
+	<td colspan=2><input type="Button" class="defaultButton" value="Lisa" id="addProductToDocument"/></td>
 </tr>
-<tr class="tableHeaderRow">
-	<th class="documentsCodeTd">Kood</th>
-	<th class="documentsNameTd">Nimetus</th>
-	<th class="documentsAmountTd">Kogus</th>
-	<th class="documentsPriceTd">Hind</th>
-	<th class="documentsUnitTd">Ühik</th>
-	<th class="documentsDiscountTd">Ale</th>
-	<th class="documentsSumTd">Summa</th>
-	<th class="documentsDeleteTd"><input id="documentsDeleteSelectedProducts" class="defaultButton" type="button" value="Kustuta valitud"/></th>
-</tr>
+</table>
+<table id="documentsTable">
+<thead>
+	<tr class="tableHeaderRow">
+		<th class="documentsCodeTd tableBorderRight">Kood</th>
+		<th class="documentsNameTd tableBorderRight">
+			<div class="productEstonianDiv">Nimetus</div>
+			<div class="productEnglishDiv hidden">Inglise nimetus</div>
+		</th>
+		<th class="documentsAmountTd tableBorderRight">Kogus</th>
+		<th class="documentsPriceTd tableBorderRight">
+			<div class="productEstonianDiv">Hind</div>
+			<div class="productEnglishDiv hidden">Ostu Hind</div>
+		</th>
+		<th class="documentsUnitTd tableBorderRight">
+			<div class="productEstonianDiv">Ühik</div>
+			<div class="productEnglishDiv hidden">Inglise ühik</div>
+		</th>
+		<th class="documentsDiscountTd tableBorderRight">Ale</th>
+		<th>Summa</th>
+		<th class="documentsDeleteTd"><input id="documentsDeleteSelectedProducts" class="defaultButton" type="button" value="Kustuta valitud"/></th>
+	</tr>
+</thead>
+<tbody>
+</tbody>
 
 </table>
 

@@ -14,6 +14,18 @@ $(document).ready(function(){
 	});
 	
 	/*
+	 * typing the name into the search field
+	 */
+	$(document).on("input", "#clientSearchName", function(){
+		if($("#clientTypeSelect").val() == "default" ||
+				$("#clientTypeSelect").val()==null){ // the type isn't selected
+			return;
+		}
+
+		$("#clientTypeSelect").change();
+	});
+	
+	/*
 	 * choosing the client type and making post according to it
 	 */
 	$(document).on("change", "#clientTypeSelect", function(){
@@ -26,10 +38,20 @@ $(document).ready(function(){
 		
 		showLoadingDiv();
 		
+		var name = $("#clientSearchName").val();
+		if(name == $("#clientSearchName").data("default_val")){
+			name = "";
+		}
+		if(checkForInvalidStringCharacters(new Array(
+				new Array(name,"clientSearchName")
+				))){
+			return;
+		}
+		
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/documents",
-	        data : {clientType: type},
+	        url : contextPath+"/documents/client/search",
+	        data : {clientType: type, clientName:name},
 	        success : function(response) {
 	        	
 	        	var clientsJSON = jQuery.parseJSON(response);
@@ -42,6 +64,42 @@ $(document).ready(function(){
 	        	}
 	        	else{
 	        		showErrorNotification(clientsJSON.message);
+	        	}
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+		
+	});
+	
+	/*
+	 * user selects a client by clicking on the row
+	 */
+	$(document).on("click", ".clientTableRow", function(){
+		
+		var id = $(this).children(".clientNameTd").children(".clientID").html();
+		var type = $("#clientTypeSelect").val();
+		var documentID = $("#insertDocumentID").html();
+		
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/documents/client/select",
+	        data : {selectedClientID:id, selectedClientType:type, currentDocumentID:documentID},
+	        success : function(response) {
+	        	
+	        	var responseJSON = jQuery.parseJSON(response);
+	        	
+	        	if(responseJSON.response=="success"){
+	        		addSelectedClientToDocument(responseJSON.client);
+	        		$("#clientSelectDiv").hide();
+	        		
+	        		showSuccessNotification(responseJSON.message);
+	        	}
+	        	else{
+	        		showErrorNotification(responseJSON.message);
 	        	}
 	        	hideLoadingDiv();
 	        },
@@ -75,8 +133,9 @@ $(document).ready(function(){
 		var cell3 = row.insertCell(2);
 		var cell4 = row.insertCell(3);
 		
-		cell1.className += "tableBorderRight";
+		cell1.className += "tableBorderRight clientNameTd";
 		cell1.innerHTML = client.name;
+		cell1.innerHTML += "<div class='clientID hidden'>"+client.ID+"</div>";
 		
 		cell2.className += "tableBorderRight";
 		cell2.innerHTML = client.contactPerson;
@@ -87,4 +146,16 @@ $(document).ready(function(){
 		cell4.innerHTML = client.totalSum;
 	};
 	
+	/*
+	 * adds the selected client to the document
+	 */
+	var addSelectedClientToDocument = function(client){
+		$("#insertClientID").html(client.ID);
+		$("#insertClientName").val(client.name);
+		$("#insertContactPerson").val(client.contactPerson);
+		$("#insertClientAddress").val(client.address);
+		$("#insertClientAdditionalAddress").val(client.additionalAddress);
+		$("#insertClientPhone").val(client.phone);
+		$("#insertEmail").val(client.email);
+	};
 });

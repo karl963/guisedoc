@@ -44,7 +44,7 @@ $(document).ready(function() {
 
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/clients",
+	        url : contextPath+"/clients/detailed",
 	        data : {id: id},
 	        success : function(jsonString) {
 
@@ -52,15 +52,7 @@ $(document).ready(function() {
 	        	
 	        	addClientDetailedDataRow(rowIndex,clientJSON);
 	        	
-	        	// make the animation
-	        	$('#clientsTable > tbody > tr.detailedTr')
-	        	 .find('td')
-	        	 .wrapInner('<div style="display: none;" />')
-	        	 .parent()
-	        	 .find('td > div')
-	        	 .slideDown(600, function(){
-
-	        	 });
+	        	openDetailedDataDiv("clientsTable");
 	        	
 	        	if(clientJSON.response=="success"){
 	        		showSuccessNotification(clientJSON.message);
@@ -79,6 +71,67 @@ $(document).ready(function() {
 	}
 	
 	/*
+	 * Searching for clients documents with a number input
+	 */
+	$(document).on("input","#searchClientDetailNumber",function(){
+		
+		showLoadingDiv();
+		
+		var number = $(this).val();
+		
+		if(number == $(this).data("default_val")){
+			return;
+		}
+		
+		if(checkForInvalidStringCharacters(new Array(
+				new Array(number,"searchClientDetailNumber")
+				))){
+			return;
+		}
+		
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/clients/searchDocument",
+	        data : {documentNumber:number},
+	        success : function(responseJSON) {
+	        	
+	        	var documentsJSON = jQuery.parseJSON(responseJSON);
+	        	
+	        	if(documentsJSON.response=="success"){
+	        		showSuccessNotification(documentsJSON.message);
+	        		
+	        		updateClientDetailDocuments(documentsJSON.documents);
+	        	}
+	        	else{
+	        		showErrorNotification(documentsJSON.message);
+	        	}
+	        	
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	var updateClientDetailDocuments = function(documentsJSON){
+		$(".documentNumberDiv").remove();
+		var numbersHTML = "";
+		for(var i = 0; i<documentsJSON.length ;i++){
+			var doc = documentsJSON[i];
+			
+			numbersHTML += "<div class='documentNumberDiv'>"+
+			
+			doc.fullNumber+" <small><i>("+doc.totalSum+", "+doc.formatedDate+")</i></small>"+
+			
+			"</div>";
+		}
+		
+		$("#clientDetailNumbersDiv").html(numbersHTML);
+	};
+	
+	/*
 	 * click on table row, get detailed client data
 	 */
 	$(document).on("click", ".clientRow", function(){
@@ -88,14 +141,7 @@ $(document).ready(function() {
 		var clickedRow = $(this); // the row we clicked on
 		
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
-			
-			$('#clientsTable > tbody > tr.detailedTr')
-			 	.find('td')
-			 	.wrapInner('<div style="display: block;" />')
-			 	.parent()
-			 	.find('td > div')
-			 	.slideUp(200, function(){
-				 
+			closeDetailedDataDiv("clientsTable", function(){
 			 	$(".detailedTr").remove(); // remove the old row
 			 	makeDetailClientPost(clickedRow); // make a new detailed client data row
 			});
@@ -121,8 +167,8 @@ $(document).ready(function() {
 		
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/clients",
-	        data : {clientJSONString: clientJSONString},
+	        url : contextPath+"/clients/save",
+	        data : {clientJSONString: JSON.stringify(clientJSONString)},
 	        success : function(response) {
 	        	
 	        	if(response.split(";")[0]=="success"){
@@ -142,6 +188,15 @@ $(document).ready(function() {
 	        }
 	    });
 		
+	});
+	
+	/*
+	 * close the detailed div on button click
+	 */
+	$(document).on("click", ".closeDetailDiv",function(){
+		closeDetailedDataDiv("clientsTable",function(){
+			$(".detailedTr").remove();
+		});
 	});
 	
 	/*
@@ -174,8 +229,8 @@ $(document).ready(function() {
 
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/clients",
-	        data : {searchJSON : searchJSON},
+	        url : contextPath+"/clients/search",
+	        data : {searchJSON : JSON.stringify(searchJSON)},
 	        success : function(clientsJSONString) {
 	        	
 	        	var clientsJSON = jQuery.parseJSON(clientsJSONString);
@@ -220,14 +275,13 @@ $(document).ready(function() {
 			return;
 		}
 		
-		var searchJSON = "{"+
-			"'name':'"+name+"'," +
-			"'contactPerson':'"+contactPerson+"',"+
-			"'sellers':"+sellers+"," +
-			"'realBuyers':"+realBuyers+"," +
-			"'nonBuyers':"+nonBuyers +
-		"}";
-		
+		searchJSON = {};
+		searchJSON.name = name;
+		searchJSON.contactPerson = contactPerson;
+		searchJSON.sellers = sellers;
+		searchJSON.realBuyers = realBuyers;
+		searchJSON.nonBuyers = nonBuyers;
+
 		return searchJSON;
 	};
 	
@@ -249,18 +303,16 @@ $(document).ready(function() {
 			return;
 		}
 		
-		var clientJSONString = "{";
 		
-		clientJSONString +=
-			"'name':'"+name+"',"+
-			"'phone':'"+phone+"',"+
-			"'contactPerson':'"+contactPerson+"',"+
-			"'email':'"+email+"',"+
-			"'address':'"+address+"'";
+		var clientJSON = {};
 		
-		clientJSONString += "}";
+		clientJSON.name = name;
+		clientJSON.phone = phone;
+		clientJSON.contactPerson = contactPerson;
+		clientJSON.email = email;
+		clientJSON.address = address;
 		
-		return clientJSONString;
+		return clientJSON;
 	};
 	
 	var addClientSearchHistory = function(){
@@ -301,71 +353,107 @@ $(document).ready(function() {
 		}
 		
 	};
-});
 
-function addClientDetailedDataRow(rowIndex,clientJSON){
-	
-	var table = document.getElementById("clientsTable");
-	
-	var row = table.insertRow(rowIndex+1);
-	var cell=row.insertCell(0);
-	
-	cell.innerHTML = "<div class='clientDetailedDataDiv'>" +
+	function addClientDetailedDataRow(rowIndex,clientJSON){
+		
+		var table = document.getElementById("clientsTable");
+		
+		var row = table.insertRow(rowIndex+1);
+		var cell=row.insertCell(0);
+		
+		cell.innerHTML = "<div class='clientDetailedDataDiv'>" +
+		
+			"<div id='leftSideDetailDiv'>"+
 			
-			"<div class='clientDetailDataPieceDiv'><span class='clientDetailNameDiv'>Nimi</span> <span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailNameInput' value='"+clientJSON.name+"'/> </span>" +
-			"<span class='clientDetailNameDiv'>Tehinguid kokku:</span> <span class='clientDetailValueDiv'>"+clientJSON.totalDeals+"</span></div>"+
-			
-			"<div class='clientDetailDataPieceDiv'><span class='clientDetailNameDiv'>Kontaktisik</span> <span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailContactPersonInput' value='"+clientJSON.contactPerson+"' /> </span>" +
-			"<span class='clientDetailNameDiv'>Viimase tehingu nr:</span> <span class='clientDetailValueDiv'>"+clientJSON.lastDealNR+"</span></div>"+
-			
-			"<div class='clientDetailDataPieceDiv'><span class='clientDetailNameDiv'>Telefon</span> <span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailPhoneInput' value='"+clientJSON.phone+"'/> </span>" +
-			"<span class='clientDetailNameDiv'>Viimane tehing:</span> <span class='clientDetailValueDiv'>"+clientJSON.lastDealDate+"</span></div>"+
-			
-			"<div class='clientDetailDataPieceDiv'><span class='clientDetailNameDiv'>Email</span> <span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailEmailInput' value='"+clientJSON.email+"' /> </span>" +
+					"<div><span class='clientDetailNameDiv'>Tehinguid kokku:</span> <span class='clientDetailInputDiv'>"+clientJSON.totalDeals+"</span></div>" +
+					"<div><span class='clientDetailNameDiv'>Viimase tehingu nr:</span> <span class='clientDetailInputDiv'>"+clientJSON.lastDealNR+"</span></div>" +
+					"<div><span class='clientDetailNameDiv'>Viimane tehing:</span> <span class='clientDetailInputDiv'>"+clientJSON.lastDealDate+"</span></div>" +
+				
+					"<div>" +
+						"<span class='clientDetailNameDiv'>Nimi</span>" +
+						"<span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailNameInput' value='"+clientJSON.name+"'/> </span>" +
+					"</div>" +
+				
+					"<div>" +
+						"<span class='clientDetailNameDiv'>Kontaktisik</span>" +
+						"<span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailContactPersonInput' value='"+clientJSON.contactPerson+"' /> </span>" +
+					"</div>" +
+		
+					"<div>" +
+						"<span class='clientDetailNameDiv'>Telefon</span>" +
+						"<span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailPhoneInput' value='"+clientJSON.phone+"'/> </span>" +
+					"</div>" +
+					
+					"<div>" +
+						"<span class='clientDetailNameDiv'>Email</span>" +
+						"<span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailEmailInput' value='"+clientJSON.email+"' /> </span>" +
+					"</div>" +
+					
+					"<div>" +
+						"<span class='clientDetailNameDiv'>Aadress</span>" +
+						"<span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailAddressInput' value='"+clientJSON.address+"'/> </span>" +
+					"</div>" +
+					
 			"</div>"+
 			
-			"<div class='clientDetailDataPieceDiv'><span class='clientDetailNameDiv'>Aadress</span> <span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailAddressInput' value='"+clientJSON.address+"'/> </span> </div>" +
-			""+
-			"<div class='clientDetailDataPieceDiv'><input type='button' class='clientDetailSaveButton defaultButton' value='Salvesta'/></div>" +
+			"<div id='rightsideDetailDiv'>"+
+				"<div><input type='search' value='Otsi Numbriga' id='searchClientDetailNumber' class='clientSearchInputField defaultInputField searchInputField'/></div>"+
+				"<div><small>Tehtud dokumendid (summa koos käibemaksuga)</small></div>"+
+				
+				"<div id='clientDetailNumbersDiv'>" +
+				"</div>"+
+			
+			"</div>"+
+			
+			"<div>" +
+				"<input type='button' class='clientDetailSaveButton defaultButton' value='Salvesta'/>" +
+				"<input type='button' class='closeDetailDiv defaultButton' value='Sulge'/>" +
+			"</div>" +
+			
 			"</div>";
-	cell.colSpan = "3";
-	cell.className = "clientDetailedDataRow";
-	
-	row.className = "detailedTr";
-	return row;
-}
-
-function addAllClientsToTable(clientsJSON){
-	
-	for(var i = 0;i < clientsJSON.clients.length ; i++){
+		cell.colSpan = "3";
+		cell.className = "clientDetailedDataRow";
 		
-		var id = clientsJSON.clients[i].id;
-		var name = clientsJSON.clients[i].name;
-		var contactPerson = clientsJSON.clients[i].contactPerson;
-		var totalBoughtFor = clientsJSON.clients[i].totalBoughtFor;
+		row.className = "detailedTr";
 		
-		addClientRowToTable(id,name,contactPerson,totalBoughtFor);
+		updateClientDetailDocuments(clientJSON.documents);
+		
+		return row;
 	}
 	
-}
+	function addAllClientsToTable(clientsJSON){
+		
+		for(var i = 0;i < clientsJSON.clients.length ; i++){
+			
+			var id = clientsJSON.clients[i].id;
+			var name = clientsJSON.clients[i].name;
+			var contactPerson = clientsJSON.clients[i].contactPerson;
+			var totalBoughtFor = clientsJSON.clients[i].totalBoughtFor;
+			
+			addClientRowToTable(id,name,contactPerson,totalBoughtFor);
+		}
+		
+	}
+	
+	function addClientRowToTable(id,name,contactPerson,totalBoughtFor){
+		
+		var table = document.getElementById("clientsTable");
+		var row = table.insertRow(2);
+		var cell1 = row.insertCell(0);
+		var cell2 = row.insertCell(1);
+		var cell3 = row.insertCell(2);
+		
+		row.className = "clientRow";
+		row.setAttribute("id","clientRow"+id);
+		
+		cell1.innerHTML = name;
+		cell1.className = "clientNameTd tableBorderRight";
+		
+		cell2.innerHTML = contactPerson;
+		cell2.className = "clientContactPersonTd tableBorderRight";
+		
+		cell3.innerHTML = totalBoughtFor;
+		cell3.className = "clientTotalBoughtForTd";
+	}
 
-function addClientRowToTable(id,name,contactPerson,totalBoughtFor){
-	
-	var table = document.getElementById("clientsTable");
-	var row = table.insertRow(2);
-	var cell1 = row.insertCell(0);
-	var cell2 = row.insertCell(1);
-	var cell3 = row.insertCell(2);
-	
-	row.className = "clientRow";
-	row.setAttribute("id","clientRow"+id);
-	
-	cell1.innerHTML = name;
-	cell1.className = "clientNameTd tableBorderRight";
-	
-	cell2.innerHTML = contactPerson;
-	cell2.className = "clientContactPersonTd tableBorderRight";
-	
-	cell3.innerHTML = totalBoughtFor;
-	cell3.className = "clientTotalBoughtForTd";
-}
+});

@@ -1,13 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<div class="contentBody" >
-
 <div id="productsSideDiv">
 	<input type="button" value="EST" id="productsInEstonian" class="selectedLanguageButton"/>
 	<input type="button" value="ENG" id="productsInEnglish" class="defaultButton"/>
 </div>
 
-<table id="productsTable">
+<table id="searchTable">
 	<tr id="searchRow">
 		<td class="productCodeTd">
 			<input type="search" id="productCodeSearchInput" class="productSearchInputField searchInputField defaultInputField" maxlength="45" value="Otsitava kood"/>
@@ -29,6 +27,9 @@
 			<input type="button" value="Lisa" class="defaultButton" id="addNewProduct"/>
 		</td>
 	</tr>
+</table>
+<table id="productsTable" >
+<thead>
 	<tr class="tableHeaderRow">
 		
 		<th id="codeField" class="productCodeDiv tableBorderRight">Kood</th>
@@ -51,6 +52,8 @@
 			<div>Laoseis</div>
 		</th>
 	</tr>
+</thead>
+<tbody>
 	<c:forEach items="${products}" var="product">
 	<tr class="productTableRow">
 		<td class="productCodeTd tableBorderRight">
@@ -74,6 +77,5 @@
 		</td>
 	</tr>
 	</c:forEach>
+</tbody>
 </table>
-
-</div>

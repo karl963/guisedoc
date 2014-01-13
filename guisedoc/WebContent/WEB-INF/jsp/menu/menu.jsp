@@ -14,6 +14,9 @@
 		<li class="topMenu defaultMenuLink mainMenuBigLink" id="menuBigLink3">
 			<a id="statistics">Statistika</a>
 		</li>
+		<li class="topMenu defaultMenuLink mainMenuBigLink" id="menuBigLink4">
+			<a id="settings">Seaded</a>
+		</li>
 	</ul>
 	
 	<div id="logiVäljaDiv">logi välja</div>

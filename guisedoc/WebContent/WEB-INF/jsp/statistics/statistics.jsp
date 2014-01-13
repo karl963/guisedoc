@@ -1,4 +1,3 @@
-<div class="contentBody">
 
 <div id="statisticsOptionsDiv">
 		
@@ -9,10 +8,8 @@
 		<input id="statisticsDateTo" type="date" />
 	</span>
 	<span class="separateOptionDiv">
-		<input type="text" id="statisticsCodeInput" class="searchInputField defaultInputField" value="Otsitava toote kood" />
+		<input type="search" id="statisticsCodeInput" class="searchInputField defaultInputField" value="Otsitava toote kood" />
 	</span>
-	<!--&ensp;&ensp;&ensp;-->
-	
 	<span class="separateOptionDiv">
 		<label><input type="radio" name="statisticsClientGroup" value="actualBuyer" checked/>Ostnud kliendid</label>
 		<br>
@@ -20,10 +17,10 @@
 		<br>
 		<label><input type="radio" name="statisticsClientGroup" value="seller" />Müüjad</label>
 		<br>
-		<input type="text" id="statisticsClientInput" value="Kliendi nimi" class="searchInputField defaultInputField" />
-		<select>
-		
+		<input type="search" id="statisticsClientInput" value="Kliendi nimi" class="searchInputField defaultInputField" />
+		<select id="clientsSelectBox">
 		</select>
+		<div id="clientIDDiv" class="hidden">0</div>
 	</span>
 	<span class="separateOptionDiv">
 		<label><input type="radio" name="statisticsTypeGroup" value="sumAll" checked/>Kõigi tehingute tooted kokku</label>
@@ -39,5 +36,3 @@
 <div id="hideOrShowStatisticsOptionDiv">Peida otsingu täpsustused</div>
 
 <div id="statisticsTableDiv"></div>
-	
-</div>

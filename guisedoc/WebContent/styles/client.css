@@ -33,21 +33,38 @@
 */
 .clientDetailNameDiv{
 	display: inline-block;
-	min-width:150px;
+	min-width:155px;
+	width:155px;
 }
-.clientDetailDataPieceDiv{
-	left: 10px;
-	padding:5px;
+.clientDetailInputDiv{
+	display: inline-block;
+	width:60%;
 }
 .clientDetailInputDiv input{
-	width:30%;
-	min-width:120px;
+	width:100%;
 }
+
 .clientDetailedDataRow{
 	background-color:#DDE4E4;
 }
-.clientDetailValueDiv{
-	min-width:100px;
+
+#leftSideDetailDiv{
+	width: 50%;
+	height: 100%;
+	display: inline-block;
+	float: left;
+}
+#rightsideDetailDiv{
+	width: 49%;
+	height: 100%;
+	display: inline-block;
+	float: left;
+}
+
+#clientDetailNumbersDiv{
+	overflow:auto;
+	background:#ffffff;
+	height:180px;
 }
 
 /*

@@ -1,4 +1,35 @@
 $(document).ready(function(){
+	
+	/*
+	 * Changing shown language fields
+	 */
+	$("#productsInEnglish").click(function() {
+		showLoadingDiv();
+		
+		$(".productEstonianDiv").hide();
+		$(".productEnglishDiv").show();
+		
+		$("#productsInEnglish").attr("class","selectedLanguageButton");
+		$("#productsInEstonian").attr("class","defaultButton");
+		
+		isEstonian = false;
+		
+		hideLoadingDiv();
+	});
+	
+	$("#productsInEstonian").click(function() {
+		showLoadingDiv();
+		
+		$(".productEnglishDiv").hide();
+		$(".productEstonianDiv").show();
+		
+		$("#productsInEstonian").attr("class","selectedLanguageButton");
+		$("#productsInEnglish").attr("class","defaultButton");
+		
+		isEstonian = true;
+		
+		hideLoadingDiv();
+	});
 
 	/*
 	 * Put default value for each input field
@@ -35,7 +66,7 @@ $(document).ready(function(){
 	/*
 	 * AUTOCHANGE on click and revert back to default on null input
 	 */
-    $('.searchInputField').focus(function() {
+    $(document).on("focus", '.searchInputField', function() {
         if($(this).val() == $(this).data('default_val') || !$(this).data('default_val')) {
             $(this).data('default_val', $(this).val());
             $(this).val('');
@@ -43,14 +74,45 @@ $(document).ready(function(){
         }
     });
     
-    $('.searchInputField').blur(function() {
+    $(document).on("blur", '.searchInputField', function() {
         if ($(this).val() == ''){
         	$(this).val($(this).data('default_val'));
         	$(this).addClass("defaultInputField");
         }
     });
-   
 });
+
+/*
+ * closing the detailed data div
+ */
+var closeDetailedDataDiv = function(tableID, callback){
+	$('#'+tableID+' > tbody > tr.detailedTr')
+ 	.find('td')
+ 	.wrapInner('<div style="display: block;" />')
+ 	.parent()
+ 	.find('td > div')
+ 	.slideUp(200, function(){
+ 		if(callback != null){ // if we added a function to execute after
+ 			callback();
+ 		}
+ 	});
+};
+
+/*
+ * open the detailed data div
+ */
+var openDetailedDataDiv = function(tableID, callback){
+	$('#'+tableID+' > tbody > tr.detailedTr')
+	.find('td')
+	 .wrapInner('<div style="display: none;" />')
+	 .parent()
+	 .find('td > div')
+	 .slideDown(600, function(){
+ 		if(callback != null){ // if we added a function to execute after
+ 			callback();
+ 		}
+ 	});
+};
 
 /*
  * Loading div
@@ -93,7 +155,7 @@ function showSuccessNotification(message){
  */
 var validStringCharacters = "qwertyuiopüõäölkjhgfdsazxcvbnm" +
 							"QWERTYUIOPÜÕÄÖLKJHGFDSAMNBVCXZ" +
-							" ,.-;:_-<>!?1234567890+'*";
+							" ,.-;:_-<>!?/1234567890+'*";
 var validNumberCharacters = "1234567890.,";
 
 /*

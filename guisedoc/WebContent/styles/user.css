@@ -12,3 +12,23 @@
 .userDataDiv {
 	width:90%;
 }
+
+/*
+* logo
+*/
+#firmLogoWidthInput,#firmLogoHeightInput{
+	width:70px;
+}
+
+#firmLogo{
+	width:auto;
+ 	height:auto;
+	max-height:100%;
+	max-width:100%;
+	border:1px dotted #47423F;
+}
+
+#firmLogoDiv{
+	border:1px dotted #47423F;
+	text-align:center;
+}

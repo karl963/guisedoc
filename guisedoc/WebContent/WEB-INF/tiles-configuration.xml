@@ -62,4 +62,11 @@
 	</put-attribute>
 </definition>
 
+<!-- settings -->
+ 
+<definition name="settings" extends="defaultTemplate">
+	<put-attribute name="title" value="Settings"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/settings/settings.jsp" />
+</definition>
+
 </tiles-definitions>

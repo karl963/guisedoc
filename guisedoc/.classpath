@@ -35,5 +35,9 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-jsp-2.2.2.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-servlet-2.2.2.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tiles-template-2.2.2.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/itext-xtra-5.3.0.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/itextpdf-5.2.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/itextpdf-5.3.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

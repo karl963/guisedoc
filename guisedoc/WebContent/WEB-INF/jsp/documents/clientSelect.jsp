@@ -11,7 +11,8 @@
 		<option value="realBuyers">Ostnud kliendid</option>
 		<option value="sellers">Müüjad</option>
 	</select>
-	<input type="button" id="closeClientSelect" class="defaultButton" value="Katkesta valimine" />
+	<span id="clientNameInputDiv"><input type="search" class="defaultInputField searchInputField" id="clientSearchName" value="Nimi" /></span>
+	<input type="button" id="closeClientSelect" class="defaultButtonRed" value="Tagasi" />
 	
 	<div id="clientSelectTableDiv">
 		<table id="clientSelectTable">

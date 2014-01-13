@@ -27,18 +27,17 @@ public class Firm {
 	private String bankAccountNR;
 	@SerializedName("fax")
 	private String fax;
-
+	
+	@SerializedName("logoURL")
+	private String logoURL;
+	@SerializedName("logoWidth")
+	private int logoWidth;
+	@SerializedName("logoHeight")
+	private int logoHeight;
+	
 	/*
 	 * CONSTRUCTORS
 	 */
-	
-	public String getKmkr() {
-		return kmkr;
-	}
-
-	public void setKmkr(String kmkr) {
-		this.kmkr = kmkr;
-	}
 
 	public Firm(){
 		ID = Firm.DEFAULT_LONG;
@@ -51,6 +50,9 @@ public class Firm {
 		bank = Firm.DEFAULT_STRING;
 		bankAccountNR = Firm.DEFAULT_STRING;
 		fax = Firm.DEFAULT_STRING;
+		logoURL = "http://www.bestroof.ee/g/logo.jpg";//Firm.DEFAULT_STRING;
+		logoWidth = 85;
+		logoHeight = 60;
 	}
 	
 	/*
@@ -61,7 +63,38 @@ public class Firm {
 	/*
 	 * GETTERS AND SETTERS
 	 */
+	
+	public int getLogoWidth() {
+		return logoWidth;
+	}
 
+	public void setLogoWidth(int logoWidth) {
+		this.logoWidth = logoWidth;
+	}
+
+	public int getLogoHeight() {
+		return logoHeight;
+	}
+
+	public void setLogoHeight(int logoHeight) {
+		this.logoHeight = logoHeight;
+	}
+
+	public String getLogoURL() {
+		return logoURL;
+	}
+
+	public void setLogoURL(String logoURL) {
+		this.logoURL = logoURL;
+	}
+
+	public String getKmkr() {
+		return kmkr;
+	}
+
+	public void setKmkr(String kmkr) {
+		this.kmkr = kmkr;
+	}
 	
 	public String getName() {
 		return name;

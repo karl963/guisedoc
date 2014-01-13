@@ -28,5 +28,12 @@ xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springf
 	<!-- For Resources (js,css,img)-->
 	<mvc:default-servlet-handler/>
 	<mvc:annotation-driven />
+	
+	<!-- for downloading files 
+	<mvc:annotation-driven>
+    <mvc:message-converters>
+        <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+    </mvc:message-converters>
+	</mvc:annotation-driven>-->
 
 </beans>

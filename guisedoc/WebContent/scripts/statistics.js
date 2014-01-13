@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	
 	/*
-	 * fill in search history ona page load
+	 * fill in search history on a page load
 	 */
 	if(localStorage.getItem("statisticsClient") != null){
 		$(":radio[value='"+localStorage.getItem("statisticsClient")+"']").prop("checked", true);
@@ -26,6 +26,9 @@ $(document).ready(function() {
 		$("#statisticsDateTo").val(localStorage.getItem("statisticsEndDate"));
 	}
 
+	/*************************************************************
+	 * SEARCHING
+	 *************************************************************/
 	/*
 	 * Animation for hiding the options div
 	 */
@@ -64,8 +67,8 @@ $(document).ready(function() {
 		
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/statistics",
-	        data : {statisticsJSONString: statisticsJSONString},
+	        url : contextPath+"/statistics/search",
+	        data : {statisticsJSONString: JSON.stringify(statisticsJSONString)},
 	        success : function(jsonString) {
 	        	
 	        	var statisticsJSON = jQuery.parseJSON(jsonString);
@@ -87,6 +90,78 @@ $(document).ready(function() {
 	    });
 	});
 	
+	/*************************************************************
+	 * CLIENT NAME SELECTION
+	 *************************************************************/
+	/*
+	 * changed the client type, load the new names
+	 */
+	$(document).on("click","input:radio[name='statisticsClientGroup']",function(){
+		
+		var type = $("input:radio[name='statisticsClientGroup']:checked").val();
+		
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/statistics/clients",
+	        data : {clientType: type},
+	        success : function(jsonString) {
+
+	        	var clientsJSON = jQuery.parseJSON(jsonString);
+	        	
+	        	if(clientsJSON.response=="success"){
+		        	addClientNamesToBox(clientsJSON.clients);
+		        	
+	        		showSuccessNotification(clientsJSON.message);
+	        	}
+	        	else{
+	        		showErrorNotification(clientsJSON.message);
+	        	}
+	        	
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	/*
+	 * adds the clients to the dropdown box
+	 */
+	var addClientNamesToBox = function(clients){
+		$('#clientsSelectBox').find("option").remove().end()
+			.append("<option value='default' disabled>--valige klient--</option>")
+			.val("default");
+		
+		for(var i = 0; i < clients.length; i++){
+			var option = $('<option value="'+clients[i].ID+'">'+clients[i].name+'</option>');
+			$('#clientsSelectBox').append(option);
+		}
+	};
+	
+	/*
+	 * user changes client name and we invalidate the ID
+	 */
+	$(document).on("change","#statisticsClientInput",function(){
+		if($(this).val() != $("#clientsSelectBox option:selected").text()){
+			$("#clientsSelectBox").val("default");
+			$("#clientIDDiv").html("0");
+		}
+	});
+	
+	/*
+	 * user selected the client from the select field
+	 */
+	$(document).on("change","#clientsSelectBox",function(){
+		$("#clientIDDiv").html($("#clientsSelectBox option:selected").val());
+		$("#statisticsClientInput").focus();
+		$("#statisticsClientInput").val($("#clientsSelectBox option:selected").text());
+	});
+	
+	/*************************************************************
+	 * OBJECTS HANDLING
+	 *************************************************************/
 	/*
 	 * delete selected statistics objects
 	 */
@@ -96,15 +171,10 @@ $(document).ready(function() {
 		
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
 			
-			$('#statisticsTable > tbody > tr.detailedTr')
-			 	.find('td')
-			 	.wrapInner('<div style="display: block;" />')
-			 	.parent()
-			 	.find('td > div')
-			 	.slideUp(200, function(){
-				 
-			 	$(".detailedTr").remove(); // remove the old row
+			closeDetailedDataDiv("statisticsTable", function(){
+				$(".detailedTr").remove(); // remove the old row
 			});
+
 		}
 		
 		var forDeleteStatisticsJSON = makeDeleteStatisticsJSON();
@@ -114,8 +184,8 @@ $(document).ready(function() {
 
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/statistics",
-	        data : {forDeleteStatisticsJSON: forDeleteStatisticsJSON},
+	        url : contextPath+"/statistics/delete",
+	        data : {forDeleteStatisticsJSON: JSON.stringify(forDeleteStatisticsJSON)},
 	        success : function(response) {
 	        	
 	        	if(response.split(";")[0]=="success"){
@@ -147,18 +217,12 @@ $(document).ready(function() {
 		
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
 			
-			$('#statisticsTable > tbody > tr.detailedTr')
-			 	.find('td')
-			 	.wrapInner('<div style="display: block;" />')
-			 	.parent()
-			 	.find('td > div')
-			 	.slideUp(200, function(){
-				 
+			closeDetailedDataDiv("statisticsTable", function(){
 			 	if($(".detailedTr").index() < rowIndex){ // clicked after the opened row
 			 		rowIndex--; // we deleted the current row, which means we have 1 less row
 			 	}
-				 	
-			 	$(".detailedTr").remove(); // remove the old row
+			 	
+				$(".detailedTr").remove(); // remove the old row
 			 	
 			 	showDetailStatisticsView(rowIndex,id); // make a new detailed product data row
 			});
@@ -170,13 +234,22 @@ $(document).ready(function() {
 	});
 	
 	/*
+	 * close the detailed div on button click
+	 */
+	$(document).on("click", ".closeDetailDiv",function(){
+		closeDetailedDataDiv("statisticsTable",function(){
+			$(".detailedTr").remove();
+		});
+	});
+	
+	/*
 	 * Get the detailed data about statistics object
 	 */
 	function showDetailStatisticsView(rowIndex, ID){
 
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/statistics",
+	        url : contextPath+"/statistics/detail",
 	        data : {ID: ID},
 	        success : function(jsonString) {
 	        	
@@ -184,16 +257,9 @@ $(document).ready(function() {
 	        	
 	        	if(statObjJSON.response=="success"){
 	        		
-		        	addDetailedStatisticsDataRow(rowIndex,statObjJSON);
+		        	addDetailedStatisticsDataRow(rowIndex,statObjJSON.statisticObject);
 		        	
-		        	// make the animation
-		        	$('#statisticsTable > tbody > tr.detailedTr')
-		        	 .find('td')
-		        	 .wrapInner('<div style="display: none;" />')
-		        	 .parent()
-		        	 .find('td > div')
-		        	 .slideDown(600, function(){
-		        	 });
+		        	openDetailedDataDiv("statisticsTable");
 		        	
 	        		showSuccessNotification(statObjJSON.message);
 	        	}
@@ -235,8 +301,8 @@ $(document).ready(function() {
 		
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/statistics",
-	        data : {changedStatisticsJSON: changedStatisticsJSON},
+	        url : contextPath+"/statistics/save",
+	        data : {changedStatisticsJSON: JSON.stringify(changedStatisticsJSON)},
 	        success : function(response) {
 	        	
 	        	if(response.split(";")[0]=="success"){
@@ -290,6 +356,7 @@ $(document).ready(function() {
 
 		var code = $("#statisticsCodeInput").val();
 		var clientName = $("#statisticsClientInput").val();
+		var clientID = $("#clientIDDiv").html();
 		
 		if(code == $("#statisticsCodeInput").data("default_val")){
 			code = "";
@@ -308,20 +375,20 @@ $(document).ready(function() {
 			return;
 		}
 		
-		var statisticsJSONString = "{";
 		
-		statisticsJSONString += "'statisticsType':'"+$("input:radio[name='statisticsTypeGroup']:checked").val()+"',";
-		statisticsJSONString += "'dataGroup':'"+$("input:radio[name='statisticsClientGroup']:checked").val()+"',";
+		
+		var statisticsJSON = {};
+		
+		statisticsJSON.statisticsType = $("input:radio[name='statisticsTypeGroup']:checked").val();
+		statisticsJSON.dataGroup = $("input:radio[name='statisticsClientGroup']:checked").val();
 			
-		statisticsJSONString += 
-			"'startDate':'"+startDate+"',"+
-			"'endDate':'"+endDate+"',"+
-			"'code':'"+code+"',"+
-			"'clientName':'"+clientName+"'";
+		statisticsJSON.startDate = startDate;
+		statisticsJSON.endDate = endDate;
+		statisticsJSON.code = code;
+		statisticsJSON.clientID = clientID;
+		statisticsJSON.clientName = clientName;
 		
-		statisticsJSONString += "}";
-		
-		return statisticsJSONString;
+		return statisticsJSON;
 	};
 	
 	var makeDeleteStatisticsJSON = function(){
@@ -358,20 +425,20 @@ $(document).ready(function() {
 	var makeChangedStatisticsJSON = function(){
 		
 		var id = $("#statisticDetailIDDiv").html();
-		var code = $("#statisticDetailCodeInput").val();
+		//var code = $("#statisticDetailCodeInput").val();
 		var totalPrice = $("#statisticDetailPriceInput").val();
-		var clientName = $("#statisticDetailClientInput").val();
+		//var clientName = $("#statisticDetailClientInput").val();
 		var amount = $("#statisticDetailAmountInput").val();
 		
 		/*
 		 * check for invalid input
-		 */
+		 *//*
 		if(checkForInvalidStringCharacters(new Array(
 				new Array(code,"statisticDetailCodeInput"),
 				new Array(clientName,"statisticDetailClientInput")
 				))){
 			return;
-		}
+		}*/
 		if(checkForInvalidNumberCharacters(new Array(
 				new Array(amount,"statisticDetailAmountInput"),
 				new Array(totalPrice,"statisticDetailPriceInput")
@@ -379,16 +446,21 @@ $(document).ready(function() {
 			return;
 		}
 		
-		var changedStatisticsJSON = "{" +
-			"'id':"+id+","+
-			"'code:':"+code+"',"+
-			"'totalPrice':"+totalPrice+","+
-			"'clientName':'"+clientName+"',"+
-			"'amount':"+amount+
-		"}";
+		var changedStatisticsJSON = {};
+		
+		changedStatisticsJSON.id = id;
+		changedStatisticsJSON.totalPrice = totalPrice;
+		//changedStatisticsJSON.code = code;
+		changedStatisticsJSON.amount = amount;
+		//changedStatisticsJSON.clientName = clientName;
 		
 		return changedStatisticsJSON;
 	};
+	
+	/*
+	 * load the client names on page load
+	 */
+	$("input:radio[name='statisticsClientGroup']").click();
 });
 
 function addNewStatisticsTableWithData(statisticsJSON){
@@ -400,7 +472,7 @@ function addNewStatisticsTableWithData(statisticsJSON){
 	
 	var table = document.createElement("table");
 	table.setAttribute("id","statisticsTable");
-	
+
 	var headerRow = table.insertRow(0);
 	headerRow.className = "tableHeaderRow";
 	
@@ -496,10 +568,11 @@ function addNewStatisticsTableWithData(statisticsJSON){
 	}
 	
 	document.getElementById("statisticsTableDiv").appendChild(table);
+
 }
 
 function addDetailedStatisticsDataRow(rowIndex,statObjJSON){
-	
+
 	var table = document.getElementById("statisticsTable");
 	
 	var row = table.insertRow(rowIndex+1);
@@ -508,12 +581,12 @@ function addDetailedStatisticsDataRow(rowIndex,statObjJSON){
 	cell.innerHTML = "<div class='statisticDetailedDataDiv'>" +
 
 		"<div id='statisticDetailIDDiv' class='hidden'>"+statObjJSON.ID+"</div>"+
-	
+		/*
 		"<div class='statisticDetailDataPieceDiv'>" +
 			"<span class='statisticDetailCodeDiv statisticsDetailedNameDiv'>Kood</span>" +
 			"<input type='text' maxlength='45' id='statisticDetailCodeInput' class='statisticsDetailedInput' value='"+statObjJSON.code+"' />" +
 		"</div>" +
-
+		 */
 		"<div class='statisticDetailDataPieceDiv'>" +
 			"<span class='statisticDetailAmountDiv statisticsDetailedNameDiv'>Kogus</span>" +
 			"<input type='text' id='statisticDetailAmountInput' class='statisticsDetailedInput' value='"+statObjJSON.amount+"' />" +
@@ -523,14 +596,15 @@ function addDetailedStatisticsDataRow(rowIndex,statObjJSON){
 			"<span class='statisticDetailTotalPriceDiv statisticsDetailedNameDiv'>Summa</span>" +
 			"<input type='text' id='statisticDetailPriceInput' class='statisticsDetailedInput' value='"+statObjJSON.totalPrice+"' />" +
 		"</div>" +
-
+		/*
 		"<div class='statisticDetailDataPieceDiv'>" +
 			"<span class='statisticDetailClientDiv statisticsDetailedNameDiv'>Klient</span>" +
 			"<input type='text' maxlength='45' id='statisticDetailClientInput' class='statisticsDetailedInput' value='"+statObjJSON.clientName+"' />" +
 		"</div>"+
-		
+		*/
 		"<input type='button' class='saveStatisticDetailDataButton defaultButton' value='Salvesta' />"+
-
+		"<input type='button' class='closeDetailDiv defaultButton' value='Sulge' />"+
+		
 	"</div>";
 			
 	cell.colSpan = "8";

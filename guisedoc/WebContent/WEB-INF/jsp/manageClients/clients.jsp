@@ -1,7 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<div class="contentBody">
-
 <label><input type="checkbox" id="includeRealBuyers" checked/>Ostnud kliendid</label>
 &ensp;&ensp;&ensp;
 <label><input type="checkBox" id="includeNonBuyers" />Hinnapakkumise kliendid</label>
@@ -39,5 +37,3 @@
 	</c:forEach>
 	
 </table>
-
-</div>

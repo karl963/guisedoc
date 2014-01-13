@@ -1,10 +1,9 @@
-var productsJSON;
-var productsInEstonian = true;
+var isEstonian = true;
 var searchIsBeingProcessed = false;
 var changedProductsIDs;
 
 $(document).ready(function(){
-	
+
 	/*
 	 * add search history input
 	 */
@@ -51,37 +50,6 @@ $(document).ready(function(){
 	});
 	
 	/*
-	 * Changing shown language fields
-	 */
-	$("#productsInEnglish").click(function() {
-		showLoadingDiv();
-		
-		$(".productEstonianDiv").hide();
-		$(".productEnglishDiv").show();
-		
-		$("#productsInEnglish").attr("class","selectedLanguageButton");
-		$("#productsInEstonian").attr("class","defaultButton");
-		
-		productsInEstonian = false;
-		
-		hideLoadingDiv();
-	});
-	
-	$("#productsInEstonian").click(function() {
-		showLoadingDiv();
-		
-		$(".productEnglishDiv").hide();
-		$(".productEstonianDiv").show();
-		
-		$("#productsInEstonian").attr("class","selectedLanguageButton");
-		$("#productsInEnglish").attr("class","defaultButton");
-		
-		productsInEstonian = true;
-		
-		hideLoadingDiv();
-	});
-	
-	/*
 	 * Get the detailed data about the client from server, animate the row insert
 	 */
 	function showDetailProductView(clickedRow,rowIndex){
@@ -90,24 +58,16 @@ $(document).ready(function(){
 
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/manage-products",
+	        url : contextPath+"/manage-products/detail",
 	        data : {id: id},
 	        success : function(jsonString) {
 
 	        	var productJSON = jQuery.parseJSON(jsonString);
 
-	        	addProductDetailedDataRow(rowIndex,productJSON);
-	        	
-	        	// make the animation
-	        	$('#productsTable > tbody > tr.detailedTr')
-	        	 .find('td')
-	        	 .wrapInner('<div style="display: none;" />')
-	        	 .parent()
-	        	 .find('td > div')
-	        	 .slideDown(600, function(){
+	        	addProductDetailedDataRow(rowIndex,productJSON.product);
 
-	        	 });
-	        	
+	        	openDetailedDataDiv("productsTable");
+
 	        	if(productJSON.response=="success"){
 	        		showSuccessNotification(productJSON.message);
 	        	}
@@ -128,27 +88,22 @@ $(document).ready(function(){
 	 * SHOWING DETAILED VIEW of product ON CLICK, this method also applies for dynamically added elements
 	 */
 	$(document).on("click", ".productTableRow", function() {
-		
+
 		showLoadingDiv();
-		
+
 		var clickedRow = $(this); // the row we clicked on
-		var rowIndex = clickedRow.index();
-		
+		var rowIndex = clickedRow.index()+1;
+
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
-			
-			$('#productsTable > tbody > tr.detailedTr')
-			 	.find('td')
-			 	.wrapInner('<div style="display: block;" />')
-			 	.parent()
-			 	.find('td > div')
-			 	.slideUp(200, function(){
-				
-			 	if($(".detailedTr").index() < rowIndex){ // clicked after the opened row
+
+			closeDetailedDataDiv("productsTable", function(){
+			 	
+				if($(".detailedTr").index() < rowIndex){ // clicked after the opened row
 			 		rowIndex--; // we deleted the current row, which means we have 1 less row
 			 	}
 
 			 	$(".detailedTr").remove(); // remove the old row
-			 	
+
 			 	showDetailProductView(clickedRow,rowIndex); // make a new detailed product data row
 			});
 		}
@@ -161,7 +116,7 @@ $(document).ready(function(){
 	/*
 	 * Check for changed language, and then autoclick for data update
 	 */
-	if(!productsInEstonian){
+	if(!isEstonian){
 		$("#productsInEnglish").trigger("click");
 	}
 	
@@ -177,21 +132,19 @@ $(document).ready(function(){
 		if(addProductJSON == null){
 			return;
 		}
-		
+
 	    $.ajax({
 	        type : "POST",
-	        url : contextPath+"/manage-products",
-	        data : {addProductJSON: addProductJSON},
+	        url : contextPath+"/manage-products/add",
+	        data : {addProductJSON: JSON.stringify(addProductJSON)},
 	        success : function(response) {
 	        	if(response.split(";")[0]=="success"){
 	        		var id = response.split(";")[2];
 	        		
-	        		productJSON = jQuery.parseJSON(addProductJSON);
-	        		
-	        		addNewProductToTable(id,productJSON.code,productJSON.name,
-	        				productJSON.e_name,productJSON.unit,
-	        				productJSON.e_unit,productJSON.price,
-	        				productJSON.o_price,productJSON.storage);
+	        		addNewProductToTable(id,addProductJSON.code,addProductJSON.name,
+	        				addProductJSON.e_name,addProductJSON.unit,
+	        				addProductJSON.e_unit,addProductJSON.price,
+	        				addProductJSON.o_price,addProductJSON.storage);
 	        		
 	        		$("#productCodeSearchInput").val(null);
 	        		$("#productNameSearchInput").val(null);
@@ -205,7 +158,7 @@ $(document).ready(function(){
 	        		
 	        		showSuccessNotification(response.split(";")[1]);
 	        		
-	        		if(!productsInEstonian){
+	        		if(!isEstonian){
 	        			$("#productsInEnglish").trigger("click");
 	        		}
 
@@ -242,8 +195,8 @@ $(document).ready(function(){
 			
 		    $.ajax({
 		        type : "POST",
-		        url : contextPath+"/manage-products",
-		        data : {searchProductJSON : searchProductJSON, inEstonian : productsInEstonian},
+		        url : contextPath+"/manage-products/search",
+		        data : {searchProductJSON : JSON.stringify(searchProductJSON), inEstonian : isEstonian},
 		        success : function(responseString) {
 		        	
 		        	responseJSON = jQuery.parseJSON(responseString);
@@ -257,7 +210,7 @@ $(document).ready(function(){
 		        	
 		        	searchIsBeingProcessed = false;
 		        	
-	        		if(!productsInEstonian){
+	        		if(!isEstonian){
 	        			$("#productsInEnglish").trigger("click");
 	        		}
 	        		
@@ -275,7 +228,7 @@ $(document).ready(function(){
 	$(document).on("click",".saveProductDetailDataButton", function() {
 
 		showLoadingDiv();
-		var rowIndex = $(this).closest(".detailedTr").index()-1;
+		var rowIndex = $(this).closest(".detailedTr").index();
 
 		var productJSONString = makeChangedProductJSON();
 		if(productJSONString == null){
@@ -285,9 +238,9 @@ $(document).ready(function(){
 		$.ajax({
 			traditional: true,
 	        type : "POST",
-	        url : contextPath+"/manage-products",
+	        url : contextPath+"/manage-products/save",
 	        datatype: 'json',
-	        data : {productJSONString: productJSONString},
+	        data : {productJSONString: JSON.stringify(productJSONString)},
 	        success : function(response) {
 	        	
 	        	if(response.split(";")[0]=="success"){
@@ -306,6 +259,15 @@ $(document).ready(function(){
 	        	showErrorNotification("Error serveriga ühendumisel");
 	        }
 	    });
+	});
+	
+	/*
+	 * close the detailed div on button click
+	 */
+	$(document).on("click", ".closeDetailDiv",function(){
+		closeDetailedDataDiv("productsTable",function(){
+			$(".detailedTr").remove();
+		});
 	});
 	
 	/*
@@ -341,7 +303,7 @@ $(document).ready(function(){
 			return;
 		}
 		
-		if(productsInEstonian){
+		if(isEstonian){
 			name = $("#productNameSearchInput").val();
 			unit = $("#productUnitSearchInput").val();
 			price = $("#productPriceSearchInput").val();
@@ -412,16 +374,16 @@ $(document).ready(function(){
 			}
 		}
 		
-		newProductJSON = '{'+
-			'"name":"'+name+'",'+
-			'"e_name":"'+e_name+'",'+
-			'"unit":"'+unit+'",'+
-			'"e_unit":"'+e_unit+'",'+
-			'"price":"'+price+'",'+
-			'"o_price":"'+o_price+'",'+
-			'"code":"'+code+'",'+
-			'"storage":'+0.0+''+
-		'}';
+		newProductJSON = {};
+		
+		newProductJSON.name = name;
+		newProductJSON.e_name = e_name;
+		newProductJSON.unit = unit;
+		newProductJSON.e_unit = e_unit;
+		newProductJSON.price = price;
+		newProductJSON.o_price = o_price;
+		newProductJSON.code = code;
+		newProductJSON.storage = 0.0;
 		
 		return newProductJSON;
 	};
@@ -448,12 +410,12 @@ $(document).ready(function(){
 			unit = "";
 		}
 		
-		var searchProductJSON = "{"+
-			"'code':'"+code+"',"+
-			"'name':'"+name+"',"+
-			"'price':"+price+","+
-			"'unit':'"+unit+"'"+
-		"}";
+		searchProductJSON = {};
+		
+		searchProductJSON.name = name;
+		searchProductJSON.unit = unit;
+		searchProductJSON.price = price;
+		searchProductJSON.code = code;
 		
 		return searchProductJSON;
 	};
@@ -495,20 +457,19 @@ $(document).ready(function(){
 			return;
 		}
 		
-		var productJSONString =
-		'{'+
-			'"ID":'+		rowProductID+','+
-			'"code":"'+		code		+'",'+
-			'"name":"'+		name		+'",'+
-			'"e_name":"'+	e_name		+'",'+
-			'"unit":"'+		unit		+'",'+
-			'"e_unit":"'+	e_unit		+'",'+
-			'"price":'+		price		+','+
-			'"o_price":'+	o_price		+','+
-			'"storage":'+	storage		+''+
-		'}';
+		productJSON = {};
 		
-		return productJSONString;
+		productJSON.ID = rowProductID;
+		productJSON.name = name;
+		productJSON.e_name = e_name;
+		productJSON.unit = unit;
+		productJSON.e_unit = e_unit;
+		productJSON.price = price;
+		productJSON.o_price = o_price;
+		productJSON.code = code;
+		productJSON.storage = storage;
+		
+		return productJSON;
 	};
 });
 
@@ -517,8 +478,8 @@ $(document).ready(function(){
  */
 function addNewProductToTable(id,code,name,e_name,unit,e_unit,price,o_price,storage){
 	
-	var table=document.getElementById("productsTable");
-	var row=table.insertRow(2);
+	var table=document.getElementById("productsTable").getElementsByTagName('tbody')[0];
+	var row=table.insertRow(0);
 	row.className = "productTableRow";
 	var cell1=row.insertCell(0);
 	var cell2=row.insertCell(1);
@@ -635,7 +596,7 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 			"</div>" +
 			
 			"<input type='button' class='saveProductDetailDataButton defaultButton' value='Salvesta' />"+
-			
+			"<input type='button' class='closeDetailDiv defaultButton' value='Sulge' />"+
 		"</div>"+
 			
 		"<div class='rightSideProductDetailViewDiv'>"+

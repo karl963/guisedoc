@@ -1,60 +1,68 @@
 package com.guisedoc.object;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 import com.guisedoc.enums.DocumentType;
+import com.guisedoc.workshop.document.DocumentBuilder;
+import com.guisedoc.workshop.document.settings.Language;
 
 public class Document {
 	
 	public static String DEFAULT_STRING = "";
 	public static Double DEFAULT_DOUBLE = 0.0;
-	public static int DEFAULT_LONG = 0;
+	public static long DEFAULT_LONG = 0L;
+	public static int DEFAULT_INT = 0;
 	public static boolean DEFAULT_BOOLEAN = false;
+	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+	public static SimpleDateFormat HTML5_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	@SerializedName("ID")
 	private long ID;
 	@SerializedName("number")
 	private long number;
+	
 	@SerializedName("prefix")
 	private String prefix;
-	@SerializedName("name")
-	private String name;
-	@SerializedName("address")
-	private String address;
-	@SerializedName("additionalAddress")
-	private String additionalAddress;
-	@SerializedName("contactPerson")
-	private String contactPerson;
 	@SerializedName("orderNR")
 	private String orderNR;
-	@SerializedName("phone")
-	private String phone;
-	@SerializedName("email")
-	private String email;
 	@SerializedName("shipmentTime")
 	private String shipmentTime;
 	@SerializedName("shipmentAddress")
 	private String shipmentAddress;
+	@SerializedName("shipmentPlace")
+	private String shipmentPlace;
+	
 	@SerializedName("validDue")
-	private Double validDue;
+	private long validDue;
 	@SerializedName("advance")
 	private Double advance;
+	
 	@SerializedName("paymentRequirement")
 	private int paymentRequirement;
+	
 	@SerializedName("paydInCash")
 	private boolean paydInCash;
 	@SerializedName("showDiscount")
 	private boolean showDiscount;
 	@SerializedName("addToStatistics")
 	private boolean addToStatistics;
+	@SerializedName("showCE")
+	private boolean showCE;
+
 	@SerializedName("date")
 	private Date date;
 	
+	@SerializedName("client")
+	private Client client;
+
 	private List<Product> products;
 	private DocumentType type;
+	private String fullNumber;
+	private Language language;
 	
 	/*
 	 * Constructors
@@ -63,24 +71,23 @@ public class Document {
 	public Document(){
 		this.number = Document.DEFAULT_LONG;
 		this.prefix = Document.DEFAULT_STRING;
-		this.name = Document.DEFAULT_STRING;
-		this.address = Document.DEFAULT_STRING;
-		this.additionalAddress = Document.DEFAULT_STRING;
-		this.contactPerson = Document.DEFAULT_STRING;
 		this.orderNR = Document.DEFAULT_STRING;
-		this.phone = Document.DEFAULT_STRING;
-		this.email = Document.DEFAULT_STRING;
 		this.shipmentTime = Document.DEFAULT_STRING;
 		this.shipmentAddress = Document.DEFAULT_STRING;
-		this.validDue = Document.DEFAULT_DOUBLE;
+		this.shipmentPlace = Document.DEFAULT_STRING;
+		this.validDue = Document.DEFAULT_LONG;
 		this.advance = Document.DEFAULT_DOUBLE;
-		this.paymentRequirement = Document.DEFAULT_LONG;
+		this.paymentRequirement = Document.DEFAULT_INT;
 		this.paydInCash = Document.DEFAULT_BOOLEAN;
 		this.showDiscount = Document.DEFAULT_BOOLEAN;
 		this.addToStatistics = Document.DEFAULT_BOOLEAN;
 		this.date = new Date();
 		this.setProducts(new ArrayList<Product>());
 		this.type = DocumentType.QUOTATION;
+		this.client = new Client();
+		this.fullNumber = null;
+		this.setLanguage(new Language("EST"));
+		this.showCE = !Document.DEFAULT_BOOLEAN;
 	}
 	
 	/*
@@ -88,9 +95,58 @@ public class Document {
 	 */
 	
 	public String getFullNumber(){
+		if(fullNumber != null){
+			return fullNumber;
+		}
 		return prefix+number;
 	}
 	
+	public Double getTotalSum(){
+		Double sum = 0.0;
+		for(Product p : products){
+			sum += p.getTotalSum();
+		}
+		return sum;
+	}
+	
+	public String getFormatedDate(){
+		return Document.DATE_FORMAT.format(this.date);
+	}
+	
+	public String getHtml5FormatedDate(){
+		return Document.HTML5_DATE_FORMAT.format(this.date);
+	}
+	
+	public String getTypeString(){
+		return this.type.toString().toLowerCase();
+	}
+	
+	public void setType(String typeString){
+		typeString = typeString.toLowerCase();
+		
+		if(typeString.equals("invoice")){
+			type = DocumentType.INVOICE;
+		}
+		else if(typeString.equals("advance_invoice")){
+			type = DocumentType.ADVANCE_INVOICE;
+		}
+		else if(typeString.equals("delivery_note")){
+			type = DocumentType.DELIVERY_NOTE;
+		}
+		else if(typeString.equals("quotation")){
+			type = DocumentType.QUOTATION;
+		}
+		else if(typeString.equals("order")){
+			type = DocumentType.ORDER;
+		}
+		else if(typeString.equals("order_confirmation")){
+			type = DocumentType.ORDER_CONFIRMATION;
+		}
+	}
+	
+	public byte[] getDocumentInBytes(){
+		return DocumentBuilder.build(this);
+	}
 	
 	/*
 	 * getters and setters
@@ -120,60 +176,12 @@ public class Document {
 		this.number = number;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getAdditionalAddress() {
-		return additionalAddress;
-	}
-
-	public void setAdditionalAddress(String additionalAddress) {
-		this.additionalAddress = additionalAddress;
-	}
-
-	public String getContactPerson() {
-		return contactPerson;
-	}
-
-	public void setContactPerson(String contactPerson) {
-		this.contactPerson = contactPerson;
-	}
-
 	public String getOrderNR() {
 		return orderNR;
 	}
 
 	public void setOrderNR(String orderNR) {
 		this.orderNR = orderNR;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 
 	public String getShipmentTime() {
@@ -192,11 +200,19 @@ public class Document {
 		this.shipmentAddress = shipmentAddress;
 	}
 
-	public Double getValidDue() {
+	public String getShipmentPlace() {
+		return shipmentPlace;
+	}
+
+	public void setShipmentPlace(String shipmentPlace) {
+		this.shipmentPlace = shipmentPlace;
+	}
+	
+	public Long getValidDue() {
 		return validDue;
 	}
 
-	public void setValidDue(Double validDue) {
+	public void setValidDue(long validDue) {
 		this.validDue = validDue;
 	}
 
@@ -264,4 +280,30 @@ public class Document {
 		this.prefix = prefix;
 	}
 	
+	public Client getClient() {
+		return client;
+	}
+
+	public void setClient(Client client) {
+		this.client = client;
+	}
+	
+	public void setFullNumber(String fullNumber){
+		this.fullNumber = fullNumber;
+	}
+
+	public Language getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
+	public boolean isShowCE() {
+		return showCE;
+	}
+
+	public void setShowCE(boolean showCE) {
+		this.showCE = showCE;
+	}
 }

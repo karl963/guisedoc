@@ -22,6 +22,8 @@ public class Client {
 	private String contactPerson;
 	@SerializedName("address")
 	private String address;
+	@SerializedName("additionalAddress")
+	private String additionalAddress;
 	@SerializedName("email")
 	private String email;
 	@SerializedName("totalDeals")
@@ -42,6 +44,7 @@ public class Client {
 		phone = Client.DEFAULT_STRING;
 		contactPerson = Client.DEFAULT_STRING;
 		address = Client.DEFAULT_STRING;
+		additionalAddress = Client.DEFAULT_STRING;
 		email = Client.DEFAULT_STRING;
 		totalDeals = Client.DEFAULT_LONG;
 		totalBoughtFor = Client.DEFAULT_DOUBLE;
@@ -99,6 +102,14 @@ public class Client {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+	
+	public String getAdditionalAddress() {
+		return additionalAddress;
+	}
+
+	public void setAdditionalAddress(String additionalAddress) {
+		this.additionalAddress = additionalAddress;
 	}
 
 	public String getEmail() {

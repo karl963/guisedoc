@@ -2,7 +2,7 @@
 
 <div id="documentsTabsDiv">
 	<c:forEach items="${documents}" var="document">
-		<span class="documentsTab">${document.fullNumber}</span>
+		<span class="documentsTab selectableDocumentTab"><span>${document.fullNumber}</span><span class="tabDocumentID hidden">${document.ID}</span></span>
 	</c:forEach>
 	<span class="documentsTab" id="newDocumentTab">
 		Uus dokument: 
@@ -15,7 +15,7 @@
 			<option value="Delivery_note" >Saateleht</option>
 			<option value="Order" >Order</option>
 			<option value="-" disabled >----------------</option>
-			<option value="existing">Vana dokument</option>
+			<option value="existing">Ava vana dokument</option>
 		</select>
 	</span>
 </div>

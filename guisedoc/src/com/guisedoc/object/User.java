@@ -22,6 +22,8 @@ public class User {
 	@SerializedName("skype")
 	private String skype;
 	
+	private Firm firm;
+	
 	/*
 	 * Constructors
 	 */
@@ -34,6 +36,7 @@ public class User {
 		phone = User.DEFAULT_STRING;
 		email = User.DEFAULT_STRING;
 		skype = User.DEFAULT_STRING;
+		setFirm(new Firm());
 	}
 	
 	/*
@@ -99,6 +102,14 @@ public class User {
 
 	public void setSkype(String skype) {
 		this.skype = skype;
+	}
+
+	public Firm getFirm() {
+		return firm;
+	}
+
+	public void setFirm(Firm firm) {
+		this.firm = firm;
 	}
 	
 	
