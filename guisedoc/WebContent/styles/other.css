@@ -39,8 +39,6 @@ input:not([type="button"]):not([type="checkbox"]):not([type="radio"]):focus,text
 	outline:1px solid #527578;
 }
 
-.defaultButtonRed{
-}
 .defaultButtonRed:hover{
 	background: #a01500; /* Old browsers */
 	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
@@ -53,6 +51,7 @@ input:not([type="button"]):not([type="checkbox"]):not([type="radio"]):focus,text
 	background: linear-gradient(to bottom,  #a01500 0%,#5b0c00 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a01500', endColorstr='#5b0c00',GradientType=0 ); /* IE6-8 */
 }
+
 
 .defaultButton {
 	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #355052), color-stop(1, #779799));
@@ -79,12 +78,12 @@ input:not([type="button"]):not([type="checkbox"]):not([type="radio"]):focus,text
 }
 
 .defaultButton, .defaultButtonRed {
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
-	border-radius:5px;
+	-moz-border-radius:1px;
+	-webkit-border-radius:1px;
+	border-radius:1px;
 	display:inline-block;
 	color:#ffffff;
-	padding:5px 10px;
+	padding:2px 10px;
 	font-weight:bold;
 	
 	outline: none;
@@ -165,6 +164,7 @@ input:not([type="button"]):not([type="checkbox"]):not([type="radio"]):focus,text
 * Loading div
 */
 #fullPageLoadingDiv{
+	display:none;
 	z-index:999;
 	top:50%;
     left:50%;
@@ -188,6 +188,9 @@ td{
    	word-wrap: break-word;      /* IE */
    	word-break: break-all;      /* Chrome */
 }
+.alignRightTd{
+	text-align:right;
+}
 
 /*
 * langu buttons style
@@ -207,13 +210,13 @@ td{
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8e8979', endColorstr='#bcb8ad',GradientType=0 ); /* IE6-8 */
 
 	background-color:#bcb8ad;
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
-	border-radius:5px;
+	-moz-border-radius:1px;
+	-webkit-border-radius:1px;
+	border-radius:1px;
 	border:1px solid #8e8979;
 	display:inline-block;
 	color:#ffffff;
-	padding:5px 10px; /* 5px 50px*/
+	padding:2px 10px;
 	font-weight:bold;
 	text-shadow:1px 1px 1px #8e8979;
 
@@ -241,4 +244,17 @@ td{
 	border: 0;
 	
 	outline: none;
+}
+
+/*
+* sorting tables
+*/
+.headerSortable{
+	background: url(../images/both.gif) no-repeat 99%;
+}
+.headerSortUp {
+	background: url(../images/asc.gif) no-repeat 99%;
+}
+.headerSortDown {
+	background: url(../images/desc.gif) no-repeat 99%;
 }

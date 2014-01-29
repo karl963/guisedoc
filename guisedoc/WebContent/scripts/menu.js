@@ -36,4 +36,10 @@ $(document).ready(function() {
 		$("#"+linkID).addClass("selectedMenuLink");
 	}
 	
+	/*
+	 * logging out
+	 */
+	$(document).on("click","#logiVäljaDiv",function(){
+		window.location.href = contextPath+"/login/doLogout";
+	});
 });

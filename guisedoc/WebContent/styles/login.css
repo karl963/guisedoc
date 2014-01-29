@@ -1,0 +1,21 @@
+#loginFormDiv{
+	width: 200px;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+	
+	padding:10px;
+	background-color:#DDE4E4;
+	
+	text-align:center;
+}
+
+#loginFormDiv input:not([type="button"]){
+	width:80%;
+}
+
+#errorMessageDiv{
+	color: #5b0c00;
+}

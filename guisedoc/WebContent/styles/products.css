@@ -28,9 +28,18 @@
 	min-width: 65px;
 	max-width: 65px;
 }
+.productDeleteTd{
+	width:70px;
+	text-align: center;
+	overflow: hidden;
+}
 
-.loaderGifTr{
-	text-align:center;	
+.productsDeleteLabel{
+	width: 100%;
+	display: block;
+	height: auto !important;
+	height: 100%;
+	min-height: 100%;
 }
 
 /*
@@ -91,5 +100,4 @@
 }
 .saveProductDetailDataButton{
 	width:120px;
-	padding:5px;
 }

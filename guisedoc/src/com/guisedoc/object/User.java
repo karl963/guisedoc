@@ -1,6 +1,10 @@
 package com.guisedoc.object;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.google.gson.annotations.SerializedName;
+import com.guisedoc.workshop.document.settings.DateFormats;
 
 public class User {
 	
@@ -22,12 +26,20 @@ public class User {
 	@SerializedName("skype")
 	private String skype;
 	
-	private Firm firm;
+	private Date lastOnline;
+	private long totalDeals;
+	
+	private Profile profile;
+	private Settings settings;
+	
+	// for queries from database
+	private long profileID;
+	private long settingsID;
 	
 	/*
 	 * Constructors
 	 */
-	
+
 	public User(){
 		ID = User.DEFAULT_LONG;
 		userName = User.DEFAULT_STRING;
@@ -36,17 +48,42 @@ public class User {
 		phone = User.DEFAULT_STRING;
 		email = User.DEFAULT_STRING;
 		skype = User.DEFAULT_STRING;
-		setFirm(new Firm());
+		profile = new Profile();
+		lastOnline = new Date();
+		totalDeals = User.DEFAULT_LONG;
+		setSettings(new Settings());
+		
+		setProfileID(User.DEFAULT_LONG);
+		setSettingsID(User.DEFAULT_LONG);
 	}
 	
 	/*
 	 * Methods
 	 */
 
+	public String getLastOnlineString(){
+		return DateFormats.DOT_DATE_FORMAT().format(lastOnline);
+	}
 	
 	/*
 	 * Getters and setters
 	 */
+
+	public Date getLastOnline() {
+		return lastOnline;
+	}
+
+	public void setLastOnline(Date lastOnline) {
+		this.lastOnline = lastOnline;
+	}
+
+	public long getTotalDeals() {
+		return totalDeals;
+	}
+
+	public void setTotalDeals(long totalDeals) {
+		this.totalDeals = totalDeals;
+	}
 
 	public long getID() {
 		return ID;
@@ -103,15 +140,37 @@ public class User {
 	public void setSkype(String skype) {
 		this.skype = skype;
 	}
-
-	public Firm getFirm() {
-		return firm;
+	
+	public Profile getProfile() {
+		return profile;
 	}
 
-	public void setFirm(Firm firm) {
-		this.firm = firm;
+	public void setProfile(Profile profile) {
+		this.profile = profile;
 	}
-	
-	
+
+	public Settings getSettings() {
+		return settings;
+	}
+
+	public void setSettings(Settings settings) {
+		this.settings = settings;
+	}
+
+	public long getProfileID() {
+		return profileID;
+	}
+
+	public void setProfileID(long profileID) {
+		this.profileID = profileID;
+	}
+
+	public long getSettingsID() {
+		return settingsID;
+	}
+
+	public void setSettingsID(long settingsID) {
+		this.settingsID = settingsID;
+	}
 	
 }

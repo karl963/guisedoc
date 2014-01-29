@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <div id="documentsOptionsDiv">
 	<span class="optionSubDiv">
 		<input type="button" class="defaultButton" id="importDocumentButton" value="Impordi dokument"/>
@@ -7,13 +9,13 @@
 	<span class="optionSubDiv">
 		<div id="insertDocumentID" class="hidden">0</div>
 		<span class="allTypes">
-			Number <input type="text" id="insertNumber"/></span>
-		<span class="quotation_type order_confirmation_type">
+			Tehingu number <input type="text" id="insertNumber"/></span>
+		<span class="quotation_type order_confirmation_type invoice_type advance_invoice_type">
 			Kehtivus <input type="number" id="insertValidDue" step="any" value="0"/></span>
 		<span class="invoice_type">
 			Ettemaks <input type="number" id="insertAdvance" step="any" value="0"/></span>
-		<span class="invoice_type advance_invoice_type quotation_type order_confirmation_type">
-			Maksetingimus <input type="number" id="insertPaymentRequirement" step="any" value="0"/></span>
+		<span class="quotation_type order_confirmation_type">
+			Maksetingimus <input type="text" id="insertPaymentRequirement" step="any" value="0"/></span>
 		<span class="quotation_type order_confirmation_type order_type">
 			Tarneaeg <input type="text" id="insertShipmentTime"/></span>
 		<span class="quotation_type order_confirmation_type order_type">
@@ -52,12 +54,19 @@
 			<label><input type="checkbox" id="insertPaydInCash" /> Tasutud sularahas</label></span>
 		<span class="order_confirmation_type order_type delivery_note_type">
 			<label><input type="checkbox" id="insertShowCE" /> Näita CE tähist</label></span>
+		<span class="order_confirmation_type delivery_note_type quotation_type">
+			CE täpsustus: <input type="text" id="insertCeSpecification"/></span>
 	</span>
 	<div class="separator"></div>
 	<span class="optionSubDiv">
 		<input type="button" value="EST" id="productsInEstonian" class="selectedLanguageButton"/>
 		<input type="button" value="ENG" id="productsInEnglish" class="defaultButton"/>
-		<input type="button" class="defaultButton" id="getDocumentPdf" value="Koosta PDF"/>
+		
+		<c:if test="${user.profile.isAllowed('DownloadDocuments') == true}">
+			<input type="button" class="defaultButton" id="downloadDocumentPdf" value="Lae PDF alla"/>
+		</c:if>
+		
+		<input type="button" class="defaultButton" id="viewDocumentPdf" value="PDF eelvaade"/>
 		<span class="allTypes">Summa kokku: <span id="totalSumDiv"></span></span>
 	</span>
 </div>

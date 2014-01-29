@@ -3,6 +3,15 @@
 
 <tiles-definitions>
 
+<!-- login page -->
+
+<definition name="login" template="/WEB-INF/jsp/other/loginTemplate.jsp">
+    <put-attribute name="title" value="Guisedoc login"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/login/login.jsp" />
+	<put-attribute name="header" value="/WEB-INF/jsp/must/header.jsp" />
+	<put-attribute name="footer" value="/WEB-INF/jsp/must/footer.jsp" />
+</definition>
+
 <!-- default page includes -->
 
 <definition name="defaultTemplate" template="/WEB-INF/jsp/other/defaultTemplate.jsp">
@@ -10,33 +19,26 @@
     <put-attribute name="menu" value="/WEB-INF/jsp/menu/menu.jsp" />
 	<put-attribute name="footer" value="/WEB-INF/jsp/must/footer.jsp" />
 </definition>
-
-<!-- login page -->
-
-<definition name="login" extends="defaultTemplate">
-    <put-attribute name="title" value="Guisedoc login"/>
-	<put-attribute name="body" value="/WEB-INF/jsp/login/login.jsp" />
-</definition>
  
 <!-- user data management -->
  
-<definition name="manage-user-data" extends="defaultTemplate">
-    <put-attribute name="title" value="Manage user's data"/>
-	<put-attribute name="body" value="/WEB-INF/jsp/manageUserData/manage-user-data.jsp" />
+<definition name="user-firm" extends="defaultTemplate">
+    <put-attribute name="title" value="User and firm data"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/user-firm/user-firm.jsp" />
 </definition>
  
 <!-- product management -->
  
-<definition name="manage-products" extends="defaultTemplate">
+<definition name="products" extends="defaultTemplate">
 	<put-attribute name="title" value="Manage products"/>
-	<put-attribute name="body" value="/WEB-INF/jsp/manageProducts/manage-products.jsp" />
+	<put-attribute name="body" value="/WEB-INF/jsp/products/products.jsp" />
 </definition>
 
 <!-- client management -->
  
 <definition name="clients" extends="defaultTemplate">
 	<put-attribute name="title" value="Clients"/>
-	<put-attribute name="body" value="/WEB-INF/jsp/manageClients/clients.jsp" />
+	<put-attribute name="body" value="/WEB-INF/jsp/clients/clients.jsp" />
 </definition>
 
 <!-- statistics management -->
@@ -64,9 +66,14 @@
 
 <!-- settings -->
  
-<definition name="settings" extends="defaultTemplate">
-	<put-attribute name="title" value="Settings"/>
-	<put-attribute name="body" value="/WEB-INF/jsp/settings/settings.jsp" />
+<definition name="settingsMy" extends="defaultTemplate">
+	<put-attribute name="title" value="My settings"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/settings/settingsMy.jsp" />
+</definition>
+
+<definition name="settingsUsers" extends="defaultTemplate">
+	<put-attribute name="title" value="Users settings"/>
+	<put-attribute name="body" value="/WEB-INF/jsp/settings/settingsUsers.jsp" />
 </definition>
 
 </tiles-definitions>

@@ -1,5 +1,9 @@
 package com.guisedoc.controller.clients;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -7,8 +11,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.guisedoc.messages.ClientMessages;
 import com.guisedoc.object.Client;
+import com.guisedoc.object.Product;
+import com.guisedoc.workshop.document.settings.DateFormats;
 import com.guisedoc.workshop.json.JsonArray;
 import com.guisedoc.workshop.json.JsonObject;
 
@@ -24,6 +32,7 @@ public class ClientHandling {
 		
 		JsonObject jsonObject = new JsonObject();
 
+		jsonObject.addElement("ID", ClientGet.clients.get(ID).getID());
 		jsonObject.addElement("name", ClientGet.clients.get(ID).getName());
 		jsonObject.addElement("phone", ClientGet.clients.get(ID).getPhone());
 		jsonObject.addElement("email", ClientGet.clients.get(ID).getEmail());
@@ -58,8 +67,6 @@ public class ClientHandling {
 
 		Client c = new Gson().fromJson(clientJSONString, Client.class);
 		
-		System.out.println(c.getName());
-
 		return "success;"+ClientMessages.CLIENT_DATA_SAVE_SUCCESS;
 	}
 	
@@ -76,7 +83,7 @@ public class ClientHandling {
 				JsonObject document = new JsonObject();
 				document.addElement("fullNumber", "documentnr"+i);
 				document.addElement("totalSum", i*240.5);
-				document.addElement("formatedDate", "10.01.2014");
+				document.addElement("formatedDate", DateFormats.DOT_DATE_FORMAT().format(new Date().getTime()+1000*60*60*24*i));
 				
 				documents.addElement(document);
 			}
@@ -89,5 +96,38 @@ public class ClientHandling {
 		
 		return jsonObject.getJsonString();
 	}
+	
+	@RequestMapping(value="/add", method = RequestMethod.POST, params={"clientJSON"})
+	@ResponseBody
+	public String addClient(@RequestParam("clientJSON")String clientJSON){
 
+		Client c = new Gson().fromJson(clientJSON, Client.class);
+		
+		c.setID(123);
+		
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addElement("ID", c.getID());
+		
+		jsonObject.addElement("response", "success");
+		jsonObject.addElement("message", ClientMessages.CLIENT_ADD_SUCCESS);
+		
+		return jsonObject.getJsonString();
+	}
+	
+	@RequestMapping(value="/delete", method = RequestMethod.POST, params={"forDeleteJSON"})
+	@ResponseBody
+	public String deleteClients(@RequestParam("forDeleteJSON")String forDeleteJSON){
+		
+		List<Product> products = new ArrayList<Product>();
+		
+		Gson gson = new Gson();
+		JsonParser parser = new JsonParser();
+		
+		com.google.gson.JsonArray productArray = parser.parse(forDeleteJSON).getAsJsonArray();
+	    for(JsonElement productElement : productArray){
+	    	products.add(gson.fromJson(productElement, Product.class));
+	    }
+
+		return "success;"+ClientMessages.CLIENT_DELETE_SUCCESS;
+	}
 }

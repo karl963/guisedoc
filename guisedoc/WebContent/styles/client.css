@@ -16,8 +16,24 @@
 }
 
 .clientTotalBoughtForTd{
-	min-width: 100px;
+	min-width: 140px;
 	width:10%;
+}
+.totalBoughtForTd{
+	text-align:right;
+}
+.clientDeleteTd{
+	width:70px;
+	text-align: center;
+	overflow: hidden;
+}
+
+.clientDeleteLabel{
+	width: 100%;
+	display: block;
+	height: auto !important;
+	height: 100%;
+	min-height: 100%;
 }
 
 /*
@@ -65,6 +81,21 @@
 	overflow:auto;
 	background:#ffffff;
 	height:180px;
+}
+
+#numbersTable{
+	margin-left:1%;
+	width:98%;
+}
+.numbersSumCell{
+	text-align:right;
+	font-style:italic;
+	font-size: 70%;
+}
+.numbersDateCell{
+	text-align:center;
+	font-style:italic;
+	font-size: 70%;
 }
 
 /*

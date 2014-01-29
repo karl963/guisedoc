@@ -15,16 +15,20 @@
 		<option value="order">Order</option>
 	</select>
 	<span id="documentNumberInputDiv"><input type="search" class="defaultInputField searchInputField" id="documentSearchNumber" value="Number" /></span>
-	<input type="button" id="closeImportDocument" class="defaultButtonRed" value="Tagasi" />
+	<input type="button" id="closeImportDocument" class="defaultButton" value="Tagasi" />
 	
 	<div id="importDocumentTableDiv">
 		<table id="importDocumentTable">
+			<thead>
 			<tr>
 				<th class="tableHeaderRow">Number</th>
 				<th class="tableHeaderRow">Kliendi nimi</th>
 				<th class="tableHeaderRow">Summa</th>
 				<th class="tableHeaderRow">Kuupäev</th>
 			</tr>
+			</thead>
+			<tbody>
+			</tbody>
 		</table>
 	</div>
 	

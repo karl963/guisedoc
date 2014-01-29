@@ -17,6 +17,10 @@
 
 #logiVäljaDiv{
 	float:right;
+	color:#FFFFFF;
+	height:100%;
+	text-align:center;
+	cursor:default;
 }
 
 /*
@@ -89,7 +93,7 @@
 #mainMenu li:hover ul {
    	display: block;
 }
-#mainMenu > li:hover > a , #mainMenu ul li:hover, .selectedMenuLink{
+#mainMenu > li:hover > a , #mainMenu ul li:hover, .selectedMenuLink, #logiVäljaDiv:hover{
 	color: #47423F;
 	
 	background: #8e8979; /* Old browsers */

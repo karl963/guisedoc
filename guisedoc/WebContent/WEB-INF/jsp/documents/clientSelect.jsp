@@ -12,16 +12,19 @@
 		<option value="sellers">Müüjad</option>
 	</select>
 	<span id="clientNameInputDiv"><input type="search" class="defaultInputField searchInputField" id="clientSearchName" value="Nimi" /></span>
-	<input type="button" id="closeClientSelect" class="defaultButtonRed" value="Tagasi" />
+	<input type="button" id="closeClientSelect" class="defaultButton" value="Tagasi" />
 	
 	<div id="clientSelectTableDiv">
 		<table id="clientSelectTable">
+			<thead>
 			<tr>
 				<th class="tableHeaderRow">Nimi</th>
 				<th class="tableHeaderRow">Kontaktisik</th>
 				<th class="tableHeaderRow">Tehinguid</th>
 				<th class="tableHeaderRow">Summa</th>
 			</tr>
+			</thead>
+			<tbody></tbody>
 		</table>
 	</div>
 	

@@ -1,0 +1,35 @@
+/*
+* users table
+*/
+#usersTable{
+	width:60%;
+	min-width:730px;
+}
+/*
+* detailed user div
+*/
+.userDetailDiv{
+	background-color:#DDE4E4;
+}
+
+/*
+* profiles table
+*/
+#profilesTable{
+	width:40%;
+	min-width:570px;
+}
+
+/*
+* detailed profile div
+*/
+.profileDetailDiv{
+	background-color:#DDE4E4;
+}
+.profileRuleDiv{
+	display:inline-block;
+	padding:5px;
+}
+.profileRuleGroupDiv{
+	border-bottom:1px dotted #47423F;
+}

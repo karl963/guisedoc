@@ -4,6 +4,8 @@ var changedProductsIDs;
 
 $(document).ready(function(){
 
+	makeSortable("productsTable");
+	
 	/*
 	 * add search history input
 	 */
@@ -27,48 +29,27 @@ $(document).ready(function(){
 		$("#productUnitSearchInput").val(localSotorage.getItem("productUnit"));
 		$("#productUnitSearchInput").blue();
 	}
-
-	
-	var sortingUp = true;
-	var HTMLarrowUp="&#8679;";
-	var HTMLarrowDown="&#8681;";
-	
-	/*
-	 * SORTING PRODUCTS TABLE
-	 */
-	$("#codeField").click(function() {
-		
-	});
-	$("#nameField").click(function() {
-		
-	});
-	$("#priceField").click(function() {
-		
-	});
-	$("#unitField").click(function() {
-		
-	});
 	
 	/*
 	 * Get the detailed data about the client from server, animate the row insert
 	 */
 	function showDetailProductView(clickedRow,rowIndex){
 
-		var id = clickedRow.children(".productCodeTd").children(".productID").html();
+		var id = clickedRow.attr("id").replace("productRow","");
 
 		$.ajax({
 	        type : "POST",
-	        url : contextPath+"/manage-products/detail",
+	        url : contextPath+"/products/detail",
 	        data : {id: id},
 	        success : function(jsonString) {
 
 	        	var productJSON = jQuery.parseJSON(jsonString);
 
-	        	addProductDetailedDataRow(rowIndex,productJSON.product);
-
-	        	openDetailedDataDiv("productsTable");
-
 	        	if(productJSON.response=="success"){
+
+	        		addProductDetailedDataRow(rowIndex,productJSON.product);
+	        		openDetailedDataDiv("productsTable");
+	        		
 	        		showSuccessNotification(productJSON.message);
 	        	}
 	        	else{
@@ -85,13 +66,13 @@ $(document).ready(function(){
 	}
 	
 	/*
-	 * SHOWING DETAILED VIEW of product ON CLICK, this method also applies for dynamically added elements
+	 * SHOWING DETAILED VIEW of product ON CLICK
 	 */
-	$(document).on("click", ".productTableRow", function() {
+	$(document).on("click", ".productRowClickable", function() {
 
 		showLoadingDiv();
 
-		var clickedRow = $(this); // the row we clicked on
+		var clickedRow = $(this).closest(".productTableRow"); // the row we clicked on
 		var rowIndex = clickedRow.index()+1;
 
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
@@ -135,7 +116,7 @@ $(document).ready(function(){
 
 	    $.ajax({
 	        type : "POST",
-	        url : contextPath+"/manage-products/add",
+	        url : contextPath+"/products/add",
 	        data : {addProductJSON: JSON.stringify(addProductJSON)},
 	        success : function(response) {
 	        	if(response.split(";")[0]=="success"){
@@ -195,7 +176,7 @@ $(document).ready(function(){
 			
 		    $.ajax({
 		        type : "POST",
-		        url : contextPath+"/manage-products/search",
+		        url : contextPath+"/products/search",
 		        data : {searchProductJSON : JSON.stringify(searchProductJSON), inEstonian : isEstonian},
 		        success : function(responseString) {
 		        	
@@ -225,8 +206,11 @@ $(document).ready(function(){
 		}
 	});
 	
+	/*
+	 * saving product data
+	 */
 	$(document).on("click",".saveProductDetailDataButton", function() {
-
+		
 		showLoadingDiv();
 		var rowIndex = $(this).closest(".detailedTr").index();
 
@@ -238,7 +222,7 @@ $(document).ready(function(){
 		$.ajax({
 			traditional: true,
 	        type : "POST",
-	        url : contextPath+"/manage-products/save",
+	        url : contextPath+"/products/save",
 	        datatype: 'json',
 	        data : {productJSONString: JSON.stringify(productJSONString)},
 	        success : function(response) {
@@ -271,13 +255,91 @@ $(document).ready(function(){
 	});
 	
 	/*
+	 * delete selected products
+	 */
+	$(document).on("click","#deleteProductsButton",function(){
+		
+		showLoadingDiv();
+		
+		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
+			
+			closeDetailedDataDiv("productsTable", function(){
+				$(".detailedTr").remove(); // remove the old row
+			});
+
+		}
+		
+		var forDeleteJSON = makeDeleteProductsJSON();
+		if(forDeleteJSON == null){
+			hideLoadingDiv();
+			return;
+		}
+
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/products/delete",
+	        data : {forDeleteJSON: JSON.stringify(forDeleteJSON)},
+	        success : function(response) {
+	        	
+	        	if(response.split(";")[0]=="success"){
+	        		showSuccessNotification(response.split(";")[1]);
+	        		deleteSelectedObjectsFromTable();
+	        	}
+	        	else{
+	        		showErrorNotification(response.split(";")[1]);
+	        	}
+	        },
+	        error : function(e) {
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
+
+	/*
+	 * delete selected objects from table after post success
+	 */
+	function deleteSelectedObjectsFromTable(){
+		$(".productDeleteCheckbox").each(function(){
+			if($(this).is(":checked")){
+				$(this).closest(".productTableRow").remove();
+			}
+		});
+	}
+	
+	/*
+	 * deleteable objects json
+	 */
+	var makeDeleteProductsJSON = function(){
+		
+		var objects = [];
+		
+		$(".productDeleteCheckbox").each(function(){
+
+			if($(this).is(":checked")){
+
+				var object = {};
+				object.ID = $(this).closest(".productTableRow").attr("id").replace("productRow","");
+				
+				objects.push(object);
+			}
+			
+		});
+
+		if(objects.length == 0){ // there were no objects selected, no need to post
+			return;
+		}
+
+		return objects;
+	};
+	
+	/*
 	 * Updates the regular data row's data after saving the detail data
 	 */
 	var updateProductRegularRowData = function(index){
 
 		var row = $('tr', $("#productsTable")).eq(index);
 		
-		row.children(".productCodeTd").children("div").eq(1).html($("#productDetailCodeInput").val());
+		row.children(".productCodeTd").html($("#productDetailCodeInput").val());
 		row.children(".productNameTd").children("div").eq(0).html($("#productDetailNameInput").val());
 		row.children(".productNameTd").children("div").eq(1).html($("#productDetailENameInput").val());
 		row.children(".productUnitTd").children("div").eq(0).html($("#productDetailUnitInput").val());
@@ -479,43 +541,50 @@ $(document).ready(function(){
 function addNewProductToTable(id,code,name,e_name,unit,e_unit,price,o_price,storage){
 	
 	var table=document.getElementById("productsTable").getElementsByTagName('tbody')[0];
+	
 	var row=table.insertRow(0);
 	row.className = "productTableRow";
+	row.setAttribute("id","productRow"+id);
+	
 	var cell1=row.insertCell(0);
 	var cell2=row.insertCell(1);
 	var cell3=row.insertCell(2);
 	var cell4=row.insertCell(3);
 	var cell5=row.insertCell(4);
+	var cell6=row.insertCell(5);
 	
 	// CELL code
-	cell1.innerHTML="" +
-		"<div class='productID hidden'>"+id+"</div>" +
-		"<div>"+code+"</div>";
-	cell1.className = "productCodeTd tableBorderRight";
+	cell1.innerHTML=code;
+	cell1.className = "productCodeTd tableBorderRight productRowClickable";
 	
 	// CELL name
 	cell2.innerHTML="" +
 		"<div class='productEstonianDiv'>"+name+"</div>" +
 		"<div class='hidden productEnglishDiv'>"+e_name+"</div>";
-	cell2.className = "productNameTd tableBorderRight";
+	cell2.className = "productNameTd tableBorderRight productRowClickable";
 	
 	// CELL price
 	cell3.innerHTML="" +
-		"<div class='productEstonianDiv'>"+price+"</div>" +
-		"<div class='hidden productEnglishDiv'>"+o_price+"</div>";
-	cell3.className = "productPriceTd tableBorderRight";
+		"<div class='productEstonianDiv'>"+parseFloat(price).toFixed(2)+"</div>" +
+		"<div class='hidden productEnglishDiv'>"+parseFloat(o_price).toFixed(2)+"</div>";
+	cell3.className = "productPriceTd tableBorderRight productRowClickable alignRightTd";
 
 	// CELL unit
 	cell4.innerHTML="" +
 		"<div class='productEstonianDiv'>"+unit+"</div>" +
 		"<div class='hidden productEnglishDiv'>"+e_unit+"</div>";
-	cell4.className = "productUnitTd tableBorderRight";
+	cell4.className = "productUnitTd tableBorderRight productRowClickable";
 
-	// CELL unit
+	// CELL storage
 	cell5.innerHTML="" +
-		"<div>"+storage+"</div>";
-	cell5.className = "storageTd";
+		"<div>"+parseFloat(storage).toFixed(3)+"</div>";
+	cell5.className = "storageTd tableBorderRight productRowClickable alignRightTd";
 
+	// CELL delete
+	cell6.innerHTML="" +
+		"<label class='productsDeleteLabel'><input type='checkbox' class='productDeleteCheckbox' /></label>";
+	cell6.className = "productDeleteTd";
+	
 }
 
 function addAllProductsIntoTable(productsJSON){
@@ -543,6 +612,11 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 	var row = table.insertRow(rowIndex+1);
 	var cell=row.insertCell(0);
 	
+	var saveButton = "";
+	if(allowedChangeProducts == "true"){
+		saveButton = "<input type='button' class='saveProductDetailDataButton defaultButton' value='Salvesta' />";
+	}
+	
 	cell.innerHTML =
 	
 		"<div class='leftSideProductDetailViewDiv'>"+
@@ -563,7 +637,7 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 			
 			"<div class='productDetailDataPieceDiv'>" +
 				"<span class='productDetailPriceDiv'>Hind</span>" +
-				"<input type='text' maxlength='45' id='productDetailPriceInput' value='"+productJSON.price+"' />" +
+				"<input type='text' maxlength='45' id='productDetailPriceInput' value='"+parseFloat(productJSON.price).toFixed(2)+"' />" +
 			"</div>" +
 			
 			"<div class='productDetailDataPieceDiv'>" +
@@ -580,7 +654,7 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 			
 			"<div class='productDetailDataPieceDiv'>" +
 				"<span class='productDetailOPriceDiv'>Ostu hind</span>" +
-				"<input type='text' maxlength='45' id='productDetailOPriceInput' value='"+productJSON.o_price+"' />" +
+				"<input type='text' maxlength='45' id='productDetailOPriceInput' value='"+parseFloat(productJSON.o_price).toFixed(2)+"' />" +
 			"</div>" +
 			
 			"<div class='productDetailDataPieceDiv'>" +
@@ -592,10 +666,10 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 			
 			"<div class='productDetailDataPieceDiv'>" +
 				"<span class='productDetailStorageDiv'>Laoseis</span>" +
-				"<input type='text' maxlength='20' id='productDetailStorageInput' value='"+productJSON.storage+"' />" +
+				"<input type='text' maxlength='20' id='productDetailStorageInput' value='"+parseFloat(productJSON.storage).toFixed(3)+"' />" +
 			"</div>" +
 			
-			"<input type='button' class='saveProductDetailDataButton defaultButton' value='Salvesta' />"+
+			saveButton +
 			"<input type='button' class='closeDetailDiv defaultButton' value='Sulge' />"+
 		"</div>"+
 			
@@ -640,7 +714,7 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 	
 		"</div>";
 			
-	cell.colSpan = "5";
+	cell.colSpan = "6";
 	cell.className = "productDetailedDataRow";
 	
 	row.className = "detailedTr";

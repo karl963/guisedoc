@@ -56,7 +56,7 @@ public class ClientSearch {
 			
 			JsonObject client = new JsonObject();
 
-			client.addElement("id", c.getID());
+			client.addElement("ID", c.getID());
 			client.addElement("name", c.getName());
 			client.addElement("contactPerson", c.getContactPerson());
 			client.addElement("totalBoughtFor", c.getTotalBoughtFor());

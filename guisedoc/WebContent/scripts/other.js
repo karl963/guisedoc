@@ -85,14 +85,17 @@ $(document).ready(function(){
 /*
  * closing the detailed data div
  */
-var closeDetailedDataDiv = function(tableID, callback){
-	$('#'+tableID+' > tbody > tr.detailedTr')
- 	.find('td')
+var closeDetailedDataDiv = function(tableID, callback, rowName){
+	if(rowName == undefined){
+		rowName = "detailedTr";
+	}
+	$('#'+tableID+' > tbody > tr.'+rowName)
+ 	.find("td").eq(0)
  	.wrapInner('<div style="display: block;" />')
  	.parent()
- 	.find('td > div')
+ 	.find('td > div').eq(0)
  	.slideUp(200, function(){
- 		if(callback != null){ // if we added a function to execute after
+ 		if(callback != undefined){ // if we added a function to execute after
  			callback();
  		}
  	});
@@ -101,14 +104,17 @@ var closeDetailedDataDiv = function(tableID, callback){
 /*
  * open the detailed data div
  */
-var openDetailedDataDiv = function(tableID, callback){
-	$('#'+tableID+' > tbody > tr.detailedTr')
-	.find('td')
+var openDetailedDataDiv = function(tableID, callback,rowName){
+	if(rowName == undefined){
+		rowName = "detailedTr";
+	}
+	$('#'+tableID+' > tbody > tr.'+rowName)
+	.find('td').eq(0)
 	 .wrapInner('<div style="display: none;" />')
 	 .parent()
-	 .find('td > div')
+	 .find('td > div').eq(0)
 	 .slideDown(600, function(){
- 		if(callback != null){ // if we added a function to execute after
+ 		if(callback != undefined){ // if we added a function to execute after
  			callback();
  		}
  	});
@@ -155,7 +161,7 @@ function showSuccessNotification(message){
  */
 var validStringCharacters = "qwertyuiopüõäölkjhgfdsazxcvbnm" +
 							"QWERTYUIOPÜÕÄÖLKJHGFDSAMNBVCXZ" +
-							" ,.-;:_-<>!?/1234567890+'*";
+							" ,.-;:_-<>!?/1234567890+'*@";
 var validNumberCharacters = "1234567890.,";
 
 /*
@@ -234,4 +240,222 @@ function giveInvalidInputMessage(elementID, message){
 	showErrorNotification(message);
 	
 	hideLoadingDiv();
+}
+
+/*
+* SORTING TABLES
+*/
+var makeSortable = function(tableID){
+	$("#"+tableID+" > thead > tr > th").each(function(){
+		if($(this).children("input").length == 0){
+			$(this).addClass("headerSortable");
+		}
+	});
+};
+
+$(document).ready(function(){
+	
+	var sortableIndexes = [];
+	var sortableValues = [];
+	var rowsArray = [];
+	var sortUp = false;
+	
+	// sort up
+	$(document).on("click",".headerSortDown, .headerSortable",function(){
+		sortUp = false;
+
+		if($(this).closest("[class^='detailed']").length == 0){ // if we didn't have the click in the detailed div
+			$("[class^='detailed']").remove();
+		}
+		var tableID = $(this).closest("table").attr("id");
+		var columnIndex = $(this).index();
+
+		makeAllHeadersSortable(tableID);
+
+		$(this).removeClass("headerSortable");
+		$(this).addClass("headerSortUp");
+		
+		// check for the column type
+		if($(this).hasClass("dateColumn")){
+			makeIndexesAndValuesDates(tableID,columnIndex);
+		}
+		else if($(this).hasClass("numberColumn")){
+			makeIndexesAndValuesNumbers(tableID,columnIndex);
+		}
+		else{
+			makeIndexesAndValues(tableID,columnIndex);
+		}
+
+		addSortedToTable(tableID,mergeSort(sortableIndexes));
+	});
+	
+	// sort down
+	$(document).on("click",".headerSortUp",function(){
+		sortUp = true;
+
+		if($(this).closest("[class^='detailed']").length == 0){ // if we didn't have the click in the detailed div
+			$("[class^='detailed']").remove();
+		}
+		var tableID = $(this).closest("table").attr("id");
+		var columnIndex = $(this).index();
+
+		makeAllHeadersSortable(tableID);
+		
+		$(this).removeClass("headerSortable");
+		$(this).addClass("headerSortDown");
+		
+		// check for the column type
+		if($(this).hasClass("dateColumn")){
+			makeIndexesAndValuesDates(tableID,columnIndex);
+		}
+		else if($(this).hasClass("numberColumn")){
+			makeIndexesAndValuesNumbers(tableID,columnIndex);
+		}
+		else{
+			makeIndexesAndValues(tableID,columnIndex);
+		}
+		
+		addSortedToTable(tableID,mergeSort(sortableIndexes));
+	});
+	
+	/*
+	 * changes the classes of headers to headerSortable
+	 */
+	var makeAllHeadersSortable = function(tableID){
+		$("#"+tableID+" > thead > tr > th").each(function(){
+			$(this).removeClass("headerSortUp");
+			$(this).removeClass("headerSortDown");
+			if($(this).find("input").length == 0){
+				$(this).addClass("headerSortable");
+			}
+		});
+	};
+	
+	/*
+	 * finds the first visible text in the TD
+	 */
+	var findFirstVisibleString = function(tableID,rowIndex,columnIndex){
+		if($("#"+tableID+" > tbody > tr").eq(rowIndex).find("td").eq(columnIndex).find("div").length > 0){
+			return $("#"+tableID+" > tbody > tr").eq(rowIndex).find("td").eq(columnIndex).find("div").filter(":visible").eq(0).html().trim();
+		}
+		
+		return $("#"+tableID+" > tbody > tr").eq(rowIndex).find("td").eq(columnIndex).html().trim();
+	};
+	
+	/*
+	 * cleans arrays and adds the table data
+	 */
+	var makeIndexesAndValues = function(tableID,columnIndex){
+		var sortIndex = 0;
+		$("#"+tableID+" > tbody > tr").each(function(){
+			rowsArray.push($(this).clone());
+			sortableValues.push(findFirstVisibleString(tableID,sortIndex,columnIndex));
+			
+			sortableIndexes.push(sortIndex);
+			sortIndex++;
+		});
+		
+		$("#"+tableID+" > tbody > tr").remove();
+	};
+	
+	var makeIndexesAndValuesDates = function(tableID,columnIndex){
+		var sortIndex = 0;
+		$("#"+tableID+" > tbody > tr").each(function(){
+			rowsArray.push($(this).clone());
+			sortableValues.push(parseDate(findFirstVisibleString(tableID,sortIndex,columnIndex)));
+			
+			sortableIndexes.push(sortIndex);
+			sortIndex++;
+		});
+		
+		$("#"+tableID+" > tbody > tr").remove();
+	};
+	
+	var makeIndexesAndValuesNumbers = function(tableID,columnIndex){
+		var sortIndex = 0;
+		$("#"+tableID+" > tbody > tr").each(function(){
+			rowsArray.push($(this).clone());
+			sortableValues.push(parseFloat(findFirstVisibleString(tableID,sortIndex,columnIndex)));
+			
+			sortableIndexes.push(sortIndex);
+			sortIndex++;
+		});
+		
+		$("#"+tableID+" > tbody > tr").remove();
+	};
+	
+	/*
+	 * adds the sorted data back to the table
+	 */
+	var addSortedToTable = function(tableID,indexes){
+		while(indexes.length > 0){
+			var row = rowsArray[indexes.shift()];
+			$("#"+tableID+" tbody").append(row);
+		}
+		
+		// clean all arrays
+		sortableIndexes.length = 0;
+		sortableValues.length = 0;
+		rowsArray.length = 0;
+	};
+	
+	/**************************************
+	**** MERGE SORT
+	**************************************/
+
+	var mergeSort = function(array){
+	    if (array.length < 2) return array;
+	 
+	    var middle = parseInt(array.length / 2);
+	    var left = array.slice(0, middle);
+	    var right = array.slice(middle, array.length);
+
+	    return merge(mergeSort(left), mergeSort(right));
+	};
+	 
+	var merge = function(left, right){
+
+	    var result = [];
+
+	    while (left.length && right.length) {
+	    	if(sortUp){
+		        if(sortableValues[left[0]] <= sortableValues[right[0]]) { // <=
+		            result.push(left.shift());
+		        }
+		        else{
+		            result.push(right.shift());
+		        }
+	    	}
+	    	else{
+		        if(sortableValues[left[0]] > sortableValues[right[0]]) { // >
+		            result.push(left.shift());
+		        }
+		        else{
+		            result.push(right.shift());
+		        }
+	    	}
+	    }
+	 
+	    while (left.length) result.push(left.shift());
+	 
+	    while (right.length) result.push(right.shift());
+	 
+	    return result;
+	};
+});
+
+/*
+ * checks if the input is a number
+ */
+function isNumber(n) {
+	return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+/*
+* takes input string date and gives the date output
+* inut as day.month.year, output new date
+*/
+function parseDate(input) {
+	var parts = input.split('.');
+	return new Date(parts[2], parts[1]-1, parts[0]);
 }

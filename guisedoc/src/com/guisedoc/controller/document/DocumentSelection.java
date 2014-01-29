@@ -31,6 +31,7 @@ public class DocumentSelection {
 		for(int i = 0; i< 500 ; i++){
 			Document d = new Document();
 			d.setNumber(i);
+			d.setID(i);
 			d.setType(DocumentType.INVOICE);
 			documents.add(d);
 			
@@ -71,13 +72,28 @@ public class DocumentSelection {
 	public String getSelectedDocumentData(@RequestParam("selectedDocumentType")String type,
 			@RequestParam("selectedDocumentID")long newDocumentID,@RequestParam("isEstonian")boolean isEstonian,
 			@RequestParam("currentDocumentID")long openedDocumentID){
-		
+
 		if(type.equals("tab")){ // we didn't import, we selected it's tab
 			
 		}
 		
-		String documentJSON = "{";
-
+		// check if we don't have the document opened, then open it
+		boolean wasOpened = false;
+		for(Document d : DocumentGet.documents){
+			if(d.getID() == newDocumentID){
+				wasOpened = true;
+				break;
+			}
+		}
+		if(!wasOpened){
+			Document ddd = new Document();
+			ddd.setID(newDocumentID);
+			DocumentGet.documents.add(ddd);
+		}
+		
+		
+		//create json
+		
 		Document d = new Document();
 		
 		for(Document dd : DocumentGet.documents){

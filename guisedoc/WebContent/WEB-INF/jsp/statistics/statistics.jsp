@@ -1,6 +1,8 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<c:if test="${user.profile.isAllowed('ViewStatistics') == true}">
 <div id="statisticsOptionsDiv">
-		
+
 	<span class="separateOptionDiv">
 		Ajavahemik:
 		<input id="statisticsDateFrom" type="date" />
@@ -29,10 +31,14 @@
 	</span>
 	<div class="separateOptionDiv">
 		<input id="searchForStatistics" type="button" value="Otsi" class="defaultButton" />
-		<input id="createPDFOfStatistics" type="button" value="Koosta PDF" class="defaultButton" />
+		<c:if test="${user.profile.isAllowed('DownloadStatistics') == true}">
+			<input id="downloadPDFOfStatistics" type="button" value="Lae PDF alla" class="defaultButton" />
+		</c:if>
+		<input id="viewPDFOfStatistics" type="button" value="PDF eelvaade" class="defaultButton" />
 	</div>
 </div>
 
 <div id="hideOrShowStatisticsOptionDiv">Peida otsingu täpsustused</div>
+</c:if>
 
 <div id="statisticsTableDiv"></div>

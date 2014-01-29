@@ -43,4 +43,20 @@
         <welcome-file>/WEB-INF/redirect.jsp</welcome-file>
     </welcome-file-list>
     
+    <!-- databases -->
+
+    <resource-ref>
+		<description>MySQL database main</description>
+		<res-ref-name>jdbc/main</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+  	</resource-ref>
+
+  	<resource-ref>
+		<description>MySQL database Bestroof</description>
+		<res-ref-name>jdbc/bestroof</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+  	</resource-ref>
+
 </web-app>

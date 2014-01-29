@@ -2,28 +2,36 @@ var isEstonian = true;
 var importingDocument = false;
 
 $(document).ready(function() {
-
+	$.cookie("downloadStarted","");
 	/*************************************************************
 	 * downloading the pdf
 	 *************************************************************/
-	$(document).on("click", "#getDocumentPdf", function getPDF(){
-
-		$.cookie("pdfDownload", "finished",{ path: contextPath+"/documents" });
+	$(document).on("click", "#downloadDocumentPdf", function getPDF(){
+		$.cookie("documentsDownload","false",{ expires: 1, path: contextPath+"/documents/pdf" });
+		
 		showSuccessNotification("Teie dokument laetakse alla mõne sekundi pärast!");
 		showLoadingDiv();
+				
+		window.location.href=contextPath+"/documents/pdf/download?ID="+getCurrentDocumentID();
 		
-		window.location.href=contextPath+"/documents/pdf?ID="+getCurrentDocumentID();
-
 		waitForDownloadStart();
 	});
 	
+	$(document).on("click", "#viewDocumentPdf", function getPDF(){
+		showSuccessNotification("Teie dokument avatakse mõne sekundi pärast!");
+		window.open(contextPath+"/documents/pdf/view?ID="+getCurrentDocumentID(),"_blank");
+	});
+		
 	/*
 	 * check every 200 ms if the download is starting
 	 */
 	var waitForDownloadStart = function() {
-	    if($.cookie("pdfDownload") == "finished") {
+		var cookieVal = $.cookie("documentsDownload");
+
+	    if(cookieVal == "false") {
 	        setTimeout(function(){ waitForDownloadStart(); }, 200);
-	    }else {
+	    }else{
+	    	$.cookie("documentsDownload",null,{ expires: 0, path:contextPath+"/documents/pdf" });
 	    	hideLoadingDiv();
 	    }
 	    return false;
@@ -72,6 +80,10 @@ $(document).ready(function() {
 	};
 	
 	var updateQueueNumbers = function(){
+		
+		if(allowedChangeDocuments == "false"){
+			return;
+		}
 		
 		var i = 0;
 		var documentID = getCurrentDocumentID();
@@ -213,6 +225,10 @@ $(document).ready(function() {
 	 */
 	$(document).on("click", ".selectableDocumentTab", function(){
 		
+		if($(this).hasClass("selectedTab")){ // if it's already opened
+			return;
+		}
+		
 		showLoadingDiv();
 		
 		closeDetailedDataDiv("documentsTable", function(){
@@ -260,9 +276,8 @@ $(document).ready(function() {
 	};
 	
 	/*
-	 * id there's no active document, we make the last selected/first one active
+	 * if there's no active document, we make the last selected/first one active
 	 */
-	
 	if($(".selectedTab").length == 0){
 		showLoadingDiv();
 		if(localStorage.getItem("lastSelectedDocumentID") != null){ // make last selected active
@@ -286,6 +301,10 @@ $(document).ready(function() {
 	 *************************************************************/
 	$(document).on("blur","#documentsOptionsDiv input[type='text'], #documentsOptionsDiv input[type='date']", function(){
 
+		if(allowedChangeDocuments == "false"){
+			return;
+		}
+		
 		showLoadingDiv();
 		
 		var value = $(this).val();
@@ -302,6 +321,10 @@ $(document).ready(function() {
 	
 	$(document).on("blur","#documentsOptionsDiv input[type='number']", function(){
 		
+		if(allowedChangeDocuments == "false"){
+			return;
+		}
+		
 		showLoadingDiv();
 		
 		var value = parseFloat($(this).val());
@@ -317,6 +340,10 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click","#documentsOptionsDiv input[type='checkbox']", function(){
+		
+		if(allowedChangeDocuments == "false"){
+			return;
+		}
 		
 		showLoadingDiv();
 		
@@ -363,7 +390,12 @@ $(document).ready(function() {
 	 * adding a new product to list by clicking add button
 	 */
 	$(document).on("click", "#addProductToDocument", function(){
-
+		
+		if(allowedChangeDocuments == "false"){
+			showErrorNotification(permissionDeniedMessage);
+			return;
+		}
+		
 		showLoadingDiv();
 		
 		var productJSON = makeAddDocumentProductJSON();
@@ -403,6 +435,11 @@ $(document).ready(function() {
 	 * click on delete selected products from the document
 	 */
 	$(document).on("click", "#documentsDeleteSelectedProducts", function(){
+		
+		if(allowedChangeDocuments == "false"){
+			showErrorNotification(permissionDeniedMessage);
+			return;
+		}
 		
 		showLoadingDiv();
 		
@@ -450,6 +487,10 @@ $(document).ready(function() {
 	 * and display to the user
 	 */
 	$(document).on("input", ".productSearchField", function(){
+		
+		if(allowedChangeDocuments == "false"){
+			return;
+		}
 		
 		showLoadingDiv();
 		
@@ -624,6 +665,11 @@ $(document).ready(function() {
 	 * saves the document product detailed data
 	 */
 	$(document).on("click", ".saveDocumentsDetailDataButton", function(){
+		
+		if(allowedChangeDocuments == "false"){
+			showErrorNotification(permissionDeniedMessage);
+			return;
+		}
 		
 		showLoadingDiv();
 		
@@ -1209,7 +1255,7 @@ var addProductToDocumentsTable = function(id, product){
 	
 	var sum;
 	if(product.calculatedSum == true || product.sum == undefined){
-		sum = "";
+		sum = 0;
 	}
 	else{
 		sum = product.sum;
@@ -1218,14 +1264,14 @@ var addProductToDocumentsTable = function(id, product){
 	cell1.innerHTML = product.code;
 	cell1.className = "documentsCodeTd tableBorderRight productRowClickable";
 	
-	cell3.innerHTML = product.amount;
-	cell3.className = "documentsAmountTd tableBorderRight productRowClickable";
+	cell3.innerHTML = parseFloat(product.amount).toFixed(2);
+	cell3.className = "alignRightTd documentsAmountTd tableBorderRight productRowClickable";
 
 	var nameDivs = "<div class='documentsTableNameDiv productEstonianDiv'>"+product.name+"</div>"+
 					"<div class='documentsTableENameDiv productEnglishDiv'>"+product.e_name+"</div>";
 	
-	var priceDivs = "<div class='documentsTablePriceDiv productEstonianDiv'>"+product.price+"</div>"+
-					"<div class='documentsTableOPriceDiv productEnglishDiv'>"+product.o_price+"</div>";
+	var priceDivs = "<div class='documentsTablePriceDiv productEstonianDiv'>"+parseFloat(product.price).toFixed(2)+"</div>"+
+					"<div class='documentsTableOPriceDiv productEnglishDiv'>"+parseFloat(product.o_price).toFixed(2)+"</div>";
 	
 	var unitDivs = "<div class='documentsTableUnitDiv productEstonianDiv'>"+product.unit+"</div>"+
 					"<div class='documentsTableEUnitDiv productEnglishDiv'>"+product.e_unit+"</div>";
@@ -1234,16 +1280,16 @@ var addProductToDocumentsTable = function(id, product){
 	cell2.className = "documentsNameTd tableBorderRight productRowClickable";
 
 	cell4.innerHTML = priceDivs;
-	cell4.className = "documentsPriceTd tableBorderRight productRowClickable";
+	cell4.className = "documentsPriceTd tableBorderRight productRowClickable alignRightTd";
 	
 	cell5.innerHTML = unitDivs;
 	cell5.className = "documentsUnitTd tableBorderRight productRowClickable";
 	
 	cell6.innerHTML = product.discount;
-	cell6.className = "documentsDiscountTd tableBorderRight productRowClickable";
+	cell6.className = "alignRightTd documentsDiscountTd tableBorderRight productRowClickable";
 	
-	cell7.innerHTML = ""+sum;
-	cell7.className = "documentsSumTd tableBorderRight productRowClickable";
+	cell7.innerHTML = parseFloat(sum).toFixed(2);
+	cell7.className = "alignRightTd documentsSumTd tableBorderRight productRowClickable";
 	
 	cell8.innerHTML = "<label class='documentsDeleteCheckboxLabel'><input class='documentsDeleteCheckbox' type='checkbox'/></label>";
 	cell8.className = "documentsDeleteTd";
@@ -1305,7 +1351,7 @@ var makeNewTabAndOpenIt = function(id,number){
 	$("#newDocumentSelect").val("default");
 	
 	/*
-	 * if we added first tab, we don't click on it because ther will be 
+	 * if we added first tab, we don't click on it because there will be 
 	 * a click later in autocheck if first document (on load)
 	 */
 	if($(".selectableDocumentTab").length==1){

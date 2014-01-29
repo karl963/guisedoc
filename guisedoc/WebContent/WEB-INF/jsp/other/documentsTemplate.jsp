@@ -3,6 +3,7 @@
 
 <tiles:insertAttribute name="tabs" />
 
+<c:if test="${user.profile.isAllowed('ViewDocuments') == true}">
 <c:choose>
 <c:when test="${howManyDocuments > 0}" >
 	<tiles:insertAttribute name="options" />
@@ -10,6 +11,9 @@
 	<tiles:insertAttribute name="searchResults" />
 	
 	<tiles:insertAttribute name="clientSelect" />
-	<tiles:insertAttribute name="importDocument"  />
 </c:when>
 </c:choose>
+
+<tiles:insertAttribute name="importDocument"  />
+	
+</c:if>

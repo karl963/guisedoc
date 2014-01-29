@@ -1,5 +1,7 @@
 $(document).ready(function() {
 	
+	makeSortable("clientsTable");
+	
 	/*
 	 * search history input
 	 */
@@ -33,6 +35,125 @@ $(document).ready(function() {
 		$("#includeRealBuyers").prop("checked",false);
 	}
 
+	/*
+	 * add client
+	 */
+	$(document).on("click","#clientAddButton",function(){
+		
+		var name = $("#clientSearchNameInput").val();
+		var contactPerson = $("#clientSearchContactPersonInput").val();
+		
+		if(checkForInvalidStringCharacters(new Array(
+				new Array(name,"clientSearchNameInput"),
+				new Array(contactPerson,"clientSearchContactPersonInput")
+				))){
+			return;
+		}
+		
+		var clientJSON = {};
+		clientJSON.name = name;
+		clientJSON.contactPerson = contactPerson;
+		
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/clients/add",
+	        data : {clientJSON: JSON.stringify(clientJSON)},
+	        success : function(response) {
+
+	        	responseJSON = jQuery.parseJSON(response);
+	        	
+	        	if(responseJSON.response=="success"){
+	        		addClientRowToTable(responseJSON.ID,clientJSON.name,clientJSON.contactPerson,0.0);
+	        		showSuccessNotification(responseJSON.message);
+	        	}
+	        	else{
+	        		showErrorNotification(responseJSON.message);
+	        	}
+	        	
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	/*
+	 * delete clients
+	 */
+	$(document).on("click","#deleteClientsButton",function(){
+		
+		showLoadingDiv();
+		
+		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
+			closeDetailedDataDiv("clientsTable", function(){
+				$(".detailedTr").remove(); // remove the old row
+			});
+		}
+		
+		var forDeleteJSON = makeDeleteClientsJSON();
+		if(forDeleteJSON == null){
+			hideLoadingDiv();
+			return;
+		}
+
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/clients/delete",
+	        data : {forDeleteJSON: JSON.stringify(forDeleteJSON)},
+	        success : function(response) {
+	        	
+	        	if(response.split(";")[0]=="success"){
+	        		showSuccessNotification(response.split(";")[1]);
+	        		deleteSelectedObjectsFromTable();
+	        	}
+	        	else{
+	        		showErrorNotification(response.split(";")[1]);
+	        	}
+	        },
+	        error : function(e) {
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	/*
+	 * delete selected objects from table after post success
+	 */
+	function deleteSelectedObjectsFromTable(){
+		$(".clientDeleteCheckbox").each(function(){
+			if($(this).is(":checked")){
+				$(this).closest(".clientRow").remove();
+			}
+		});
+	}
+	
+	/*
+	 * deleteable objects json
+	 */
+	var makeDeleteClientsJSON = function(){
+		
+		var objects = [];
+		
+		$(".clientDeleteCheckbox").each(function(){
+
+			if($(this).is(":checked")){
+
+				var object = {};
+				object.ID = $(this).closest(".clientRow").attr("id").replace("clientRow","");
+				
+				objects.push(object);
+			}
+			
+		});
+
+		if(objects.length == 0){ // there were no objects selected, no need to post
+			return;
+		}
+
+		return objects;
+	};
 	
 	/*
 	 * Get the detailed data about the client from server, animate the row insert
@@ -40,7 +161,7 @@ $(document).ready(function() {
 	function makeDetailClientPost(clickedRow){
 
 		var id = clickedRow.attr("id").replace("clientRow","");
-		var rowIndex = $("#"+clickedRow.attr("id")).index();
+		var rowIndex = $(clickedRow).index();
 
 		$.ajax({
 	        type : "POST",
@@ -49,12 +170,12 @@ $(document).ready(function() {
 	        success : function(jsonString) {
 
 	        	var clientJSON = jQuery.parseJSON(jsonString);
-	        	
-	        	addClientDetailedDataRow(rowIndex,clientJSON);
-	        	
-	        	openDetailedDataDiv("clientsTable");
-	        	
+
 	        	if(clientJSON.response=="success"){
+	        		
+	        		addClientDetailedDataRow(rowIndex,clientJSON);
+	        		openDetailedDataDiv("clientsTable");
+	        		
 	        		showSuccessNotification(clientJSON.message);
 	        	}
 	        	else{
@@ -115,34 +236,74 @@ $(document).ready(function() {
 	    });
 	});
 	
+	/*
+	 * updates the documents in clients detail row
+	 */
 	var updateClientDetailDocuments = function(documentsJSON){
-		$(".documentNumberDiv").remove();
-		var numbersHTML = "";
+		$(".documentNumberTable").remove();
+		
+		var table = document.createElement("table");
+		table.createTHead();
+		table.createTFoot();
+		
+		table.setAttribute("id","numbersTable");
+		var headerRow = table.createTHead().insertRow(0);
+		headerRow.className += "tableHeaderRow";
+		
+		var headerCell1 = document.createElement("th");
+		var headerCell2 = document.createElement("th");
+		var headerCell3 = document.createElement("th");
+		
+		headerCell1.innerHTML = "Number";
+		headerCell1.className += "tableBorderRight";
+		
+		headerCell2.innerHTML = "Summa";
+		headerCell2.className += "tableBorderRight numberColumn";
+		
+		headerCell3.innerHTML = "Kuupäev";
+		headerCell3.className += "dateColumn";
+		
+		headerRow.appendChild(headerCell1);
+		headerRow.appendChild(headerCell2);
+		headerRow.appendChild(headerCell3);
+		
+		var tbody = table.createTBody();
+		
 		for(var i = 0; i<documentsJSON.length ;i++){
 			var doc = documentsJSON[i];
 			
-			numbersHTML += "<div class='documentNumberDiv'>"+
+			var row = tbody.insertRow(0);
+			var cell1 = row.insertCell(0);
+			var cell2 = row.insertCell(1);
+			var cell3 = row.insertCell(2);
 			
-			doc.fullNumber+" <small><i>("+doc.totalSum+", "+doc.formatedDate+")</i></small>"+
+			cell1.innerHTML = doc.fullNumber;
+			cell1.className += "tableBorderRight";
 			
-			"</div>";
+			cell2.innerHTML = parseFloat(doc.totalSum).toFixed(2);
+			cell2.className += "numbersSumCell tableBorderRight";
+			
+			cell3.innerHTML = doc.formatedDate;
+			cell3.className += "numbersDateCell";
 		}
 		
-		$("#clientDetailNumbersDiv").html(numbersHTML);
+		$("#clientDetailNumbersDiv").html(table);
+		makeSortable("numbersTable");
 	};
 	
 	/*
 	 * click on table row, get detailed client data
 	 */
-	$(document).on("click", ".clientRow", function(){
+	$(document).on("click", ".clientRowClickable", function(){
 		
 		showLoadingDiv();
-		
-		var clickedRow = $(this); // the row we clicked on
+		var clickedRow = $(this).closest(".clientRow"); // the row we clicked on
 		
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
+
 			closeDetailedDataDiv("clientsTable", function(){
 			 	$(".detailedTr").remove(); // remove the old row
+
 			 	makeDetailClientPost(clickedRow); // make a new detailed client data row
 			});
 		}
@@ -152,13 +313,13 @@ $(document).ready(function() {
 	});
 	
 	/*
-	 * Save data post
+	 * Save client data post
 	 */
 	$(document).on("click", ".clientDetailSaveButton", function(){
 		
 		showLoadingDiv();
 		
-		var rowIndex = $(this).closest(".detailedTr").index()-1;
+		var clientID = $(this).closest(".clientDetailedDataDiv").children("#leftSideDetailDiv").children(".clientIDDiv").html();
 
 		var clientJSONString = makeClientDetailJSON();
 		if(clientJSONString == null){
@@ -174,7 +335,7 @@ $(document).ready(function() {
 	        	if(response.split(";")[0]=="success"){
 	        		showSuccessNotification(response.split(";")[1]);
 	        		
-	        		updateClientRegularRowData(rowIndex);
+	        		updateClientRegularRowData(clientID);
 	        	}
 	        	else{
 	        		showErrorNotification(response.split(";")[1]);
@@ -202,10 +363,8 @@ $(document).ready(function() {
 	/*
 	 * Updates the regular data row's data after saving the detail data
 	 */
-	function updateClientRegularRowData(index){
-
-		var row = $('tr', $("#clientsTable")).eq(index);
-		
+	function updateClientRegularRowData(ID){
+		var row = $("#clientRow"+ID);
 		row.children(".clientNameTd").html($("#clientDetailNameInput").val());
 		row.children(".clientContactPersonTd").html($("#clientDetailContactPersonInput").val());
 	}
@@ -287,6 +446,7 @@ $(document).ready(function() {
 	
 	var makeClientDetailJSON = function(){
 		
+		var ID = $(".leftSideDetailDiv").children(".clientIDDiv").val();
 		var name = $("#clientDetailNameInput").val();
 		var phone = $("#clientDetailPhoneInput").val();
 		var contactPerson = $("#clientDetailContactPersonInput").val();
@@ -306,6 +466,7 @@ $(document).ready(function() {
 		
 		var clientJSON = {};
 		
+		clientJSON.ID = ID;
 		clientJSON.name = name;
 		clientJSON.phone = phone;
 		clientJSON.contactPerson = contactPerson;
@@ -355,16 +516,21 @@ $(document).ready(function() {
 	};
 
 	function addClientDetailedDataRow(rowIndex,clientJSON){
-		
-		var table = document.getElementById("clientsTable");
+
+		var table = document.getElementById("clientsTable").getElementsByTagName('tbody')[0];
 		
 		var row = table.insertRow(rowIndex+1);
 		var cell=row.insertCell(0);
 		
+		var saveButton = "";
+		if(allowedChangeClients == "true"){
+			saveButton = "<input type='button' class='clientDetailSaveButton defaultButton' value='Salvesta'/>";
+		}
+		
 		cell.innerHTML = "<div class='clientDetailedDataDiv'>" +
 		
 			"<div id='leftSideDetailDiv'>"+
-			
+					"<div class='clientIDDiv hidden'>"+clientJSON.ID+"</div>"+
 					"<div><span class='clientDetailNameDiv'>Tehinguid kokku:</span> <span class='clientDetailInputDiv'>"+clientJSON.totalDeals+"</span></div>" +
 					"<div><span class='clientDetailNameDiv'>Viimase tehingu nr:</span> <span class='clientDetailInputDiv'>"+clientJSON.lastDealNR+"</span></div>" +
 					"<div><span class='clientDetailNameDiv'>Viimane tehing:</span> <span class='clientDetailInputDiv'>"+clientJSON.lastDealDate+"</span></div>" +
@@ -406,12 +572,12 @@ $(document).ready(function() {
 			"</div>"+
 			
 			"<div>" +
-				"<input type='button' class='clientDetailSaveButton defaultButton' value='Salvesta'/>" +
+				saveButton +
 				"<input type='button' class='closeDetailDiv defaultButton' value='Sulge'/>" +
 			"</div>" +
 			
 			"</div>";
-		cell.colSpan = "3";
+		cell.colSpan = "4";
 		cell.className = "clientDetailedDataRow";
 		
 		row.className = "detailedTr";
@@ -425,35 +591,38 @@ $(document).ready(function() {
 		
 		for(var i = 0;i < clientsJSON.clients.length ; i++){
 			
-			var id = clientsJSON.clients[i].id;
+			var ID = clientsJSON.clients[i].ID;
 			var name = clientsJSON.clients[i].name;
 			var contactPerson = clientsJSON.clients[i].contactPerson;
 			var totalBoughtFor = clientsJSON.clients[i].totalBoughtFor;
 			
-			addClientRowToTable(id,name,contactPerson,totalBoughtFor);
+			addClientRowToTable(ID,name,contactPerson,totalBoughtFor);
 		}
-		
 	}
 	
 	function addClientRowToTable(id,name,contactPerson,totalBoughtFor){
 		
-		var table = document.getElementById("clientsTable");
-		var row = table.insertRow(2);
+		var table = document.getElementById("clientsTable").getElementsByTagName("tbody")[0];
+		var row = table.insertRow(0);
 		var cell1 = row.insertCell(0);
 		var cell2 = row.insertCell(1);
 		var cell3 = row.insertCell(2);
+		var cell4 = row.insertCell(3);
 		
 		row.className = "clientRow";
 		row.setAttribute("id","clientRow"+id);
 		
 		cell1.innerHTML = name;
-		cell1.className = "clientNameTd tableBorderRight";
+		cell1.className = "clientNameTd tableBorderRight clientRowClickable";
 		
 		cell2.innerHTML = contactPerson;
-		cell2.className = "clientContactPersonTd tableBorderRight";
+		cell2.className = "clientContactPersonTd tableBorderRight clientRowClickable";
 		
-		cell3.innerHTML = totalBoughtFor;
-		cell3.className = "clientTotalBoughtForTd";
+		cell3.innerHTML = parseFloat(totalBoughtFor).toFixed(2);
+		cell3.className = "alignRightTd clientTotalBoughtForTd tableBorderRight clientRowClickable";
+		
+		cell4.innerHTML = "<label class='clientDeleteLabel' ><input type='checkBox' class='clientDeleteCheckbox'/></label>";
+		cell4.className = "clientDeleteTd";
 	}
 
 });

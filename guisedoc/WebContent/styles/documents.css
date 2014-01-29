@@ -98,9 +98,7 @@
 }
 .documentsDeleteTd{
 	text-align:center;
-	width:100px;
-	max-width:100px;
-	min-width:100px;
+	width:70px;
 	overflow:hidden;
 }
 .documentsDiscountTd{
@@ -214,8 +212,14 @@
 	padding:2px;
 }
 
-#insertClientAddress, #insertShipmentAddress, #insertShipmentTime{
+#insertClientAddress, #insertShipmentAddress, #insertShipmentTime,#insertPaymentRequirement{
 	width:250px;
+}
+#insertValidDue{
+	width:50px;	
+}
+#insertAdvance{
+	width:80px;
 }
 
 /*

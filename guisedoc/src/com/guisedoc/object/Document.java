@@ -35,14 +35,15 @@ public class Document {
 	private String shipmentAddress;
 	@SerializedName("shipmentPlace")
 	private String shipmentPlace;
-	
+	@SerializedName("CeSpecification")
+	private String CeSpecification;
+	@SerializedName("paymentRequirement")
+	private String paymentRequirement;
+
 	@SerializedName("validDue")
 	private long validDue;
 	@SerializedName("advance")
 	private Double advance;
-	
-	@SerializedName("paymentRequirement")
-	private int paymentRequirement;
 	
 	@SerializedName("paydInCash")
 	private boolean paydInCash;
@@ -77,7 +78,7 @@ public class Document {
 		this.shipmentPlace = Document.DEFAULT_STRING;
 		this.validDue = Document.DEFAULT_LONG;
 		this.advance = Document.DEFAULT_DOUBLE;
-		this.paymentRequirement = Document.DEFAULT_INT;
+		this.paymentRequirement = Document.DEFAULT_STRING;
 		this.paydInCash = Document.DEFAULT_BOOLEAN;
 		this.showDiscount = Document.DEFAULT_BOOLEAN;
 		this.addToStatistics = Document.DEFAULT_BOOLEAN;
@@ -88,6 +89,7 @@ public class Document {
 		this.fullNumber = null;
 		this.setLanguage(new Language("EST"));
 		this.showCE = !Document.DEFAULT_BOOLEAN;
+		this.CeSpecification = Document.DEFAULT_STRING;;
 	}
 	
 	/*
@@ -144,8 +146,8 @@ public class Document {
 		}
 	}
 	
-	public byte[] getDocumentInBytes(){
-		return DocumentBuilder.build(this);
+	public byte[] getDocumentInBytes(Firm firm, User user){
+		return DocumentBuilder.build(this,firm,user);
 	}
 	
 	/*
@@ -224,11 +226,11 @@ public class Document {
 		this.advance = advance;
 	}
 
-	public int getPaymentRequirement() {
+	public String getPaymentRequirement() {
 		return paymentRequirement;
 	}
 
-	public void setPaymentRequirement(int paymentRequirement) {
+	public void setPaymentRequirement(String paymentRequirement) {
 		this.paymentRequirement = paymentRequirement;
 	}
 
@@ -305,5 +307,12 @@ public class Document {
 
 	public void setShowCE(boolean showCE) {
 		this.showCE = showCE;
+	}
+	public String getCeSpecification() {
+		return CeSpecification;
+	}
+
+	public void setCeSpecification(String ceSpecification) {
+		CeSpecification = ceSpecification;
 	}
 }

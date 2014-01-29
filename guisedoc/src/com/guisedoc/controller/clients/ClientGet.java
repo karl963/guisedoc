@@ -4,12 +4,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.guisedoc.controller.UserValidator;
 import com.guisedoc.object.Client;
+import com.guisedoc.object.User;
 
 @Controller
 public class ClientGet {
@@ -17,7 +22,12 @@ public class ClientGet {
 	public static List<Client> clients = new ArrayList<Client>();
 
 	@RequestMapping(value="/clients", method = RequestMethod.GET)
-	public String getClientsView(Model model){
+	public Object getClientsView(HttpSession session, RedirectAttributes redirectAttributes,
+			Model model){
+		
+		if(UserValidator.validateLoggedUser(session)){
+			return UserValidator.directToLogin(session.getServletContext().getContextPath(),redirectAttributes);
+		}
 
 		if(clients.size() == 0){
 			for(int i = 0; i<10;i++){
@@ -38,7 +48,7 @@ public class ClientGet {
 		}
 		
 		model.addAttribute("clients",clients);
-		model.addAttribute("pageRequest","clients");
+		model.addAttribute("user",session.getAttribute("user"));
 		
 		return "clients";
 	}

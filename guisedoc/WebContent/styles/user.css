@@ -2,13 +2,16 @@
 	display: inline-block;
 	min-width:120px;
 }
+.prefixDataDescription{
+	display: inline-block;
+	min-width:150px;
+}
 
 .userDataInput input[type="text"]{
 	min-width:200px;
 	width:50%;
 	maxlength:45;
 }
-
 .userDataDiv {
 	width:90%;
 }

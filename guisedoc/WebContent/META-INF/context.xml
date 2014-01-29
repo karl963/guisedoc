@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+
+    <!-- Default set of monitored resources -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+
+<Resource
+	name="jdbc/main"
+	auth="Container" 
+	type="javax.sql.DataSource"
+    maxActive="100" 
+    maxIdle="30" 
+    maxWait="1000"
+    username="mainer" 
+    password="corenuke" 
+    driverClassName="com.mysql.jdbc.Driver"
+    url="jdbc:mysql://localhost:3306/main"
+    timeBetweenEvictionRunsMillis="300000"
+    removeAbandonedTimeout="60"
+/>
+               
+<Resource
+	name="jdbc/bestroof"
+	auth="Container" 
+	type="javax.sql.DataSource"
+    maxActive="100" 
+    maxIdle="30" 
+    maxWait="1000"
+    username="bestroof" 
+    password="bestroofer" 
+    driverClassName="com.mysql.jdbc.Driver"
+    url="jdbc:mysql://localhost:3306/bestroof"
+    timeBetweenEvictionRunsMillis="300000"
+    removeAbandonedTimeout="60"
+/>
+ 
+ 
+
+</Context>

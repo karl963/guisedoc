@@ -35,56 +35,6 @@ import com.guisedoc.workshop.document.DocumentBuilder;
 @Controller
 @RequestMapping("/documents")
 public class DocumentHandling {
-	
-	@RequestMapping(value="/pdf",method = RequestMethod.GET, params={"ID"})
-	@ResponseBody
-	public HttpEntity<byte[]> getPDF(@RequestParam("ID")long id, HttpServletRequest request, HttpServletResponse response){
-		
-        Document dd = new Document();
-        
-        dd.setPrefix("AA");
-        dd.setNumber(2222);
-        dd.setType(DocumentType.ADVANCE_INVOICE);
-        
-        List<Product> products = new ArrayList<Product>();
-        for(int i = 0; i < 60; i++){
-        	Product p = new Product();
-        	p.setCode("K"+i*11111);
-        	if(i == 4 || i == 6 || i == 10){
-        		p.setAdditional_Info("a\n"
-        				+ "b\n"
-        				+ "c\n"
-        				+ "asd\n"
-        				+ "asd\n"
-        				+ "dd\n"
-        				+ "ass\n"
-        				+ "asdsada");
-        	}
-        	p.setName("name"+i);
-        	p.setPrice(i*1.0);
-        	p.setDiscount(10.0);
-        	p.setUnit("unit");
-        	p.setAmount(i*1.0);
-        	p.setTotalSum(i*1000.0);
-
-        	products.add(p);
-        }
-        
-        dd.setProducts(products);
-        
-
-		byte[] bytes = DocumentBuilder.build(dd);
-
-		HttpHeaders header = new HttpHeaders();
-		header.setContentType(new MediaType("application", "pdf"));
-	    header.set("Content-Disposition",
-	    		"attachment; filename=" + dd.getFullNumber().replace(" ", "_"));
-	    header.setContentLength(bytes.length);
-
-	    response.addCookie(new Cookie("pdfDownload","starting"));
-	    
-		return new HttpEntity<byte[]>(bytes, header);
-	}
 
 	@RequestMapping(value="/add", method = RequestMethod.POST, params={"newDocumentType"})
 	@ResponseBody
@@ -133,7 +83,7 @@ public class DocumentHandling {
 			d.setAdvance(Double.parseDouble(String.valueOf(value).replace(",", "."))); 
 		}
 		else if(attributeName.equals("PaymentRequirement")){
-			d.setPaymentRequirement(Integer.parseInt(String.valueOf(value))); 
+			d.setPaymentRequirement(String.valueOf(value)); 
 		}
 		else if(attributeName.equals("ShipmentTime")){
 			d.setShipmentTime((String) value);
@@ -146,6 +96,9 @@ public class DocumentHandling {
 		}
 		else if(attributeName.equals("OrderNumber")){
 			d.setOrderNR((String) value);
+		}
+		else if(attributeName.equals("CeSpecification")){
+			d.setCeSpecification((String) value);
 		}
 		else if(attributeName.equals("ClientName")){
 			d.getClient().setName((String) value);

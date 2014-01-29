@@ -1,4 +1,10 @@
 $(document).ready(function() {
+
+	var clientType = "";
+	var startDate = "";
+	var endDate = "";
+	var clientName = "";
+	var code = "";
 	
 	/*
 	 * fill in search history on a page load
@@ -25,6 +31,54 @@ $(document).ready(function() {
 	if(localStorage.getItem("statisticsEndDate") != null){
 		$("#statisticsDateTo").val(localStorage.getItem("statisticsEndDate"));
 	}
+	
+	/*************************************************************
+	 * downloading the pdf
+	 *************************************************************/
+	$(document).on("click", "#downloadPDFOfStatistics", function getPDF(){
+		$.cookie("statisticsDownload","false",{ expires: 1, path: contextPath+"/statistics/pdf" });
+
+		showSuccessNotification("Teie dokument laetakse alla mõne sekundi pärast!");
+		showLoadingDiv();
+
+		var path = contextPath+"/statistics/pdf/download";
+
+		path += "?clientType="+clientType+"&startDate="+startDate+"&endDate="+endDate+
+		"&clientName="+clientName+"&code="+code;
+		
+		window.location.href = path;
+
+		waitForDownloadStart();
+	});
+	
+	$(document).on("click", "#viewPDFOfStatistics", function getPDF(){
+		showSuccessNotification("Teie dokument avatakse mõne sekundi pärast!");
+		
+		var path = contextPath+"/statistics/pdf/view";
+		
+		path += "?clientType="+clientType+"&startDate="+startDate+"&endDate="+endDate+
+			"&clientName="+clientName+"&code="+code;
+		
+		window.open(path,"_blank");
+	});
+	
+	/*
+	 * check every 200 ms if the download is starting
+	 */
+	/*
+	 * check every 200 ms if the download is starting
+	 */
+	var waitForDownloadStart = function() {
+		var cookieVal = $.cookie("statisticsDownload");
+
+	    if(cookieVal == "false") {
+	        setTimeout(function(){ waitForDownloadStart(); }, 200);
+	    }else{
+	    	$.cookie("statisticsDownload",null,{ expires: 0, path:contextPath+"/statistics/pdf" });
+	    	hideLoadingDiv();
+	    }
+	    return false;
+	};
 
 	/*************************************************************
 	 * SEARCHING
@@ -58,8 +112,8 @@ $(document).ready(function() {
 		showLoadingDiv();
 
 		$("#statisticsTable").remove();
-		var statisticsJSONString = makeStatisticsJSON();
-		if(statisticsJSONString == null){
+		var statisticsJSON = makeStatisticsJSON();
+		if(statisticsJSON == null){
 			return;
 		}
 		
@@ -68,17 +122,25 @@ $(document).ready(function() {
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/statistics/search",
-	        data : {statisticsJSONString: JSON.stringify(statisticsJSONString)},
-	        success : function(jsonString) {
+	        data : {statisticsJSONString: JSON.stringify(statisticsJSON)},
+	        success : function(response) {
 	        	
-	        	var statisticsJSON = jQuery.parseJSON(jsonString);
+	        	var responseJSON = jQuery.parseJSON(response);
 	        	
-	        	if(statisticsJSON.response=="success"){
-	        		showSuccessNotification(statisticsJSON.message);
-	        		addNewStatisticsTableWithData(statisticsJSON);
+	        	if(responseJSON.response=="success"){
+	        		showSuccessNotification(responseJSON.message);
+	        		addNewStatisticsTableWithData(responseJSON);
+	        		
+	        		clientType = statisticsJSON.dataGroup;
+	        		startDate = statisticsJSON.startDate;
+	        		endDate = statisticsJSON.endDate;
+	        		clientName = statisticsJSON.clientName;
+	        		code = statisticsJSON.code;
+	        		
+	        		makeSortable("statisticsTable");
 	        	}
 	        	else{
-	        		showErrorNotification(statisticsJSON.message);
+	        		showErrorNotification(responseJSON.message);
 	        	}
 	        	
 	        	hideLoadingDiv();
@@ -167,6 +229,11 @@ $(document).ready(function() {
 	 */
 	$(document).on("click","#deleteSelectedStatistics", function(){
 		
+		if(allowedDeleteStatistics == "false"){
+			showErrorNotification(permissionDeniedMessage);
+			return;
+		}
+		
 		showLoadingDiv();
 		
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
@@ -179,6 +246,7 @@ $(document).ready(function() {
 		
 		var forDeleteStatisticsJSON = makeDeleteStatisticsJSON();
 		if(forDeleteStatisticsJSON == null){
+			hideLoadingDiv();
 			return;
 		}
 
@@ -212,7 +280,7 @@ $(document).ready(function() {
 		
 		showLoadingDiv();
 		
-		var rowIndex = $(this).closest(".statisticsRow").index(); // the row we clicked on
+		var rowIndex = $(this).closest(".statisticsRow").index()+1; // the row we clicked on
 		var id = $(this).closest(".statisticsRow").attr("id").replace("statisticsRow","");
 		
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
@@ -294,6 +362,8 @@ $(document).ready(function() {
 		
 		showLoadingDiv();
 		
+		var index = $(this).closest(".detailedTr").index();
+		console.log(index);
 		var changedStatisticsJSON = makeChangedStatisticsJSON();
 		if(changedStatisticsJSON == null){
 			return;
@@ -306,20 +376,28 @@ $(document).ready(function() {
 	        success : function(response) {
 	        	
 	        	if(response.split(";")[0]=="success"){
+	        		changeRegularDataRow(changedStatisticsJSON,index);
 	        		showSuccessNotification(response.split(";")[1]);
 	        	}
 	        	else{
 	        		showErrorNotification(response.split(";")[1]);
 	        	}
-	        	
-	        	hideLoadingDiv();
 	        },
 	        error : function(e) {
-	        	hideLoadingDiv();
 	        	showErrorNotification("Viga serveriga ühendumisel");
 	        }
 	    });
 	});
+	
+	/*
+	 * changes the regular data row in table
+	 */
+	var changeRegularDataRow = function(object,index){
+		var row = $("#statisticsTable").children("tbody").children("tr").eq(index-1);
+
+		row.children(".statisticsAmountTd").html(parseFloat(object.amount).toFixed(2));
+		row.children(".statisticsTotalPriceTd").html(parseFloat(object.totalPrice).toFixed(2));
+	};
 	
 	/*
 	 * add search elements to history (storage)
@@ -391,32 +469,29 @@ $(document).ready(function() {
 		return statisticsJSON;
 	};
 	
+	/*
+	 * deleteable objects json
+	 */
 	var makeDeleteStatisticsJSON = function(){
-		
-		var forDeleteStatisticsJSON = "{'statisticObjects':[";
-		var wasObjectBefore = false;
+		var objects = [];
 		
 		$(".statisticsDeleteCheckbox").each(function(){
 
 			if($(this).is(":checked")){
+
+				var object = {};
+				object.ID = $(this).closest(".statisticsRow").attr("id").replace("statisticsRow","");
 				
-				if(wasObjectBefore){
-					forDeleteStatisticsJSON += ",";
-				}
-				forDeleteStatisticsJSON += "{'ID':"+$(this).closest(".statisticsRow").attr("id").replace("statisticsRow","")+"}";
-				
-				wasObjectBefore = true;
+				objects.push(object);
 			}
 			
 		});
-		
-		forDeleteStatisticsJSON += "]}";
-		
-		if(!wasObjectBefore){ // there were no objects selected, no need to post
+
+		if(objects.length == 0){ // there were no objects selected, no need to post
 			return;
 		}
-		
-		return forDeleteStatisticsJSON;
+
+		return objects;
 	};
 	
 	/*
@@ -472,15 +547,23 @@ function addNewStatisticsTableWithData(statisticsJSON){
 	
 	var table = document.createElement("table");
 	table.setAttribute("id","statisticsTable");
+	table.createTHead();
+	table.createTBody();
 
-	var headerRow = table.insertRow(0);
+	var headerRow = table.getElementsByTagName("thead")[0].insertRow(0);
 	headerRow.className = "tableHeaderRow";
 	
-	var headerCell1 = headerRow.insertCell(0);
-	var headerCell2 = headerRow.insertCell(1);
-	var headerCell3 = headerRow.insertCell(2);
-	var headerCell4 = headerRow.insertCell(3);
-	var headerCell5 = headerRow.insertCell(4);
+	var headerCell1 = document.createElement("th");
+	var headerCell2 = document.createElement("th");
+	var headerCell3 = document.createElement("th");
+	var headerCell4 = document.createElement("th");
+	var headerCell5 = document.createElement("th");
+	
+	headerRow.appendChild(headerCell1);
+	headerRow.appendChild(headerCell2);
+	headerRow.appendChild(headerCell3);
+	headerRow.appendChild(headerCell4);
+	headerRow.appendChild(headerCell5);
 	
 	headerCell1.innerHTML = "Kood";
 	headerCell1.className = "statisticsCodeTd tableBorderRight";
@@ -492,32 +575,37 @@ function addNewStatisticsTableWithData(statisticsJSON){
 	headerCell3.className = "statisticsUnitTd tableBorderRight";
 	
 	headerCell4.innerHTML = "Kogus";
-	headerCell4.className = "statisticsAmountTd tableBorderRight";
+	headerCell4.className = "statisticsAmountTd tableBorderRight numberColumn";
 	
 	headerCell5.innerHTML = "Summa";
-	headerCell5.className = "statisticsTotalPriceTd";
+	headerCell5.className = "statisticsTotalPriceTd numberColumn";
 
 	if(hasExtraCells){
 		headerCell5.className += " tableBorderRight";
 		
-		var headerCell6 = headerRow.insertCell(5);
-		var headerCell7 = headerRow.insertCell(6);
-		var headerCell8 = headerRow.insertCell(7);
+		var headerCell6 = document.createElement("th");
+		var headerCell7 = document.createElement("th");
+		var headerCell8 = document.createElement("th");
+		headerRow.appendChild(headerCell6);
+		headerRow.appendChild(headerCell7);
+		headerRow.appendChild(headerCell8);
 		
 		headerCell6.innerHTML = "Aeg";
-		headerCell6.className = "statisticsDateTd tableBorderRight";
+		headerCell6.className = "statisticsDateTd tableBorderRight dateColumn";
 		
 		headerCell7.innerHTML = "Klient";
 		headerCell7.className = "statisticsClientNameTd tableBorderRight";
 		
-		headerCell8.innerHTML = "<input type='button' id='deleteSelectedStatistics' value='Kustuta valitud' class='defaultButton' />";
+		if(allowedDeleteStatistics == "true"){
+			headerCell8.innerHTML = "<input type='button' id='deleteSelectedStatistics' value='Kustuta valitud' class='defaultButton' />";
+		}
 		headerCell8.className = "statisticsDeleteTd";
 	}
 	
 	for(var i = 0; i < statisticsJSON.statisticsObjects.length; i++){
 		
 		var statObj = statisticsJSON.statisticsObjects[i];
-		var statRow = table.insertRow(1);
+		var statRow = table.getElementsByTagName("tbody")[0].insertRow(0);
 		var cell1 = statRow.insertCell(0);
 		var cell2 = statRow.insertCell(1);
 		var cell3 = statRow.insertCell(2);
@@ -538,11 +626,11 @@ function addNewStatisticsTableWithData(statisticsJSON){
 		cell3.innerHTML = statObj.unit;
 		cell3.className = "statisticsUnitTd tableBorderRight";
 		
-		cell4.innerHTML = statObj.amount;
-		cell4.className = "statisticsAmountTd tableBorderRight";
+		cell4.innerHTML = parseFloat(statObj.amount).toFixed(2);
+		cell4.className = "statisticsAmountTd tableBorderRight alignRightTd";
 		
-		cell5.innerHTML = statObj.totalPrice;
-		cell5.className = "statisticsTotalPriceTd";
+		cell5.innerHTML = parseFloat(statObj.totalPrice).toFixed(2);
+		cell5.className = "statisticsTotalPriceTd alignRightTd";
 		
 		if(hasExtraCells){
 			cell1.className += " statisticsRowClickable";
@@ -578,6 +666,12 @@ function addDetailedStatisticsDataRow(rowIndex,statObjJSON){
 	var row = table.insertRow(rowIndex+1);
 	var cell=row.insertCell(0);
 	
+	var saveButton = "";
+	
+	if(allowedChangeStatistics == "true"){
+		saveButton = "<input type='button' class='saveStatisticDetailDataButton defaultButton' value='Salvesta' />";
+	}
+	
 	cell.innerHTML = "<div class='statisticDetailedDataDiv'>" +
 
 		"<div id='statisticDetailIDDiv' class='hidden'>"+statObjJSON.ID+"</div>"+
@@ -602,7 +696,7 @@ function addDetailedStatisticsDataRow(rowIndex,statObjJSON){
 			"<input type='text' maxlength='45' id='statisticDetailClientInput' class='statisticsDetailedInput' value='"+statObjJSON.clientName+"' />" +
 		"</div>"+
 		*/
-		"<input type='button' class='saveStatisticDetailDataButton defaultButton' value='Salvesta' />"+
+		saveButton +
 		"<input type='button' class='closeDetailDiv defaultButton' value='Sulge' />"+
 		
 	"</div>";

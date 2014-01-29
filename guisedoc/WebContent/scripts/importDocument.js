@@ -1,8 +1,15 @@
 $(document).ready(function(){
+	
+	makeSortable("importDocumentTable");
+	
 	/*
 	 * open choose document view
 	 */
 	$(document).on("click", "#importDocumentButton", function(){
+		if(allowedChangeDocuments == "false"){
+			showErrorNotification(permissionDeniedMessage);
+			return;
+		}
 		$("#importDocumentDiv").show();
 	});
 	
@@ -10,6 +17,7 @@ $(document).ready(function(){
 	 * close choose document view
 	 */
 	$(document).on("click", "#closeImportDocument, #importDocumentBackground", function(){
+		$("#newDocumentSelect").val("default");
 		$("#importDocumentDiv").hide();
 	});
 	
@@ -83,6 +91,11 @@ $(document).ready(function(){
 		var id = $(this).children(".documentNumberTd").children(".documentID").html();
 		var currentID = $("#insertDocumentID").html();
 		var type = $("#documentTypeSelect").val();
+
+		// check if we had any document opened, so we won't get error on post
+		if(currentID == undefined){
+			currentID = 0;
+		}
 		
 		$.ajax({
 	        type : "POST",
@@ -93,6 +106,12 @@ $(document).ready(function(){
 	        	var responseJSON = jQuery.parseJSON(response);
 	        	
 	        	if(responseJSON.response=="success"){
+	        		
+	        		if(currentID == 0){ // if we didn't have any documents opened yet, we reload to make content
+	        			window.location = contextPath+"/documents";
+	        			return;
+	        		}
+	        		
 	        		addSelectedDocumentData(responseJSON.document);
 	        		$("#importDocumentDiv").hide();
 	        		calculateTotalSum();
@@ -125,9 +144,9 @@ $(document).ready(function(){
 	 * adds a document to the table
 	 */
 	var addSearchResultDocument = function(foundDocument){
-		var table = document.getElementById("importDocumentTable");
+		var table = document.getElementById("importDocumentTable").getElementsByTagName("tbody")[0];
 		
-		var row = table.insertRow(1);
+		var row = table.insertRow(0);
 		row.className += "documentTableRow";
 		var cell1 = row.insertCell(0);
 		var cell2 = row.insertCell(1);
@@ -135,7 +154,7 @@ $(document).ready(function(){
 		var cell4 = row.insertCell(3);
 		
 		cell1.className += "tableBorderRight documentNumberTd";
-		cell1.innerHTML = foundDocument.fullNumber;
+		cell1.innerHTML = "<div>"+foundDocument.fullNumber+"</div>";
 		cell1.innerHTML += "<div class='documentID hidden'>"+foundDocument.ID+"</div>";
 		
 		cell2.className += "tableBorderRight";
@@ -153,7 +172,7 @@ $(document).ready(function(){
  * adds the selected document to the document
  */
 var addSelectedDocumentData = function(document){
-	
+
 	// if we are selecting document to open, not importing
 	if(!importingDocument){
 		makeNewTabAndOpenIt(document.ID,document.fullNumber);

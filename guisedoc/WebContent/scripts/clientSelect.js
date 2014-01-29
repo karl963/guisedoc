@@ -1,8 +1,14 @@
 $(document).ready(function(){
+	
+	makeSortable("clientSelectTable");
 	/*
 	 * open choose client view
 	 */
 	$(document).on("click", "#chooseClientButton", function(){
+		if(allowedChangeDocuments == "false"){
+			showErrorNotification(permissionDeniedMessage);
+			return;
+		}
 		$("#clientSelectDiv").show();
 	});
 	
@@ -10,6 +16,7 @@ $(document).ready(function(){
 	 * close choose client view
 	 */
 	$(document).on("click", "#closeClientSelect, #clientSelectBackground", function(){
+		$("#newDocumentSelect").val("default");
 		$("#clientSelectDiv").hide();
 	});
 	
@@ -124,9 +131,9 @@ $(document).ready(function(){
 	 * adds a client to the table
 	 */
 	var addSearchResultClientToTable = function(client){
-		var table = document.getElementById("clientSelectTable");
+		var table = document.getElementById("clientSelectTable").getElementsByTagName("tbody")[0];
 		
-		var row = table.insertRow(1);
+		var row = table.insertRow(0);
 		row.className += "clientTableRow";
 		var cell1 = row.insertCell(0);
 		var cell2 = row.insertCell(1);
@@ -134,7 +141,7 @@ $(document).ready(function(){
 		var cell4 = row.insertCell(3);
 		
 		cell1.className += "tableBorderRight clientNameTd";
-		cell1.innerHTML = client.name;
+		cell1.innerHTML = "<div>"+client.name+"</div>";
 		cell1.innerHTML += "<div class='clientID hidden'>"+client.ID+"</div>";
 		
 		cell2.className += "tableBorderRight";

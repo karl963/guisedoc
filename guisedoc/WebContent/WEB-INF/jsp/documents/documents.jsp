@@ -1,6 +1,5 @@
 <div id="documentsTableDiv">
 
-
 <table id="searchTable">
 <tr>
 	<td class="documentsCodeTd"><input type="search" class="searchInputField defaultInputField productSearchField" id="documentsCodeInput" value="Kood" /></td>
@@ -29,8 +28,8 @@
 			<div class="productEnglishDiv hidden">Inglise ühik</div>
 		</th>
 		<th class="documentsDiscountTd tableBorderRight">Ale</th>
-		<th>Summa</th>
-		<th class="documentsDeleteTd"><input id="documentsDeleteSelectedProducts" class="defaultButton" type="button" value="Kustuta valitud"/></th>
+		<th class="tableBorderRight">Summa</th>
+		<th class="documentsDeleteTd"><input id="documentsDeleteSelectedProducts" class="defaultButton" type="button" value="Kustuta"/></th>
 	</tr>
 </thead>
 <tbody>

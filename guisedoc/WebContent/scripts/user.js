@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	
 	/*
-	 * saving the user and firm data
+	 * saving the user data
 	 */
 	$(document).on("click","#saveUserData", function() {
 		
@@ -18,7 +18,7 @@ $(document).ready(function() {
 			return;
 		}
 		
-		var dataJSON = makeUserAndFirmDataJson();
+		var dataJSON = makeUserDataJson();
 		if(dataJSON == null){
 			return;
 		}
@@ -26,7 +26,7 @@ $(document).ready(function() {
 		$.ajax({
 			traditional: true,
 	        type : "POST",
-	        url : contextPath+"/manage-user-data/save",
+	        url : contextPath+"/user-firm/save/user",
 	        datatype: 'json',
 	        data : {dataJSON: JSON.stringify(dataJSON)},
 	        success : function(response) {
@@ -44,20 +44,74 @@ $(document).ready(function() {
 	    });
 	});
 	
-	var makeUserAndFirmDataJson = function(){
+	/*
+	 * saving the firm data
+	 */
+	$(document).on("click","#saveFirmData", function() {
 		
-		var firmName = $("#firmNameInput").val();
-		var firmAddress = $("#firmAddressInput").val();
-		var firmRegNR = $("#firmRegNRInput").val();
-		var firmKmkr = $("#firmKmkrInput").val();
-		var firmPhone = $("#firmPhoneInput").val();
-		var firmFax = $("#firmFaxInput").val();
-		var firmEmail = $("#firmEmailInput").val();
-		var firmBank = $("#firmBankInput").val();
-		var firmBankAccountNr = $("#firmBankAccountNRInput").val();
-		var firmLogoURL = $("#firmLogoURLInput").val();
-		var logoWidth = $("#firmLogoWidthInput").val();
-		var logoHeight = $("#firmLogoHeightInput").val();
+		showLoadingDiv();
+		
+		var dataJSON = makeFirmDataJson();
+		if(dataJSON == null){
+			return;
+		}
+		
+		$.ajax({
+			traditional: true,
+	        type : "POST",
+	        url : contextPath+"/user-firm/save/firm",
+	        datatype: 'json',
+	        data : {dataJSON: JSON.stringify(dataJSON)},
+	        success : function(response) {
+	        	
+	        	if(response.split(";")[0]=="success"){
+	        		showSuccessNotification(response.split(";")[1]);
+	        	}
+	        	else{
+	        		showErrorNotification(response.split(";")[1]);
+	        	}
+	        },
+	        error : function(e) {
+	        	showErrorNotification("Error serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	/*
+	 * saving the prefixes
+	 */
+	$(document).on("click","#savePrefixes", function() {
+		
+		showLoadingDiv();
+		
+		var dataJSON = makePrefixesJson();
+		if(dataJSON == null){
+			return;
+		}
+		
+		$.ajax({
+			traditional: true,
+	        type : "POST",
+	        url : contextPath+"/user-firm/save/prefixes",
+	        datatype: 'json',
+	        data : {dataJSON: JSON.stringify(dataJSON)},
+	        success : function(response) {
+	        	
+	        	if(response.split(";")[0]=="success"){
+	        		showSuccessNotification(response.split(";")[1]);
+	        	}
+	        	else{
+	        		showErrorNotification(response.split(";")[1]);
+	        	}
+	        },
+	        error : function(e) {
+	        	showErrorNotification("Error serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	// user data json
+	var makeUserDataJson = function(){
 		
 		var userID = $("#userIDDiv").html();
 		var userName = $("#userNameInput").val();
@@ -78,6 +132,50 @@ $(document).ready(function() {
 		 */
 		
 		if(checkForInvalidStringCharacters(new Array(
+				new Array(userName,"userNameInput"),
+				new Array(userPhone,"userPhoneInput"),
+				new Array(userEmail,"userEmailInput"),
+				new Array(userSkype,"userSkypeInput"),
+				new Array(userPassword,"userNewPassword1Input")
+				))){
+			return;
+		}
+		
+		/*
+		 * Make a JSON out of data
+		 */
+		var userJSON = {};
+		userJSON.ID = userID;
+		userJSON.name = userName;
+		userJSON.phone = userPhone;
+		userJSON.email = userEmail;
+		userJSON.skype = userSkype;
+		userJSON.password = userPassword;
+		
+		return userJSON;
+	};
+	
+	// firm data json
+	var makeFirmDataJson = function(){
+		
+		var firmName = $("#firmNameInput").val();
+		var firmAddress = $("#firmAddressInput").val();
+		var firmRegNR = $("#firmRegNRInput").val();
+		var firmKmkr = $("#firmKmkrInput").val();
+		var firmPhone = $("#firmPhoneInput").val();
+		var firmFax = $("#firmFaxInput").val();
+		var firmEmail = $("#firmEmailInput").val();
+		var firmBank = $("#firmBankInput").val();
+		var firmBankAccountNr = $("#firmBankAccountNRInput").val();
+		var firmLogoURL = $("#firmLogoURLInput").val();
+		var logoWidth = $("#firmLogoWidthInput").val();
+		var logoHeight = $("#firmLogoHeightInput").val();
+
+		/*
+		 * Check all input for errors
+		 */
+		
+		if(checkForInvalidStringCharacters(new Array(
 				new Array(firmName,"firmNameInput"),
 				new Array(firmAddress,"firmAddressInput"),
 				new Array(firmRegNR,"firmRegNRInput"),
@@ -86,12 +184,7 @@ $(document).ready(function() {
 				new Array(firmFax,"firmFaxInput"),
 				new Array(firmEmail,"firmEmailInput"),
 				new Array(firmBank,"firmBankInput"),
-				new Array(firmBankAccountNr,"firmBankAccountNRInput"),
-				new Array(userName,"userNameInput"),
-				new Array(userPhone,"userPhoneInput"),
-				new Array(userEmail,"userEmailInput"),
-				new Array(userSkype,"userSkypeInput"),
-				new Array(firmLogoURL,"firmLogoURLInput")
+				new Array(firmBankAccountNr,"firmBankAccountNRInput")
 				))){
 			return;
 		}
@@ -109,18 +202,14 @@ $(document).ready(function() {
 			logoHeight = $("#firmLogo").height();
 		}
 		
-		
 		if(firmLogoURL.match(/\.(jpeg|jpg|gif|png)$/) == null && firmLogoURL != ""){
 			giveInvalidInputMessage("firmLogoURLInput","Tegemist pole pildifailiga");
 			return;
 		}
 		
-		
 		/*
 		 * Make a JSON out of data
 		 */
-		var dataJSON = [];
-		
 		var firmJSON = {};
 		firmJSON.name = firmName;
 		firmJSON.address = firmAddress;
@@ -135,18 +224,46 @@ $(document).ready(function() {
 		firmJSON.logoWidth = logoWidth;
 		firmJSON.logoheight = logoHeight;
 		
-		var userJSON = {};
-		userJSON.ID = userID;
-		userJSON.name = userName;
-		userJSON.phone = userPhone;
-		userJSON.email = userEmail;
-		userJSON.skype = userSkype;
-		userJSON.password = userPassword;
+		return firmJSON;
+	};
+	
+	// prefixes json
+	var makePrefixesJson = function(){
 		
-		dataJSON.push(firmJSON);
-		dataJSON.push(userJSON);
+		var invoice = $("#prefixInvoice").val();
+		var advanceInvoice = $("#prefixAdvanceInvoice").val();
+		var quotation = $("#prefixQuotation").val();
+		var orderConfirmation = $("#prefixOrderConfirmation").val();
+		var order = $("#prefixOrder").val();
+		var deliveryNote = $("#prefixDeliveryNote").val();
+
+		/*
+		 * Check all input for errors
+		 */
 		
-		return dataJSON;
+		if(checkForInvalidStringCharacters(new Array(
+				new Array(invoice,"prefixInvoice"),
+				new Array(advanceInvoice,"prefixAdvanceInvoice"),
+				new Array(quotation,"prefixQuotation"),
+				new Array(orderConfirmation,"prefixOrderConfirmation"),
+				new Array(order,"prefixOrder"),
+				new Array(deliveryNote,"prefixDeliveryNote")
+				))){
+			return;
+		}
+
+		/*
+		 * Make a JSON out of data
+		 */
+		var prefixes = {};
+		prefixes.invoice = invoice;
+		prefixes.advanceInvoice = advanceInvoice;
+		prefixes.quotation = quotation;
+		prefixes.orderConfirmation = orderConfirmation;
+		prefixes.order = order;
+		prefixes.deliveryNote = deliveryNote;
+		
+		return prefixes;
 	};
 	
 	/*

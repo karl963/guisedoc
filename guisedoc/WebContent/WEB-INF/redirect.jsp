@@ -8,6 +8,6 @@
 
 </head>
 <body>
-<% response.sendRedirect("manage-products"); %>
+<% response.sendRedirect("login"); %>
 </body>
 </html>

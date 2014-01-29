@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.guisedoc.object.Document;
+import com.guisedoc.object.Firm;
 import com.guisedoc.object.Product;
 import com.guisedoc.object.User;
 import com.guisedoc.workshop.document.settings.DateFormats;
@@ -34,7 +35,7 @@ public class AdvanceInvoicePDF {
 		this.DOC = d;
 	}
 	
-	public byte[] make(){
+	public byte[] make(Firm firm, User user){
 		
 		/*
 		 * make metadata for the document
@@ -52,8 +53,6 @@ public class AdvanceInvoicePDF {
 		Font TR_10_B_I = DocumentFonts.TIMES_ROMAN_10_BOLD_ITALIC();
 		Font TR_8_I = DocumentFonts.TIMES_ROMAN_8_ITALIC();
 		
-		User user = new User();
-		
 		com.itextpdf.text.Document blackBoard = null;
 		com.itextpdf.text.Document finalDocument = null;
 		
@@ -61,7 +60,7 @@ public class AdvanceInvoicePDF {
 		ByteArrayOutputStream temporaryByteStream = null;
 		PdfReader reader;
 		
-		HeaderFooter pageEvent = new HeaderFooter(user.getFirm(),false,true);
+		HeaderFooter pageEvent = new HeaderFooter(firm,false,true);
 		
 		boolean wasError = false;
 		
@@ -83,11 +82,10 @@ public class AdvanceInvoicePDF {
 			Paragraph pageStartParagraph = new Paragraph();
 			PdfPTable headerTable = new PdfPTable(3); // table with 3 columns
 			headerTable.setWidths(new int[]{170,230,70}); // table column sizes
+			headerTable.setWidthPercentage(100);
 			
 			// Type cell
-			PdfPCell documentTypeCell = new PdfPCell(new Phrase(language.get("advanceInvoice")+":  "+DOC.getFullNumber(), TR_12_B));
-			headerTable.addCell(documentTypeCell);
-			headerTable.setWidthPercentage(100);
+			headerTable.addCell(new PdfPCell(new Phrase(language.get("advanceInvoice")+":  "+DOC.getFullNumber(), TR_12_B)));
 			
 			// Date cells
 			PdfPCell languageDateCell = new PdfPCell(new Phrase(language.get("date")+":",TR_10_B));
@@ -118,7 +116,7 @@ public class AdvanceInvoicePDF {
 			languagePayReqCell.setBorder(Rectangle.NO_BORDER);
 			headerTable.addCell(languagePayReqCell);
 			
-			PdfPCell payReqCell = new PdfPCell(new Phrase(DOC.getPaymentRequirement()+" "+language.get("days"),TR_10));
+			PdfPCell payReqCell = new PdfPCell(new Phrase(DOC.getValidDue()+" "+language.get("days"),TR_10));
 			payReqCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 			payReqCell.setBorder(Rectangle.NO_BORDER);
 			headerTable.addCell(payReqCell);
@@ -181,19 +179,19 @@ public class AdvanceInvoicePDF {
 			firmParagraph.add(new Phrase(language.get("seller")+":",TR_10_B));
 			firmParagraph.add(Chunk.NEWLINE);
 			
-			firmParagraph.add(new Phrase(user.getFirm().getName(),TR_10));
+			firmParagraph.add(new Phrase(firm.getName(),TR_10));
 			firmParagraph.add(Chunk.NEWLINE);
 			
-			firmParagraph.add(new Phrase(user.getFirm().getAddress(),TR_10));
+			firmParagraph.add(new Phrase(firm.getAddress(),TR_10));
 			firmParagraph.add(Chunk.NEWLINE);
 			
-			firmParagraph.add(new Phrase("Reg nr     "+user.getFirm().getRegNR(),TR_10));
+			firmParagraph.add(new Phrase("Reg nr     "+firm.getRegNR(),TR_10));
 			firmParagraph.add(Chunk.NEWLINE);
 			
-			firmParagraph.add(new Phrase("KMKR nr  "+user.getFirm().getKmkr(),TR_10));
+			firmParagraph.add(new Phrase("KMKR nr  "+firm.getKmkr(),TR_10));
 			firmParagraph.add(Chunk.NEWLINE);
 
-			firmParagraph.add(new Phrase("a/a "+user.getFirm().getBankAccountNR()+" "+user.getFirm().getBank(),TR_10));
+			firmParagraph.add(new Phrase("a/a "+firm.getBankAccountNR()+" "+firm.getBank(),TR_10));
 			
 			buyerAndFirmTable.addCell(new PdfPCell(buyerParagraph));
 			buyerAndFirmTable.addCell(new PdfPCell(firmParagraph));

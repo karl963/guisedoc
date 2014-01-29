@@ -7,8 +7,6 @@ public class Firm {
 	public static String DEFAULT_STRING = "";
 	public static long DEFAULT_LONG = 0;
 	
-	@SerializedName("ID")
-	private long ID;
 	@SerializedName("name")
 	private String name;
 	@SerializedName("address")
@@ -40,7 +38,6 @@ public class Firm {
 	 */
 
 	public Firm(){
-		ID = Firm.DEFAULT_LONG;
 		name = Firm.DEFAULT_STRING;
 		address = Firm.DEFAULT_STRING;
 		regNR = Firm.DEFAULT_STRING;
@@ -98,14 +95,6 @@ public class Firm {
 	
 	public String getName() {
 		return name;
-	}
-
-	public long getID() {
-		return ID;
-	}
-
-	public void setID(long iD) {
-		ID = iD;
 	}
 
 	public void setName(String name) {
