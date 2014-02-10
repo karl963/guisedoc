@@ -13,16 +13,16 @@
 		<input type="search" id="statisticsCodeInput" class="searchInputField defaultInputField" value="Otsitava toote kood" />
 	</span>
 	<span class="separateOptionDiv">
-		<label><input type="radio" name="statisticsClientGroup" value="actualBuyer" checked/>Ostnud kliendid</label>
+		<label><input type="radio" name="statisticsClientGroup" value="realBuyer" checked/>Ostnud kliendid</label>
 		<br>
 		<label><input type="radio" name="statisticsClientGroup" value="nonBuyer" />Hinnapakkumise kliendid</label>
 		<br>
 		<label><input type="radio" name="statisticsClientGroup" value="seller" />Müüjad</label>
 		<br>
-		<input type="search" id="statisticsClientInput" value="Kliendi nimi" class="searchInputField defaultInputField" />
+		<input type="text" id="statisticsClientInput" disabled value="Kliendi nimi" class="searchInputField defaultInputField" />
 		<select id="clientsSelectBox">
 		</select>
-		<div id="clientIDDiv" class="hidden">0</div>
+		<span id="clientIDDiv" class="hidden">0</span>
 	</span>
 	<span class="separateOptionDiv">
 		<label><input type="radio" name="statisticsTypeGroup" value="sumAll" checked/>Kõigi tehingute tooted kokku</label>
@@ -33,12 +33,12 @@
 		<input id="searchForStatistics" type="button" value="Otsi" class="defaultButton" />
 		<c:if test="${user.profile.isAllowed('DownloadStatistics') == true}">
 			<input id="downloadPDFOfStatistics" type="button" value="Lae PDF alla" class="defaultButton" />
+			<input id="viewPDFOfStatistics" type="button" value="PDF eelvaade" class="defaultButton" />
 		</c:if>
-		<input id="viewPDFOfStatistics" type="button" value="PDF eelvaade" class="defaultButton" />
 	</div>
 </div>
 
 <div id="hideOrShowStatisticsOptionDiv">Peida otsingu täpsustused</div>
 </c:if>
-
+<br>
 <div id="statisticsTableDiv"></div>

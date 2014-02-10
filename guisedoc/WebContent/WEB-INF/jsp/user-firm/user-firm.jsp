@@ -97,10 +97,13 @@
 	<span class="userDataInput"><input id="firmBankInput" type="text" value="${firm.bank}" maxlength="45"/></span>
 </div>
 <div class="userDataDiv">
-	<span class="userDataDescription">Pangakonto nr</span>
-	<span class="userDataInput"><input id="firmBankAccountNRInput" type="text" value="${firm.bankAccountNR}" maxlength="45"/></span>
+	<span class="userDataDescription">IBAN</span>
+	<span class="userDataInput"><input id="firmIbanInput" type="text" value="${firm.iban}" maxlength="45"/></span>
 </div>
-
+<div class="userDataDiv">
+	<span class="userDataDescription">SWIFT</span>
+	<span class="userDataInput"><input id="firmSwiftInput" type="text" value="${firm.swift}" maxlength="45"/></span>
+</div>
 <br>
 
 <div class="userDataDiv">

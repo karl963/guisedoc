@@ -92,15 +92,16 @@ $(document).ready(function(){
 		var currentID = $("#insertDocumentID").html();
 		var type = $("#documentTypeSelect").val();
 
-		// check if we had any document opened, so we won't get error on post
-		if(currentID == undefined){
+		// check if we had no document opened or selected to open an existing one
+		if(currentID == undefined || $("#newDocumentSelect").val() == "existing"){
 			currentID = 0;
 		}
-		
+
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/documents/import/select",
-	        data : {selectedDocumentID:id, selectedDocumentType:type, isEstonian:isEstonian,currentDocumentID:currentID},
+	        data : {selectedDocumentID:id, selectedDocumentType:type, 
+	        	isEstonian:isEstonian,currentDocumentID:currentID},
 	        success : function(response) {
 	        	
 	        	var responseJSON = jQuery.parseJSON(response);
@@ -177,31 +178,24 @@ var addSelectedDocumentData = function(document){
 	if(!importingDocument){
 		makeNewTabAndOpenIt(document.ID,document.fullNumber);
 	}
-	
+
 	$("#insertDocumentID").html(document.ID);
-	$("#insertNumber").val(document.fullNumber);
-	$("#insertValidDue").val(document.validDue);
-	$("#insertAdvance").val(document.advance);
-	$("#insertPaymentRequirement").val(document.paymentRequirement);
-	$("#insertShipmentTime").val(document.shipmentTime);
-	$("#insertShipmentAddress").val(document.shipmentAddress);
-	$("#insertShipmentPlace").val(document.shipmentPlace);
-	$("#insertOrderNumber").val(document.orderNumber);
+	$("#insertDocumentType").html(document.type);
+
+	$("#insert_fullNumber").val(document.fullNumber);
+	$("#insert_validDue").val(document.validDue);
+	$("#insert_advance").val(document.advance);
+	$("#insert_paymentRequirement").val(document.paymentRequirement);
+	$("#insert_shipmentTime").val(document.shipmentTime);
+	$("#insert_shipmentAddress").val(document.shipmentAddress);
+	$("#insert_shipmentPlace").val(document.shipmentPlace);
+	$("#insert_orderNumber").val(document.orderNumber);
 	
-	$("#insertDocumentDate").val(document.html5FormatedDate);
-	$("#insertAddToStatistics").attr("checked",document.addToStatistics);
-	$("#insertShowDiscount").attr("checked",document.showDiscount);
-	$("#insertPaydInCash").attr("checked",document.paydInCash);
-	$("#insertShowCE").attr("checked",document.showCE);
-	
-	var client = document.client;
-	$("#insertClientID").html(client.ID);
-	$("#insertClientName").val(client.name);
-	$("#insertContactPerson").val(client.contactPerson);
-	$("#insertClientAddress").val(client.address);
-	$("#insertClientAdditionalAddress").val(client.additionalAddress);
-	$("#insertClientPhone").val(client.phone);
-	$("#insertEmail").val(client.email);
+	$("#insert_documentDate").val(document.html5FormatedDate);
+	$("#insert_addToStatistics").attr("checked",document.addToStatistics);
+	$("#insert_showDiscount").attr("checked",document.showDiscount);
+	$("#insert_paydInCash").attr("checked",document.paydInCash);
+	$("#insert_showCE").attr("checked",document.showCE);
 	
 	/*
 	 * only show input that the document needs
@@ -209,7 +203,11 @@ var addSelectedDocumentData = function(document){
 	$("#documentsOptionsDiv").children(".optionSubDiv").children("span").hide();
 	$(".allTypes").show();
 	$("."+document.type+"_type").show();
-
+	
+	// add the client
+	var client = document.client;
+	addSelectedClientToDocument(client);
+	
 	/*
 	 * add products
 	 */

@@ -26,7 +26,7 @@ public class ProfileRowMapper<Object> implements RowMapper<Object> {
 			for(int i = 3; i <= metaData.getColumnCount(); i++){ // skip 1 and 2 (ID and name)
 				profile.updateValue(metaData.getColumnName(i), rs.getBoolean(i));
 			}
-			
+
 			return (Object) profile;
 		}
 		catch(Exception x){

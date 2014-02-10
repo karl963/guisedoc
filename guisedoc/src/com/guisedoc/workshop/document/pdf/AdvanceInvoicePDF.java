@@ -191,7 +191,7 @@ public class AdvanceInvoicePDF {
 			firmParagraph.add(new Phrase("KMKR nr  "+firm.getKmkr(),TR_10));
 			firmParagraph.add(Chunk.NEWLINE);
 
-			firmParagraph.add(new Phrase("a/a "+firm.getBankAccountNR()+" "+firm.getBank(),TR_10));
+			firmParagraph.add(new Phrase(firm.getBank()+" IBAN "+firm.getIban()+" SWIFT "+firm.getSwift(),TR_10));
 			
 			buyerAndFirmTable.addCell(new PdfPCell(buyerParagraph));
 			buyerAndFirmTable.addCell(new PdfPCell(firmParagraph));

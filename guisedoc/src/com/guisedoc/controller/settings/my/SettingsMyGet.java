@@ -22,6 +22,8 @@ public class SettingsMyGet {
 	public Object getSettingsMyView(HttpSession session, RedirectAttributes redirectAttributes,
 			Model model){
 		
+		session.setAttribute("requestedPage", "settingsMy");
+		
 		if(UserValidator.validateLoggedUser(session)){
 			return UserValidator.directToLogin(session.getServletContext().getContextPath(),redirectAttributes);
 		}

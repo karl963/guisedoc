@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpEntity;
@@ -26,11 +29,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.guisedoc.database.implement.client.ClientImpl;
+import com.guisedoc.database.implement.document.DocumentImpl;
 import com.guisedoc.enums.DocumentType;
+import com.guisedoc.enums.ErrorType;
 import com.guisedoc.messages.DocumentMessages;
+import com.guisedoc.messages.ErrorMessages;
 import com.guisedoc.object.Document;
 import com.guisedoc.object.Product;
+import com.guisedoc.object.User;
 import com.guisedoc.workshop.document.DocumentBuilder;
+import com.guisedoc.workshop.document.settings.DateFormats;
 
 @Controller
 @RequestMapping("/documents")
@@ -38,106 +47,104 @@ public class DocumentHandling {
 
 	@RequestMapping(value="/add", method = RequestMethod.POST, params={"newDocumentType"})
 	@ResponseBody
-	public String makeNewDocument(@RequestParam("newDocumentType")String type){
+	public String makeNewDocument(HttpSession session,
+			@RequestParam("newDocumentType")String type){
 
-		Document d = new Document();
-		d.setNumber(DocumentGet.documents.size());
-		d.setID(DocumentGet.documents.size());
-		d.setPrefix(type);
-		d.setType(type);
-
-		DocumentGet.documents.add(d);
+		String message = null;
+		String response = null;
 		
-		return "success;"+DocumentMessages.DOCUMENT_SELECT_SUCCESS+";"+d.getFullNumber()+";"+DocumentGet.documents.size()+";"+d.getID();
+		DocumentImpl documentImpl = new DocumentImpl(session);
+		
+		Object responseObject = documentImpl
+				.addNewDocument((User)session.getAttribute("user"),type);
+		
+		if(responseObject instanceof Object[]){
+			response = "success";
+			message = DocumentMessages.DOCUMENT_SELECT_SUCCESS;
+			
+			message += ";"+((Object[])responseObject)[0];
+			message += ";"+((Object[])responseObject)[1];
+			message += ";"+((Object[])responseObject)[2];
+		}
+		else{
+			response = "failure";
+			message = ErrorMessages.getMessage((ErrorType)responseObject);
+		}
+		
+		return response+";"+message;
 	}
 	
 	@RequestMapping(value="/close", method = RequestMethod.POST, params={"closeDocumentID"})
 	@ResponseBody
-	public String closeDocument(@RequestParam("closeDocumentID")long id){
+	public String closeDocument(HttpSession session,
+			@RequestParam("closeDocumentID")long documentID){
 		
-		for(Document d : DocumentGet.documents){
-			if(d.getID() == id){
-				DocumentGet.documents.remove(d);
-				break;
-			}
+		String message = null;
+		String response = null;
+		
+		ErrorType responseObject = new DocumentImpl(session)
+				.closeDocument(((User)session.getAttribute("user")).getID(),documentID);
+		
+		if(responseObject == ErrorType.SUCCESS){
+			response = "success";
+			message = DocumentMessages.DOCUMENT_SELECT_SUCCESS;
 		}
-		
-		return "success;"+DocumentMessages.DOCUMENT_SELECT_SUCCESS;
+		else{
+			response = "failure";
+			message = ErrorMessages.getMessage(responseObject);
+		}
+
+		return response+";"+message;
 	}
 	
-	@RequestMapping(value="/save", method = RequestMethod.POST, params={"changedDocumentID"})
+	@RequestMapping(value="/save", method = RequestMethod.POST, params={"changedDocumentID","attributeName","value","valueType","clientID"})
 	@ResponseBody
-	public String saveChangedDocumentData(@RequestParam("changedDocumentID")long documentID,@RequestParam("attributeName")String attributeName,
-			@RequestParam("value")Object value){
-		String error = "";
-		
-		Document d = new Document();
-		
-		if(attributeName.equals("Number")){
-			d.setFullNumber((String)value);
+	public String saveChangedDocumentData(HttpSession session,
+			@RequestParam("changedDocumentID")long documentID,@RequestParam("attributeName")String attributeName,
+			@RequestParam("value")Object value,@RequestParam("valueType")String valueType,
+			@RequestParam("clientID")long clientID){
+
+		String message = null;
+		String response = null;
+
+		if(valueType.equals("string")){
+			value = String.valueOf(value);
 		}
-		else if(attributeName.equals("ValidDue")){
-			d.setValidDue(Long.parseLong(String.valueOf(value).replace(",", ".")));
+		else if(valueType.equals("number")){
+			value = String.valueOf(value).replace(",", ".");
 		}
-		else if(attributeName.equals("Advance")){
-			d.setAdvance(Double.parseDouble(String.valueOf(value).replace(",", "."))); 
-		}
-		else if(attributeName.equals("PaymentRequirement")){
-			d.setPaymentRequirement(String.valueOf(value)); 
-		}
-		else if(attributeName.equals("ShipmentTime")){
-			d.setShipmentTime((String) value);
-		}
-		else if(attributeName.equals("ShipmentAddress")){
-			d.setShipmentAddress((String) value); 
-		}
-		else if(attributeName.equals("ShipmentPlace")){
-			d.setShipmentPlace((String) value); 
-		}
-		else if(attributeName.equals("OrderNumber")){
-			d.setOrderNR((String) value);
-		}
-		else if(attributeName.equals("CeSpecification")){
-			d.setCeSpecification((String) value);
-		}
-		else if(attributeName.equals("ClientName")){
-			d.getClient().setName((String) value);
-		}
-		else if(attributeName.equals("ContactPerson")){
-			d.getClient().setContactPerson((String) value);
-		}
-		else if(attributeName.equals("ClientAddress")){
-			d.getClient().setAddress((String) value);
-		}
-		else if(attributeName.equals("ClientAdditionalAddress")){
-			d.getClient().setAdditionalAddress((String) value);
-		}
-		else if(attributeName.equals("ClientPhone")){
-			d.getClient().setPhone((String) value);
-		}
-		else if(attributeName.equals("Email")){
-			d.getClient().setEmail((String) value);
-		}
-		else if(attributeName.equals("DocumentDate")){
+		else if(valueType.equals("date")){
 			try {
-				d.setDate(Document.DATE_FORMAT.parse((String) value));
-			} catch (Exception e) {
-				d.setDate(new Date());
+				value = new Timestamp(DateFormats.HTML5_DATE_FORMAT().parse((String) value).getTime());
+			} catch (ParseException e) {
+				e.printStackTrace();
+				value = new Timestamp(new Date().getTime());
 			}
 		}
-		else if(attributeName.equals("AddToStatistics")){
-			d.setAddToStatistics(Boolean.parseBoolean((String) value));
+		else if(valueType.equals("boolean")){
+			value = Boolean.parseBoolean(String.valueOf(value));
 		}
-		else if(attributeName.equals("ShowDiscount")){
-			d.setShowDiscount(Boolean.parseBoolean((String) value));
+		
+		// update accordingly, document or it's client
+		ErrorType responseObject;
+		if(clientID == 0){
+			responseObject = new DocumentImpl(session)
+				.saveDocumentAttribute(attributeName, value, documentID);
 		}
-		else if(attributeName.equals("PaydInCash")){
-			d.setPaydInCash(Boolean.parseBoolean((String) value));
+		else{ // we update client date
+			responseObject = new ClientImpl(session)
+				.saveClientAttribute(attributeName, value, clientID);
 		}
-		else if(attributeName.equals("ShowCE")){
-			d.setShowCE(Boolean.parseBoolean((String) value));
+		
+		if(responseObject == ErrorType.SUCCESS){
+			response = "success";
+			message = DocumentMessages.DOCUMENT_SAVE_SUCCESS;
+		}
+		else{
+			response = "failure";
+			message = ErrorMessages.getMessage(responseObject);
 		}
 	    
-		return "success;"+DocumentMessages.DOCUMENT_SAVE_SUCCESS;
+		return response+";"+message;
 	}
 }

@@ -10,12 +10,12 @@
 		<select id="newDocumentSelect">
 			<option value="default" selected="selected" disabled="disabled">-- valige tüüp --</option>
 			<c:if test="${user.profile.isAllowed('CreateDocuments') == true}">
-			<option value="Quotation" >Hinnapakkumine</option>
-			<option value="Invoice" >Arve</option>
-			<option value="Advance_invoice" >Ettemaksu Arve</option>
-			<option value="Order_confirmation" >Tellimuse kinnitus</option>
-			<option value="Delivery_note" >Saateleht</option>
-			<option value="Order" >Order</option>
+			<option value="quotation" >Hinnapakkumine</option>
+			<option value="invoice" >Arve</option>
+			<option value="advance_invoice" >Ettemaksu Arve</option>
+			<option value="order_confirmation" >Tellimuse kinnitus</option>
+			<option value="delivery_note" >Saateleht</option>
+			<option value="order" >Order</option>
 			<option value="-" disabled >----------------</option>
 			</c:if>
 			<option value="existing">Ava vana dokument</option>

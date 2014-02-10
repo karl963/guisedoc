@@ -49,6 +49,10 @@
 	width:100px;
 }
 
+#statisticsClientInput{
+	width:200px;
+}
+
 /*
 * table
 */
@@ -95,11 +99,12 @@
 }
 .statisticsDeleteTd{
 	text-align:center;
-
-	width:1%;
-	min-width:115px;
-	max-width:115px;
+	width:60px;
 	overflow: hidden;
+}
+
+.statisticsRow:hover{
+	background-color:#DDE4E4;
 }
 
 /*

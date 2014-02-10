@@ -21,8 +21,10 @@ public class Firm {
 	private String email;
 	@SerializedName("bank")
 	private String bank;
-	@SerializedName("bankAccountNR")
-	private String bankAccountNR;
+	@SerializedName("iban")
+	private String iban;
+	@SerializedName("swift")
+	private String swift;
 	@SerializedName("fax")
 	private String fax;
 	
@@ -45,7 +47,8 @@ public class Firm {
 		phone = Firm.DEFAULT_STRING;
 		email = Firm.DEFAULT_STRING;
 		bank = Firm.DEFAULT_STRING;
-		bankAccountNR = Firm.DEFAULT_STRING;
+		iban = Firm.DEFAULT_STRING;
+		swift = Firm.DEFAULT_STRING;
 		fax = Firm.DEFAULT_STRING;
 		logoURL = "http://www.bestroof.ee/g/logo.jpg";//Firm.DEFAULT_STRING;
 		logoWidth = 85;
@@ -140,14 +143,6 @@ public class Firm {
 	public void setBank(String bank) {
 		this.bank = bank;
 	}
-
-	public String getBankAccountNR() {
-		return bankAccountNR;
-	}
-
-	public void setBankAccountNR(String bankAccountNR) {
-		this.bankAccountNR = bankAccountNR;
-	}
 	
 	public String getFax() {
 		return fax;
@@ -155,6 +150,22 @@ public class Firm {
 
 	public void setFax(String fax) {
 		this.fax = fax;
+	}
+
+	public String getIban() {
+		return iban;
+	}
+
+	public void setIban(String iban) {
+		this.iban = iban;
+	}
+
+	public String getSwift() {
+		return swift;
+	}
+
+	public void setSwift(String swift) {
+		this.swift = swift;
 	}
 
 }

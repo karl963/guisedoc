@@ -13,40 +13,30 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.guisedoc.controller.UserValidator;
+import com.guisedoc.database.Connector;
+import com.guisedoc.database.implement.client.ClientImpl;
+import com.guisedoc.enums.ErrorType;
+import com.guisedoc.messages.ErrorMessages;
 import com.guisedoc.object.Client;
 import com.guisedoc.object.User;
 
 @Controller
 public class ClientGet {
-	
-	public static List<Client> clients = new ArrayList<Client>();
 
 	@RequestMapping(value="/clients", method = RequestMethod.GET)
 	public Object getClientsView(HttpSession session, RedirectAttributes redirectAttributes,
 			Model model){
 		
+		session.setAttribute("requestedPage", "clients");
+		
 		if(UserValidator.validateLoggedUser(session)){
 			return UserValidator.directToLogin(session.getServletContext().getContextPath(),redirectAttributes);
 		}
-
-		if(clients.size() == 0){
-			for(int i = 0; i<10;i++){
-				Client c1 = new Client();
-				c1.setAddress("aadress "+i);
-				c1.setContactPerson("contact "+i);
-				c1.setEmail("email "+i);
-				c1.setID(i);
-				c1.setName("name "+i);
-				c1.setPhone("phone "+i);
-				c1.setTotalBoughtFor(i*1000.0);
-				c1.setTotalDeals(i);
-				c1.setLastDealNR("Deal"+i);
-				c1.setLastDealDate(new Date());
-				
-				clients.add(c1);
-			}
-		}
 		
+		String noteMessage = null;
+		List<Client> clients = new ArrayList<Client>();
+
+		model.addAttribute("noteMessage",noteMessage);
 		model.addAttribute("clients",clients);
 		model.addAttribute("user",session.getAttribute("user"));
 		

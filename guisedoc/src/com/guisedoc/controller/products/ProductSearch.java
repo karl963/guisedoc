@@ -39,8 +39,7 @@ public class ProductSearch {
 		Gson gson = new Gson();
 		Product searchProduct = gson.fromJson(searchProductJSON, Product.class);
 
-		Object responseObject = new ProductImpl(
-				((Connector)session.getAttribute("connector")).getDatasource())
+		Object responseObject = new ProductImpl(session)
 				.searchForProducts(searchProduct);
 		
 		if(responseObject instanceof Object[]){
@@ -49,7 +48,7 @@ public class ProductSearch {
 			List<Product> searchResultProducts = (List<Product>)((Object[])responseObject)[1];
 			
 			// put all products in json
-			for(int i = 1; i < searchResultProducts.size() ;i++){
+			for(int i = 0; i < searchResultProducts.size() ;i++){
 				Product product = searchResultProducts.get(i);
 				
 				JsonObject job = new JsonObject();

@@ -11,5 +11,9 @@ public class SettingsMessages {
 	public static String PROFILE_GET_DETAIL_SUCCESS = "Profiili andmed edukalt kuvatud";
 	public static String PROFILE_SAVE_SUCCESS = "Profiili andmed edukalt salvestatud";
 	public static String PROFILE_DELETE_SUCCESS = "Profiil edukalt kustutatud";
-
+	public static String PROFILE_ADD_SUCCESS = "Profiil edukalt lisatud";
+	
+	
+	
+	public static String SETTING_SAVE_SUCCESS = "Seaded edukalt salvestatud !";
 }

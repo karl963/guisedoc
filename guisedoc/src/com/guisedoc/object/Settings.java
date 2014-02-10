@@ -19,12 +19,19 @@ public class Settings {
 		
 		settings.put("autoSetDocNumber",new Object[]{true,"Lisa uue dokumendi number automaatselt (eesliide+id)"});
 		
+		settings.put("loadAllProductsOnOpen",new Object[]{false,"Näita kõiki tooteid toodete vaate avamisel"});
+		settings.put("cleanProductSearchAfterAdd",new Object[]{true,"Puhasta otsingu väljad peale toote lisamist"});
+		settings.put("focusProductCodeAfterAdd",new Object[]{true,"Fokuseeri tooe koodi väli peale lisamist"});
+		
+		settings.put("loadAllClientsOnOpen",new Object[]{false,"Otsi kliente klientide vaate avamisel"});
+		settings.put("cleanClientSearchAfterAdd",new Object[]{true,"Puhasta otsingu väljad peale kliendi lisamist"});
+		settings.put("focusClientNameAfterAdd",new Object[]{true,"Fokuseeri kliendi nime väli peale lisamist"});
+		
+		settings.put("autoLogin",new Object[]{false,"Hoia mind selles arvutis sisse logituna"});
 		settings.put("saveSearchResultType",new Object[]{true,"Salvesta otsingu tüübid"});
 		settings.put("saveSearchResultInput",new Object[]{true,"Salvesta otsingu sisendid"});
 		
-		settings.put("loadAllProductsOnOpen",new Object[]{false,"Näita kõiki tooteid lehe avamisel"});
-		settings.put("loadAllClientsOnOpen",new Object[]{false,"Näita kõiki kliente lehe avamisel"});
-		
+		settings.put("loadStatisticsOnOpen",new Object[]{false,"Otsi statistikat lehe avamisel"});
 	}
 	
 	/*

@@ -38,8 +38,7 @@ public class ProductHandling {
 		
 		Product newProduct = new Gson().fromJson(addProductJSON, Product.class);
 		
-		Object responseObject = new ProductImpl(
-				((Connector)session.getAttribute("connector")).getDatasource())
+		Object responseObject = new ProductImpl(session)
 				.addNewProduct(newProduct);
 
 		long ID = 0;
@@ -72,8 +71,7 @@ public class ProductHandling {
     		return "error"+";"+ProductMessages.NUMBER_FORMAT_EXCEPTION;
     	}
     	
-    	ErrorType responseObject = new ProductImpl(
-				((Connector)session.getAttribute("connector")).getDatasource())
+    	ErrorType responseObject = new ProductImpl(session)
     			.saveProduct(product);
     			
     	if(responseObject == ErrorType.SUCCESS){
@@ -98,8 +96,7 @@ public class ProductHandling {
 		String message = null;
 		String response = null;
 		
-		Object responseObject = new ProductImpl(
-				((Connector)session.getAttribute("connector")).getDatasource())
+		Object responseObject = new ProductImpl(session)
 				.getProductByID(id);
 
 		// make the product json
@@ -151,8 +148,7 @@ public class ProductHandling {
 	    	products.add(gson.fromJson(productElement, Product.class));
 	    }
 	    
-	    ErrorType responseObject = new ProductImpl(
-	    		((Connector)session.getAttribute("connector")).getDatasource())
+	    ErrorType responseObject = new ProductImpl(session)
 	    		.deleteProducts(products);
 	    
 	    if(responseObject == ErrorType.SUCCESS){

@@ -14,8 +14,8 @@
 </c:if>
 <tr class="tableHeaderRow">
 	<th class="tableBorderRight">Kasutajanimi</th>
-	<th class="tableBorderRight dateColumn">Viimane sisselogimine</th>
-	<th class="tableBorderRight numberColumn">Tehinguid kokku</th>
+	<th class="tableBorderRight dateColumn lastLoginTd dateColumn">Viimane sisselogimine</th>
+	<th class="tableBorderRight numberColumn totalDealsTd numberColumn">Tehinguid kokku</th>
 	<th>Profiil</th>
 </tr>
 </thead>
@@ -26,9 +26,9 @@
 		<div>${user.userName}</div>
 		<div class="userIDDiv hidden">${user.ID}</div>
 	</td>
-	<td class="tableBorderRight">${user.lastOnlineString}</td>
-	<td class="tableBorderRight">${user.totalDeals}</td>
-	<td class="userProfileTd">${user.profile.name}</td>
+	<td class="tableBorderRight lastLoginTd alignCenterTd">${user.lastOnlineString}</td>
+	<td class="tableBorderRight totalDealsTd alignCenterTd">${user.totalDeals}</td>
+	<td class="userProfileTd alignCenterTd">${user.profile.name}</td>
 </tr>
 </c:forEach>
 </tbody>
@@ -49,8 +49,8 @@
 </c:if>
 <tr class="tableHeaderRow">
 	<th class="tableBorderRight">Profiili nimi</th>
-	<th class="tableBorderRight">Lubatud tegevusi</th>
-	<th>Kasutajaid m‰‰ratud</th>
+	<th class="tableBorderRight numberColumn">Lubatud tegevusi</th>
+	<th class="numberColumn">Kasutajaid m‰‰ratud</th>
 </tr>
 </thead>
 <tbody>
@@ -60,8 +60,8 @@
 		<div>${profile.name}</div>
 		<div class="profileIDDiv hidden">${profile.ID}</div>
 	</td>
-	<td class="tableBorderRight">${profile.allowedActionsCount}</td>
-	<td>${profile.usersCount}</td>
+	<td class="tableBorderRight alignCenterTd">${profile.allowedActionsCount}</td>
+	<td class="alignCenterTd">${profile.usersCount}</td>
 </tr>
 </c:forEach>
 </tbody>

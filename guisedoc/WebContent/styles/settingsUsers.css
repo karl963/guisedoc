@@ -5,6 +5,17 @@
 	width:60%;
 	min-width:730px;
 }
+.lastLoginTd{
+	width: 130px;
+}
+.totalDealsTd{
+	width: 130px;
+}
+
+.userRow:hover{
+	background-color:#DDE4E4;
+}
+
 /*
 * detailed user div
 */
@@ -32,4 +43,8 @@
 }
 .profileRuleGroupDiv{
 	border-bottom:1px dotted #47423F;
+}
+
+.profileRow:hover{
+	background-color:#DDE4E4;
 }

@@ -9,6 +9,17 @@ $(document).ready(function(){
 		$(".productEstonianDiv").hide();
 		$(".productEnglishDiv").show();
 		
+		try{
+			if(getCurrentDocType() == "order"){
+				$(".regularPriceDiv").hide();
+				$(".orderPriceDiv").show();
+			}
+			else{
+				$(".regularPriceDiv").show();
+				$(".orderPriceDiv").hide();
+			}
+		}catch(err){}
+		
 		$("#productsInEnglish").attr("class","selectedLanguageButton");
 		$("#productsInEstonian").attr("class","defaultButton");
 		
@@ -23,6 +34,17 @@ $(document).ready(function(){
 		$(".productEnglishDiv").hide();
 		$(".productEstonianDiv").show();
 		
+		try{
+			if(getCurrentDocType() == "order"){
+				$(".regularPriceDiv").hide();
+				$(".orderPriceDiv").show();
+			}
+			else{
+				$(".regularPriceDiv").show();
+				$(".orderPriceDiv").hide();
+			}
+		}catch(err){}
+		
 		$("#productsInEstonian").attr("class","selectedLanguageButton");
 		$("#productsInEnglish").attr("class","defaultButton");
 		
@@ -35,7 +57,7 @@ $(document).ready(function(){
 	 * Put default value for each input field
 	 */
 	$('.defaultInputField, input[type="password"]').each(function(i, obj) {
-		$($(this)).data("default_val", $($(this)).val());
+		$(this).data("default_val", $(this).val());
 	});
 	
 	/*
@@ -161,7 +183,7 @@ function showSuccessNotification(message){
  */
 var validStringCharacters = "qwertyuiopüõäölkjhgfdsazxcvbnm" +
 							"QWERTYUIOPÜÕÄÖLKJHGFDSAMNBVCXZ" +
-							" ,.-;:_-<>!?/1234567890+'*@";
+							" ,.-;:_-<>!?/1234567890+'*@()";
 var validNumberCharacters = "1234567890.,";
 
 /*
@@ -459,3 +481,23 @@ function parseDate(input) {
 	var parts = input.split('.');
 	return new Date(parts[2], parts[1]-1, parts[0]);
 }
+
+/*
+* shows the confirmation dialog to the user
+*/
+var showConfirmationDialog = function(message, callback, attribute){
+	$("#confirmationYesButton").off("click");
+	$("#confirmationNoButton").off("click");
+	
+	$("#confirmationYesButton").on("click",function(){
+		$("#confirmationDiv").hide();
+		callback(attribute);
+	});
+	$("#confirmationNoButton").on("click",function(){
+		$("#confirmationDiv").hide();
+		return false;
+	});
+	
+	$("#confirmationTextDiv").html(message);
+	$("#confirmationDiv").show();
+};

@@ -42,6 +42,10 @@
 	min-height: 100%;
 }
 
+.productTableRow:hover{
+	background-color:#DDE4E4;
+}
+
 /*
 * SIDE DIV (language buttons, save button)
 */

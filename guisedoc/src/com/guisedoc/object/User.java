@@ -49,7 +49,7 @@ public class User {
 		email = User.DEFAULT_STRING;
 		skype = User.DEFAULT_STRING;
 		profile = new Profile();
-		lastOnline = new Date();
+		lastOnline = null;
 		totalDeals = User.DEFAULT_LONG;
 		setSettings(new Settings());
 		
@@ -62,6 +62,7 @@ public class User {
 	 */
 
 	public String getLastOnlineString(){
+		if(lastOnline == null) return "";
 		return DateFormats.DOT_DATE_FORMAT().format(lastOnline);
 	}
 	
@@ -70,6 +71,7 @@ public class User {
 	 */
 
 	public Date getLastOnline() {
+		if(lastOnline == null) return new Date();
 		return lastOnline;
 	}
 

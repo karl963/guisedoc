@@ -26,19 +26,23 @@ public class UserGet {
 	public Object userDataView(HttpSession session, RedirectAttributes redirectAttributes, 
 			Model model){
 		
+		session.setAttribute("requestedPage", "user-firm");
+		
 		if(UserValidator.validateLoggedUser(session)){
 			return UserValidator.directToLogin(session.getServletContext().getContextPath(),redirectAttributes);
 		}
 		
 		String noteMessage = null;
+		
+		FirmImpl firmImpl = new FirmImpl(session);
 
-		Object prefixes = new FirmImpl(((Connector)session.getAttribute("connector")).getDatasource()).getPrefixesArray();
+		Object prefixes = firmImpl.getPrefixesArray();
 		if(!(prefixes instanceof String[])){
 			noteMessage = "Eesliited: "+ErrorMessages.getMessage((ErrorType)prefixes);
 			prefixes = null;
 		}
 		
-		Object firm = new FirmImpl(((Connector)session.getAttribute("connector")).getDatasource()).getFirmData();
+		Object firm = firmImpl.getFirmData();
 		if(!(firm instanceof Firm)){
 			noteMessage = "Firma: "+ErrorMessages.getMessage((ErrorType)firm);
 			firm = null;

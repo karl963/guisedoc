@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,6 +16,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import com.guisedoc.database.Connector;
 import com.guisedoc.database.rowmapper.ProductRowMapper;
 import com.guisedoc.enums.ErrorType;
 import com.guisedoc.object.Product;
@@ -21,8 +24,8 @@ import com.guisedoc.object.User;
 
 public class ProductImpl extends JdbcTemplate {
 	
-	public ProductImpl(DataSource ds){
-		super(ds);
+	public ProductImpl(HttpSession session){
+		super(((Connector)session.getAttribute("connector")).getDatasource());
 	}
 	
 	public Object getAllProducts(){
@@ -49,11 +52,16 @@ public class ProductImpl extends JdbcTemplate {
 
 			List<Object> products = query(query, new ProductRowMapper<Object>());
 			
-			if(products.get(0) instanceof Product){
-				return (Product)products.get(0);
+			if(products.size() > 0){
+				if(products.get(0) instanceof Product){
+					return (Product)products.get(0);
+				}
+				else{
+					return ErrorType.DATABASE_QUERY;
+				}
 			}
 			else{
-				return ErrorType.DATABASE_QUERY;
+				return ErrorType.NONE_FOUND;
 			}
 		}
 		catch(Exception x){
@@ -64,7 +72,6 @@ public class ProductImpl extends JdbcTemplate {
 	
 	public Object addNewProduct(final Product product){
 		try{
-			
 			// insert and get the generated (ID) key back
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 			update(new PreparedStatementCreator() {
@@ -167,18 +174,85 @@ public class ProductImpl extends JdbcTemplate {
 	
 	public Object searchForProducts(Product product){
 		try{
-			String query = "UPDATE products SET code = ?, name = ?, e_name = ?,"
-					+ "unit = ?, e_unit = ?, price = ?, o_price = ?, storage = ?"
-					+ " WHERE ID=?";
+			// make the query accordingly
+			String query = "SELECT * FROM products WHERE "
+					+ "code LIKE '%"+product.getCode()+"%' AND "
+					+ "name LIKE '%"+product.getName()+"%' AND "
+					+ "e_name LIKE '%"+product.getE_name()+"%' AND "
+					+ "unit LIKE '%"+product.getUnit()+"%' AND "
+					+ "e_unit LIKE '%"+product.getE_unit()+"%'";
 			
-			// get the procuts
+			if(product.getPrice() != 0.0){
+				query += " AND price="+product.getPrice();
+			}
+			if(product.getO_price() != 0.0){
+				query += " AND o_price="+product.getO_price();
+			}
+			if(product.getStorage() != 0.0){
+				query += " AND storage="+product.getStorage();
+			}
+
+			// get the products
 			List<Product> products = query(query,new ProductRowMapper<Product>());
-			
+
 			// get the total products
-			long totalProducts = queryForObject("SELECT COUNT(ID) FROM products",Long.class);
+			long totalProducts = queryForObject("SELECT COUNT(*) FROM products",Long.class);
 			
 			Object[] returnable = new Object[]{totalProducts,products};
 			return returnable;
+		}
+		catch(Exception x){
+			x.printStackTrace();
+			return ErrorType.DATABASE_QUERY;
+		}
+	}
+	
+	public Object searchForProductsAdvanced(Product product, boolean inEstonian, int limit){
+		try{
+			Double searchOptimalLowPrice = null,searchOptimalHighPrice = null;
+			String searchPrice = null;
+			if(inEstonian){
+				searchPrice = "price";
+				searchOptimalLowPrice = product.getPrice() - product.getPrice() * 0.1;
+				searchOptimalHighPrice = product.getPrice() + product.getPrice() * 0.1;
+			}
+			else{
+				searchPrice = "o_price";
+				searchOptimalLowPrice = product.getO_price() - product.getO_price() * 0.1;
+				searchOptimalHighPrice = product.getO_price() + product.getO_price() * 0.1;
+			}
+			
+			// make the query accordingly
+			String query = "SELECT * FROM products WHERE "
+					+ "code LIKE '%"+product.getCode()+"%' AND "
+					+ "name LIKE '%"+product.getName()+"%' AND "
+					+ "e_name LIKE '%"+product.getE_name()+"%' AND "
+					+ "unit LIKE '%"+product.getUnit()+"%' AND "
+					+ "e_unit LIKE '%"+product.getE_unit()+"%' ";
+
+			// if the price has been set
+			if(searchOptimalLowPrice > 0){
+				query += " AND "+searchPrice+" > "+searchOptimalLowPrice
+				+ " AND "+searchPrice+"  < "+searchOptimalHighPrice;
+			}
+					
+			query += " LIMIT "+limit;
+
+			
+			// get the products
+			List<Object> products = query(query,new ProductRowMapper<Object>());
+
+			if(products.size() > 0){
+				if(products.get(0) instanceof Product){
+					return products;
+				}
+				else{
+					return (ErrorType)products.get(0);
+				}
+			}
+			else{
+				return new ArrayList<Product>();
+			}
 		}
 		catch(Exception x){
 			x.printStackTrace();

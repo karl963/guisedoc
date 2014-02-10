@@ -70,15 +70,15 @@ $(document).ready(function(){
 		
 		var cell1 = row.insertCell(1);
 		cell1.innerHTML = userJSON.lastOnlineString;
-		cell1.className += "tableBorderRight";
+		cell1.className += "tableBorderRight lastLoginTd alignCenterTd";
 		
 		var cell1 = row.insertCell(2);
 		cell1.innerHTML = userJSON.totalDeals;
-		cell1.className += "tableBorderRight";
+		cell1.className += "tableBorderRight totalDealsTd alignCenterTd";
 		
 		var cell1 = row.insertCell(3);
 		cell1.innerHTML = userJSON.profile.name;
-		cell1.className += "userProfileTd";
+		cell1.className += "userProfileTd alignCenterTd alignCenterTd";
 	};
 	
 	/*
@@ -148,6 +148,14 @@ $(document).ready(function(){
 		
 		var selectHTML = "Kasutaja profiil: <select id='userProfileSelect'>";
 		
+		/*
+		 * there's no name on profile which means no profile selected
+		 * so we add the default value to the options
+		 */
+		if(userJSON.user.profile.name == ""){
+			selectHTML += "<option value='default' selected disabled >-- valige profiil --</option>";
+		}
+
 		for(var i = 0; i < userJSON.profiles.length; i++){
 			var profile = userJSON.profiles[i];
 			var selected = "";
@@ -175,16 +183,25 @@ $(document).ready(function(){
 		cell.colSpan = "4";
 	};
 	
+	/*
+	 * deleting a user
+	 */
 	$(document).on("click","#deleteUserButton",function(){
+		showConfirmationDialog("Kustuta valitud kasutaja ?"
+				,deleteUser,$(this));
+	});
+	var deleteUser = function(button){
 		showLoadingDiv();
 		
-		var id = $(this).closest(".userDetailDiv").children("div").children(".userIDDiv").html();
+		var id = button.closest(".userDetailDiv").children("div").children(".userIDDiv").html();
 		var userRowIndex = $("#usersTable tr").index($(".detailedUserTr"))-1;
-		console.log(id);
+		var username = $("#usersTable tr").eq(userRowIndex)
+						.children("td").eq(0).children("div").eq(0).html();
+		
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/settingsUsers/user/delete",	
-	        data : {ID:id},
+	        data : {ID:id, username:username},
 	        success : function(response) {
 	        	
 	        	var responseJSON = jQuery.parseJSON(response);
@@ -204,7 +221,7 @@ $(document).ready(function(){
 	        	showErrorNotification("Viga serveriga ühendumisel");
 	        }
 	    });
-	});
+	};
 	
 	/*
 	 * changing the users profile
@@ -311,12 +328,13 @@ $(document).ready(function(){
 		cell1.innerHTML += "<div class='profileIDDiv hidden'>"+profileJSON.ID+"</div>";
 		cell1.className += "tableBorderRight";
 		
-		var cell1 = row.insertCell(1);
-		cell1.innerHTML = profileJSON.allowedActionsCount;
-		cell1.className += "tableBorderRight";
+		var cell2 = row.insertCell(1);
+		cell2.innerHTML = profileJSON.allowedActionsCount;
+		cell2.className += "tableBorderRight alignCenterTd";
 		
-		var cell1 = row.insertCell(2);
-		cell1.innerHTML = profileJSON.usersCount;
+		var cell3 = row.insertCell(2);
+		cell3.innerHTML = profileJSON.usersCount;
+		cell3.className += "alignCenterTd";
 
 	};
 	
@@ -462,6 +480,12 @@ $(document).ready(function(){
 		var id = $(this).closest(".profileDetailDiv").children("div").children(".profileIDDiv").html();
 		var value = $(this).is(":checked");
 		var ruleKey = $(this).attr("id").replace("rule","");
+		var index = $(this).closest("tr").index()-1;
+		
+		var count = -1;
+		if($(this).is(":checked")){
+			count = 1;
+		}
 
 		$.ajax({
 	        type : "POST",
@@ -471,6 +495,7 @@ $(document).ready(function(){
 	        	
 	        	var responseJSON = jQuery.parseJSON(response);
 	        	if(responseJSON.response =="success"){
+	        		changeProfileTableAllowedCount(index,count);
 	        		showSuccessNotification(responseJSON.message);
 	        	}
 	        	else{
@@ -484,6 +509,16 @@ $(document).ready(function(){
 	});
 	
 	/*
+	 * changes the count of allowed actions in profiles table
+	 */
+	var changeProfileTableAllowedCount = function(index,count){
+		var countRow = $("#profilesTable tbody").children(".profileRow").eq(index)
+				.children("td").eq(1);
+		
+		countRow.html(countRow.html()+count);
+	};
+	
+	/*
 	 * update profile name on blur
 	 */
 	$(document).on("blur","#inputProfileName",function(){
@@ -491,7 +526,8 @@ $(document).ready(function(){
 		
 		var id = $(this).closest(".profileDetailDiv").children("div").children(".profileIDDiv").html();
 		var name = $(this).val();
-		
+		var index = $(this).closest("tr").index()-1;
+
 		/*
 		 * Check for invalid characters
 		 */
@@ -513,6 +549,7 @@ $(document).ready(function(){
 	        	
 	        	var responseJSON = jQuery.parseJSON(response);
 	        	if(responseJSON.response =="success"){
+	        		changeProfileTableName(index, name);
 	        		showSuccessNotification(responseJSON.message);
 	        	}
 	        	else{
@@ -526,13 +563,25 @@ $(document).ready(function(){
 	});
 	
 	/*
+	 * changes the regular data row's profile name of the profiles table
+	 */
+	var changeProfileTableName = function(index,name){
+		$("#profilesTable tbody").children(".profileRow").eq(index)
+				.children("td").eq(0).children("div").eq(0).html(name);
+	};
+	
+	/*
 	 * delete product on click
 	 */
 	$(document).on("click","#deleteProfileButton",function(){
+		showConfirmationDialog("Kustuta valitud profiil ?"
+				,deleteProfile,$(this));
+	});
+	var deleteProfile = function(button){
 		
 		showLoadingDiv();
 		
-		var id = $(this).closest(".profileDetailDiv").children("div").children(".profileIDDiv").html();
+		var id = button.closest(".profileDetailDiv").children("div").children(".profileIDDiv").html();
 		var profileRowIndex = $("#profilesTable tr").index($(".detailedProfileTr"))-1;
 
 		$.ajax({
@@ -558,7 +607,7 @@ $(document).ready(function(){
 	        	showErrorNotification("Viga serveriga ühendumisel");
 	        }
 	    });
-	});
+	};
 	
 	/*
 	 * closing the detailed div

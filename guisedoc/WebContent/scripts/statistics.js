@@ -19,6 +19,7 @@ $(document).ready(function() {
 		$("#statisticsClientInput").focus(); // for change of default input class
 		$("#statisticsClientInput").val(localStorage.getItem("statisticsClientName"));
 		$("#statisticsClientInput").blur(); // for unFocus
+		$("#clientIDDiv").html(localStorage.getItem("statisticsClientID")); // for change of default input class
 	}
 	if(localStorage.getItem("statisticsCode") != null){
 		$("#statisticsCodeInput").focus(); // for change of default input class
@@ -43,8 +44,12 @@ $(document).ready(function() {
 
 		var path = contextPath+"/statistics/pdf/download";
 
-		path += "?clientType="+clientType+"&startDate="+startDate+"&endDate="+endDate+
-		"&clientName="+clientName+"&code="+code;
+		var json = makeStatisticsJSON();
+		if(json == null){
+			return;
+		}
+		
+		path += "?statisticsJSON="+JSON.stringify(json);
 		
 		window.location.href = path;
 
@@ -56,8 +61,12 @@ $(document).ready(function() {
 		
 		var path = contextPath+"/statistics/pdf/view";
 		
-		path += "?clientType="+clientType+"&startDate="+startDate+"&endDate="+endDate+
-			"&clientName="+clientName+"&code="+code;
+		var json = makeStatisticsJSON();
+		if(json == null){
+			return;
+		}
+		
+		path += "?statisticsJSON="+JSON.stringify(json);
 		
 		window.open(path,"_blank");
 	});
@@ -124,9 +133,9 @@ $(document).ready(function() {
 	        url : contextPath+"/statistics/search",
 	        data : {statisticsJSONString: JSON.stringify(statisticsJSON)},
 	        success : function(response) {
-	        	
+
 	        	var responseJSON = jQuery.parseJSON(response);
-	        	
+
 	        	if(responseJSON.response=="success"){
 	        		showSuccessNotification(responseJSON.message);
 	        		addNewStatisticsTableWithData(responseJSON);
@@ -160,8 +169,10 @@ $(document).ready(function() {
 	 */
 	$(document).on("click","input:radio[name='statisticsClientGroup']",function(){
 		
-		var type = $("input:radio[name='statisticsClientGroup']:checked").val();
+		showLoadingDiv();
 		
+		var type = $("input:radio[name='statisticsClientGroup']:checked").val();
+
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/statistics/clients",
@@ -193,11 +204,11 @@ $(document).ready(function() {
 	 */
 	var addClientNamesToBox = function(clients){
 		$('#clientsSelectBox').find("option").remove().end()
-			.append("<option value='default' disabled>--valige klient--</option>")
-			.val("default");
+			.append("<option value='0' >-- kõik kliendid --</option>")
+			.val("0");
 		
 		for(var i = 0; i < clients.length; i++){
-			var option = $('<option value="'+clients[i].ID+'">'+clients[i].name+'</option>');
+			var option = $('<option value="'+clients[i].ID+'">'+clients[i].name+' ('+clients[i].contactPerson+')</option>');
 			$('#clientsSelectBox').append(option);
 		}
 	};
@@ -217,7 +228,7 @@ $(document).ready(function() {
 	 */
 	$(document).on("change","#clientsSelectBox",function(){
 		$("#clientIDDiv").html($("#clientsSelectBox option:selected").val());
-		$("#statisticsClientInput").focus();
+		//$("#statisticsClientInput").focus();
 		$("#statisticsClientInput").val($("#clientsSelectBox option:selected").text());
 	});
 	
@@ -227,7 +238,11 @@ $(document).ready(function() {
 	/*
 	 * delete selected statistics objects
 	 */
-	$(document).on("click","#deleteSelectedStatistics", function(){
+	$(document).on("click","#deleteSelectedStatistics",function(){
+		showConfirmationDialog("Kustuta valitud statistika objektid ?"
+				,deleteStatistics);
+	});
+	var deleteStatistics = function(){
 		
 		if(allowedDeleteStatistics == "false"){
 			showErrorNotification(permissionDeniedMessage);
@@ -271,7 +286,7 @@ $(document).ready(function() {
 	        	showErrorNotification("Viga serveriga ühendumisel");
 	        }
 	    });
-	});
+	};
 	
 	/*
 	 * click on row, open detailed data
@@ -363,7 +378,7 @@ $(document).ready(function() {
 		showLoadingDiv();
 		
 		var index = $(this).closest(".detailedTr").index();
-		console.log(index);
+
 		var changedStatisticsJSON = makeChangedStatisticsJSON();
 		if(changedStatisticsJSON == null){
 			return;
@@ -412,6 +427,7 @@ $(document).ready(function() {
 
 		if($("#statisticsClientInput").val() != $("#statisticsClientInput").data("default_val")){
 			localStorage.setItem("statisticsClientName", $("#statisticsClientInput").val());
+			localStorage.setItem("statisticsClientID", $("#clientIDDiv").html());
 		}
 		else{
 			localStorage.removeItem("statisticsClientName");
@@ -500,20 +516,12 @@ $(document).ready(function() {
 	var makeChangedStatisticsJSON = function(){
 		
 		var id = $("#statisticDetailIDDiv").html();
-		//var code = $("#statisticDetailCodeInput").val();
 		var totalPrice = $("#statisticDetailPriceInput").val();
-		//var clientName = $("#statisticDetailClientInput").val();
 		var amount = $("#statisticDetailAmountInput").val();
 		
 		/*
 		 * check for invalid input
-		 *//*
-		if(checkForInvalidStringCharacters(new Array(
-				new Array(code,"statisticDetailCodeInput"),
-				new Array(clientName,"statisticDetailClientInput")
-				))){
-			return;
-		}*/
+		 */
 		if(checkForInvalidNumberCharacters(new Array(
 				new Array(amount,"statisticDetailAmountInput"),
 				new Array(totalPrice,"statisticDetailPriceInput")
@@ -523,11 +531,9 @@ $(document).ready(function() {
 		
 		var changedStatisticsJSON = {};
 		
-		changedStatisticsJSON.id = id;
+		changedStatisticsJSON.ID = id;
 		changedStatisticsJSON.totalPrice = totalPrice;
-		//changedStatisticsJSON.code = code;
 		changedStatisticsJSON.amount = amount;
-		//changedStatisticsJSON.clientName = clientName;
 		
 		return changedStatisticsJSON;
 	};
@@ -535,7 +541,19 @@ $(document).ready(function() {
 	/*
 	 * load the client names on page load
 	 */
-	$("input:radio[name='statisticsClientGroup']").click();
+	$("input:radio[name='statisticsClientGroup']").each(function(){
+		if($(this).is(":checked")){
+			$(this).click();
+			return false;
+		}
+	});
+	
+	/*
+	 * load statistics on page open if setting is set true
+	 */
+	if(loadStatisticsOnOpen){
+		$("#searchForStatistics").trigger("click");
+	}
 });
 
 function addNewStatisticsTableWithData(statisticsJSON){
@@ -597,7 +615,7 @@ function addNewStatisticsTableWithData(statisticsJSON){
 		headerCell7.className = "statisticsClientNameTd tableBorderRight";
 		
 		if(allowedDeleteStatistics == "true"){
-			headerCell8.innerHTML = "<input type='button' id='deleteSelectedStatistics' value='Kustuta valitud' class='defaultButton' />";
+			headerCell8.innerHTML = "<input type='button' id='deleteSelectedStatistics' value='Kustuta' class='defaultButton' />";
 		}
 		headerCell8.className = "statisticsDeleteTd";
 	}
@@ -675,27 +693,17 @@ function addDetailedStatisticsDataRow(rowIndex,statObjJSON){
 	cell.innerHTML = "<div class='statisticDetailedDataDiv'>" +
 
 		"<div id='statisticDetailIDDiv' class='hidden'>"+statObjJSON.ID+"</div>"+
-		/*
-		"<div class='statisticDetailDataPieceDiv'>" +
-			"<span class='statisticDetailCodeDiv statisticsDetailedNameDiv'>Kood</span>" +
-			"<input type='text' maxlength='45' id='statisticDetailCodeInput' class='statisticsDetailedInput' value='"+statObjJSON.code+"' />" +
-		"</div>" +
-		 */
+
 		"<div class='statisticDetailDataPieceDiv'>" +
 			"<span class='statisticDetailAmountDiv statisticsDetailedNameDiv'>Kogus</span>" +
-			"<input type='text' id='statisticDetailAmountInput' class='statisticsDetailedInput' value='"+statObjJSON.amount+"' />" +
+			"<input type='text' id='statisticDetailAmountInput' class='statisticsDetailedInput' value='"+parseFloat(statObjJSON.amount).toFixed(2)+"' />" +
 		"</div>" +
 
 		"<div class='statisticDetailDataPieceDiv'>" +
 			"<span class='statisticDetailTotalPriceDiv statisticsDetailedNameDiv'>Summa</span>" +
-			"<input type='text' id='statisticDetailPriceInput' class='statisticsDetailedInput' value='"+statObjJSON.totalPrice+"' />" +
+			"<input type='text' id='statisticDetailPriceInput' class='statisticsDetailedInput' value='"+parseFloat(statObjJSON.totalPrice).toFixed(2)+"' />" +
 		"</div>" +
-		/*
-		"<div class='statisticDetailDataPieceDiv'>" +
-			"<span class='statisticDetailClientDiv statisticsDetailedNameDiv'>Klient</span>" +
-			"<input type='text' maxlength='45' id='statisticDetailClientInput' class='statisticsDetailedInput' value='"+statObjJSON.clientName+"' />" +
-		"</div>"+
-		*/
+
 		saveButton +
 		"<input type='button' class='closeDetailDiv defaultButton' value='Sulge' />"+
 		

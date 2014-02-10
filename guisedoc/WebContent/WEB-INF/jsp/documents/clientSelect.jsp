@@ -7,9 +7,9 @@
 	Kliendi tyyp: 
 	<select id="clientTypeSelect">
 		<option value="default" disabled selected>-- valige tüüp --</option>
-		<option value="nonBuyers">Hinnapakkumise kliendid</option>
-		<option value="realBuyers">Ostnud kliendid</option>
-		<option value="sellers">Müüjad</option>
+		<option value="nonBuyer">Hinnapakkumise kliendid</option>
+		<option value="realBuyer">Ostnud kliendid</option>
+		<option value="seller">Müüjad</option>
 	</select>
 	<span id="clientNameInputDiv"><input type="search" class="defaultInputField searchInputField" id="clientSearchName" value="Nimi" /></span>
 	<input type="button" id="closeClientSelect" class="defaultButton" value="Tagasi" />

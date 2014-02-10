@@ -18,6 +18,7 @@
     <put-attribute name="header" value="/WEB-INF/jsp/must/header.jsp" />
     <put-attribute name="menu" value="/WEB-INF/jsp/menu/menu.jsp" />
 	<put-attribute name="footer" value="/WEB-INF/jsp/must/footer.jsp" />
+	<put-attribute name="confirm" value="/WEB-INF/jsp/other/confirm.jsp" />
 </definition>
  
 <!-- user data management -->
@@ -74,6 +75,12 @@
 <definition name="settingsUsers" extends="defaultTemplate">
 	<put-attribute name="title" value="Users settings"/>
 	<put-attribute name="body" value="/WEB-INF/jsp/settings/settingsUsers.jsp" />
+</definition>
+
+<!-- error -->
+ 
+<definition name="error" template="/WEB-INF/jsp/error/error.jsp">
+	<put-attribute name="title" value="Error page"/>
 </definition>
 
 </tiles-definitions>

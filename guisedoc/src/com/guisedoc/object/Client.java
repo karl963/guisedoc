@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.google.gson.annotations.SerializedName;
+import com.guisedoc.workshop.document.settings.DateFormats;
 
 public class Client {
 	
@@ -57,7 +58,8 @@ public class Client {
 	 */
 
 	public String getLastDealDateString(){
-		return Client.DATE_FORMAT.format(this.lastDealDate);
+		if(lastDealDate==null) return "";
+		return DateFormats.DOT_DATE_FORMAT().format(this.lastDealDate);
 	}
 	
 	/*

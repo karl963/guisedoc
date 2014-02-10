@@ -2,6 +2,7 @@ package com.guisedoc.controller.statistics;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
@@ -20,9 +21,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.gson.Gson;
 import com.guisedoc.controller.UserValidator;
 import com.guisedoc.database.Connector;
 import com.guisedoc.database.implement.firm.FirmImpl;
+import com.guisedoc.database.implement.statistics.StatisticsImpl;
 import com.guisedoc.enums.DocumentType;
 import com.guisedoc.object.Document;
 import com.guisedoc.object.Firm;
@@ -38,78 +41,75 @@ public class StatisticsPdfHandling {
 	
 	private StatisticsSummary summary;
 		
-	@RequestMapping(value="/download",method = RequestMethod.GET)
+	@RequestMapping(value="/download",method = RequestMethod.GET, params={"statisticsJSON"})
 	@ResponseBody
-	public Object downloadPDF(RedirectAttributes redirectAttributes,
-			HttpServletRequest request, HttpServletResponse response){
+	public Object downloadPDF(HttpSession session,RedirectAttributes redirectAttributes,
+			 HttpServletResponse response,
+			 @RequestParam("statisticsJSON")String statisticsJSON){
 
-		if(UserValidator.validateLoggedUser(request.getSession())){
-			return UserValidator.directToLogin(request.getContextPath(),redirectAttributes);
+		if(UserValidator.validateLoggedUser(session)){
+			return UserValidator.directToLogin(session.getServletContext()
+					.getContextPath(),redirectAttributes);
 		}
 		
+		HashMap<String,String> map = new Gson().fromJson(statisticsJSON, HashMap.class);
+		
 		try{
-			summary = new StatisticsSummary();
-			for(int i = 0;i< 78 ; i++){
-				StatisticsObject statObject = new StatisticsObject();
-				statObject.setAmount(i*1.0);
-				statObject.setCode("FGH22334");
-				statObject.setName("name"+i);
-				statObject.setTotalPrice(i*1.0);
-				statObject.setUnit("unit");
+			
+			Object responseObject = new StatisticsImpl(session)
+					.getStatisticsSummary(map);
+
+			if(responseObject instanceof StatisticsSummary){
 				
-				summary.getStatObjects().add(statObject);
+				summary = (StatisticsSummary)responseObject;
+				
+				Firm firm = (Firm) new FirmImpl(session).getFirmData();
+				byte[] bytes = DocumentBuilder.build(summary,firm,(User)session.getAttribute("user"));
+		
+				HttpHeaders header = new HttpHeaders();
+				header.setContentType(new MediaType("application", "pdf"));
+			    header.set("Content-Disposition",
+			    		"attachment; filename=" + summary.getSummaryName().replace(" ", "_")+".pdf");
+			    header.setContentLength(bytes.length);
+		
+			    response.addCookie(new Cookie("statisticsDownload","true"));
+			    
+			    return new HttpEntity<byte[]>(bytes, header);
 			}
-			
-			summary.setClientName("Balex Metal OÜ");
-			summary.setClientType("Müüja");
-			summary.setCode("FGH22334");
-			
-			Firm firm = (Firm) new FirmImpl(((Connector)request.getSession().getAttribute("connector")).getDatasource()).getFirmData();
-			byte[] bytes = DocumentBuilder.build(summary,firm,(User)request.getSession().getAttribute("user"));
-	
-			HttpHeaders header = new HttpHeaders();
-			header.setContentType(new MediaType("application", "pdf"));
-		    header.set("Content-Disposition",
-		    		"attachment; filename=" + summary.getSummaryName().replace(" ", "_")+".pdf");
-		    header.setContentLength(bytes.length);
-	
-		    response.addCookie(new Cookie("statisticsDownload","true"));
-		    
-		    return new HttpEntity<byte[]>(bytes, header);
+			else{
+				return UserValidator.directToLogin(session.getServletContext()
+						.getContextPath(),redirectAttributes);
+			}
 		}
 		catch(Exception x){
-			return UserValidator.directToLogin(request.getContextPath(),redirectAttributes);
+			return UserValidator.directToLogin(session.getServletContext()
+					.getContextPath(),redirectAttributes);
 		}
 	}
 	
-	@RequestMapping(value="/view",method = RequestMethod.GET)
+	@RequestMapping(value="/view",method = RequestMethod.GET, params = {"statisticsJSON"})
 	@ResponseBody
 	public Object viewPDF(HttpSession session, RedirectAttributes redirectAttributes,
-			HttpServletResponse response){
-		
+			HttpServletResponse response,
+			@RequestParam("statisticsJSON")String statisticsJSON){
+
 		if(UserValidator.validateLoggedUser(session)){
 			return UserValidator.directToLogin(session.getServletContext().getContextPath(),redirectAttributes);
 		}
+
+		HashMap<String,String> map = new Gson().fromJson(statisticsJSON, HashMap.class);
 		
-		summary = new StatisticsSummary();
-		
-		for(int i = 0;i< 78 ; i++){
-			StatisticsObject statObject = new StatisticsObject();
-			statObject.setAmount(i*1.0);
-			statObject.setCode("FGH22334");
-			statObject.setName("name"+i);
-			statObject.setTotalPrice(i*1.0);
-			statObject.setUnit("unit");
-			
-			summary.getStatObjects().add(statObject);
-		}
-		
-		summary.setClientName("Balex Metal OÜ");
-		summary.setClientType("Müüja");
-		summary.setCode("FGH22334");
-        
         try {
-			response.sendRedirect("preview/"+summary.getSummaryName().replace(" ", "_")+".pdf");
+			Object responseObject = new StatisticsImpl(session)
+					.getStatisticsSummary(map);
+
+			if(responseObject instanceof StatisticsSummary){
+				summary = (StatisticsSummary)responseObject;
+				response.sendRedirect("preview/"+summary.getSummaryName().replace(" ", "_")+".pdf");
+			}
+			else{
+				return null;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -128,7 +128,7 @@ public class StatisticsPdfHandling {
 		
         try{
 
-        	Firm firm = (Firm) new FirmImpl(((Connector)session.getAttribute("connector")).getDatasource()).getFirmData();
+        	Firm firm = (Firm) new FirmImpl(session).getFirmData();
     		byte[] bytes = DocumentBuilder.build(summary,firm,(User)session.getAttribute("user"));
 	
 			HttpHeaders header = new HttpHeaders();

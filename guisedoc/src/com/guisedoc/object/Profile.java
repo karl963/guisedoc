@@ -30,40 +30,40 @@ public class Profile {
 		
 		rules = new HashMap<String, Object[]>();
 		addRule("ViewProducts",new Object[]{true,"Toodete vaatamine"});
-		addRule("AddProducts",new Object[]{true,"Toodete lisamine"});
-		addRule("DeleteProducts",new Object[]{true,"Toodete kustutamine"});
-		addRule("ChangeProducts",new Object[]{true,"Toodete muutmine"});
+		addRule("AddProducts",new Object[]{false,"Toodete lisamine"});
+		addRule("DeleteProducts",new Object[]{false,"Toodete kustutamine"});
+		addRule("ChangeProducts",new Object[]{false,"Toodete muutmine"});
 		
 		addRule("ViewClients",new Object[]{true,"Klientide vaatamine"});
-		addRule("AddClients",new Object[]{true,"Klientide Lisamine"});
-		addRule("ChangeClients",new Object[]{true,"Klientide muutmine"});
-		addRule("DeleteClients",new Object[]{true,"Klientide kustutamine"});
+		addRule("AddClients",new Object[]{false,"Klientide Lisamine"});
+		addRule("ChangeClients",new Object[]{false,"Klientide muutmine"});
+		addRule("DeleteClients",new Object[]{false,"Klientide kustutamine"});
 		
 		addRule("ViewFirm",new Object[]{true,"Firma andmete vaatamine"});
-		addRule("ChangeFirm",new Object[]{true,"Firma andmete muutmine"});
+		addRule("ChangeFirm",new Object[]{false,"Firma andmete muutmine"});
 		
 		addRule("ViewStatistics",new Object[]{true,"Statistika vaatamine"});
-		addRule("ChangeStatistics",new Object[]{true,"Statistika muutmine"});
-		addRule("DeleteStatistics",new Object[]{true,"Statistika kustutamine"});
-		addRule("DownloadStatistics",new Object[]{true,"Statistika alla laadimine"});
+		addRule("ChangeStatistics",new Object[]{false,"Statistika muutmine"});
+		addRule("DeleteStatistics",new Object[]{false,"Statistika kustutamine"});
+		addRule("DownloadStatistics",new Object[]{false,"Statistika alla laadimine"});
 		
 		addRule("ViewDocuments",new Object[]{true,"Dokumentide vaatamine"});
-		addRule("CreateDocuments",new Object[]{true,"Dokumentide tekitamine"});
-		addRule("ChangeDocuments",new Object[]{true,"Dokumentide muutmine"});
-		addRule("DownloadDocuments",new Object[]{true,"Dokumentide alla laadimine"});
+		addRule("CreateDocuments",new Object[]{false,"Dokumentide tekitamine"});
+		addRule("ChangeDocuments",new Object[]{false,"Dokumentide muutmine"});
+		addRule("DownloadDocuments",new Object[]{false,"Dokumentide alla laadimine"});
 		
 		addRule("ViewUsers",new Object[]{true,"Kasutajate vaatamine"});
-		addRule("AddUsers",new Object[]{true,"Kasutajate lisamine"});
-		addRule("DeleteUsers",new Object[]{true,"Kasutajate kustutamine"});
-		addRule("ChangeUsers",new Object[]{true,"Kasutajate muutmine"});
+		addRule("AddUsers",new Object[]{false,"Kasutajate lisamine"});
+		addRule("DeleteUsers",new Object[]{false,"Kasutajate kustutamine"});
+		addRule("ChangeUsers",new Object[]{false,"Kasutajate muutmine"});
 
 		addRule("ViewProfiles",new Object[]{true,"Profiilide vaatamine"});
-		addRule("AddProfiles",new Object[]{true,"Profiilide lisamine"});
-		addRule("DeleteProfiles",new Object[]{true,"Profiilide kustutamine"});
-		addRule("ChangeProfiles",new Object[]{true,"Profiilide muutmine"});
+		addRule("AddProfiles",new Object[]{false,"Profiilide lisamine"});
+		addRule("DeleteProfiles",new Object[]{false,"Profiilide kustutamine"});
+		addRule("ChangeProfiles",new Object[]{false,"Profiilide muutmine"});
 		
 		addRule("ViewPrefixes",new Object[]{true,"Dokumendi eesliidete vaatamine"});
-		addRule("ChangePrefixes",new Object[]{true,"Dokumendi eesliidete muutmine"});
+		addRule("ChangePrefixes",new Object[]{false,"Dokumendi eesliidete muutmine"});
 	}
 	
 	/*

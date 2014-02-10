@@ -48,7 +48,8 @@ public class UserHandling {
 	    	user.setPassword(newUser.getPassword());
 	    	session.setAttribute("user", user);
 	    	
-	    	ErrorType response = (ErrorType)new UserImpl((new Connector("main")).getDatasource()).saveUserPassword(newUser);
+	    	ErrorType response = new UserImpl(new Connector("main"))
+	    			.saveUserPassword(newUser);
 		    
 		    if(response != ErrorType.SUCCESS){
 		    	returnable =  "failure;"+ErrorMessages.getMessage(response);
@@ -57,7 +58,8 @@ public class UserHandling {
 	    
 	    // if we already had an error, can't update others
 	    if(returnable == null){
-		    ErrorType response = (ErrorType)new UserImpl(((Connector)session.getAttribute("connector")).getDatasource()).saveUserData(newUser,true,false,false);
+		    ErrorType response = (ErrorType)new UserImpl(session)
+		    		.saveUserData(newUser,true,false,false);
 		    
 		    if(response == ErrorType.SUCCESS){
 		    	
@@ -88,7 +90,8 @@ public class UserHandling {
 		
 	    Firm firm = gson.fromJson(userDataJSONString, Firm.class);
 
-	    ErrorType response = (ErrorType)new FirmImpl(((Connector)session.getAttribute("connector")).getDatasource()).saveFirm(firm);
+	    ErrorType response = new FirmImpl(session)
+	    		.saveFirm(firm);
 	    
 	    String returnable = null;
 	    
@@ -111,7 +114,8 @@ public class UserHandling {
 		
 	    HashMap<String,String> prefixes = gson.fromJson(userDataJSONString, HashMap.class);
 	    
-	    ErrorType response = (ErrorType)new FirmImpl(((Connector)session.getAttribute("connector")).getDatasource()).savePrefixes(prefixes);
+	    ErrorType response = new FirmImpl(session)
+	    		.savePrefixes(prefixes);
 	    
 	    String returnable = null;
 	    

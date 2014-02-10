@@ -8,6 +8,7 @@ import java.util.List;
 import com.google.gson.annotations.SerializedName;
 import com.guisedoc.enums.DocumentType;
 import com.guisedoc.workshop.document.DocumentBuilder;
+import com.guisedoc.workshop.document.settings.DateFormats;
 import com.guisedoc.workshop.document.settings.Language;
 
 public class Document {
@@ -17,16 +18,10 @@ public class Document {
 	public static long DEFAULT_LONG = 0L;
 	public static int DEFAULT_INT = 0;
 	public static boolean DEFAULT_BOOLEAN = false;
-	public static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-	public static SimpleDateFormat HTML5_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	@SerializedName("ID")
 	private long ID;
-	@SerializedName("number")
-	private long number;
 	
-	@SerializedName("prefix")
-	private String prefix;
 	@SerializedName("orderNR")
 	private String orderNR;
 	@SerializedName("shipmentTime")
@@ -65,13 +60,14 @@ public class Document {
 	private String fullNumber;
 	private Language language;
 	
+	private long clientID;
+	private Double totalSum;
+	
 	/*
 	 * Constructors
 	 */
 	
 	public Document(){
-		this.number = Document.DEFAULT_LONG;
-		this.prefix = Document.DEFAULT_STRING;
 		this.orderNR = Document.DEFAULT_STRING;
 		this.shipmentTime = Document.DEFAULT_STRING;
 		this.shipmentAddress = Document.DEFAULT_STRING;
@@ -81,15 +77,17 @@ public class Document {
 		this.paymentRequirement = Document.DEFAULT_STRING;
 		this.paydInCash = Document.DEFAULT_BOOLEAN;
 		this.showDiscount = Document.DEFAULT_BOOLEAN;
-		this.addToStatistics = Document.DEFAULT_BOOLEAN;
+		this.addToStatistics = !Document.DEFAULT_BOOLEAN;
 		this.date = new Date();
 		this.setProducts(new ArrayList<Product>());
 		this.type = DocumentType.QUOTATION;
 		this.client = new Client();
-		this.fullNumber = null;
+		this.fullNumber = Document.DEFAULT_STRING;
 		this.setLanguage(new Language("EST"));
 		this.showCE = !Document.DEFAULT_BOOLEAN;
-		this.CeSpecification = Document.DEFAULT_STRING;;
+		this.CeSpecification = Document.DEFAULT_STRING;
+		this.setClientID(Document.DEFAULT_LONG);
+		this.totalSum = Document.DEFAULT_DOUBLE;
 	}
 	
 	/*
@@ -97,13 +95,14 @@ public class Document {
 	 */
 	
 	public String getFullNumber(){
-		if(fullNumber != null){
-			return fullNumber;
-		}
-		return prefix+number;
+		return fullNumber;
 	}
 	
 	public Double getTotalSum(){
+		if(totalSum != 0.0){
+			return totalSum;
+		}
+		
 		Double sum = 0.0;
 		for(Product p : products){
 			sum += p.getTotalSum();
@@ -112,11 +111,13 @@ public class Document {
 	}
 	
 	public String getFormatedDate(){
-		return Document.DATE_FORMAT.format(this.date);
+		if(date == null) return "";
+		return DateFormats.DOT_DATE_FORMAT().format(this.date);
 	}
 	
 	public String getHtml5FormatedDate(){
-		return Document.HTML5_DATE_FORMAT.format(this.date);
+		if(date == null) return "";
+		return DateFormats.HTML5_DATE_FORMAT().format(this.date);
 	}
 	
 	public String getTypeString(){
@@ -168,14 +169,6 @@ public class Document {
 
 	public void setID(long iD) {
 		ID = iD;
-	}
-
-	public long getNumber() {
-		return number;
-	}
-
-	public void setNumber(long number) {
-		this.number = number;
 	}
 
 	public String getOrderNR() {
@@ -259,6 +252,7 @@ public class Document {
 	}
 
 	public Date getDate() {
+		if(date == null) return new Date();
 		return date;
 	}
 
@@ -272,14 +266,6 @@ public class Document {
 
 	public void setProducts(List<Product> products) {
 		this.products = products;
-	}
-
-	public String getPrefix() {
-		return prefix;
-	}
-
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
 	}
 	
 	public Client getClient() {
@@ -314,5 +300,17 @@ public class Document {
 
 	public void setCeSpecification(String ceSpecification) {
 		CeSpecification = ceSpecification;
+	}
+
+	public long getClientID() {
+		return clientID;
+	}
+
+	public void setClientID(long clientID) {
+		this.clientID = clientID;
+	}
+	
+	public void setTotalSum(Double sum) {
+		totalSum = sum;
 	}
 }

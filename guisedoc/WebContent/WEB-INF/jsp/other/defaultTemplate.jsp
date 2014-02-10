@@ -6,3 +6,4 @@
 	<tiles:insertAttribute name="body" />
 </div>
 <tiles:insertAttribute name="footer" />
+<tiles:insertAttribute name="confirm" />

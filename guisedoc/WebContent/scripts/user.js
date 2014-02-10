@@ -166,7 +166,8 @@ $(document).ready(function() {
 		var firmFax = $("#firmFaxInput").val();
 		var firmEmail = $("#firmEmailInput").val();
 		var firmBank = $("#firmBankInput").val();
-		var firmBankAccountNr = $("#firmBankAccountNRInput").val();
+		var firmIban = $("#firmIbanInput").val();
+		var firmSwift = $("#firmSwiftInput").val();
 		var firmLogoURL = $("#firmLogoURLInput").val();
 		var logoWidth = $("#firmLogoWidthInput").val();
 		var logoHeight = $("#firmLogoHeightInput").val();
@@ -184,7 +185,8 @@ $(document).ready(function() {
 				new Array(firmFax,"firmFaxInput"),
 				new Array(firmEmail,"firmEmailInput"),
 				new Array(firmBank,"firmBankInput"),
-				new Array(firmBankAccountNr,"firmBankAccountNRInput")
+				new Array(firmIban,"firmIbanInput"),
+				new Array(firmSwift,"firmSwiftInput")
 				))){
 			return;
 		}
@@ -219,7 +221,8 @@ $(document).ready(function() {
 		firmJSON.fax = firmFax;
 		firmJSON.email = firmEmail;
 		firmJSON.bank = firmBank;
-		firmJSON.bankAccountNR = firmBankAccountNr;
+		firmJSON.iban = firmIban;
+		firmJSON.swift = firmSwift;
 		firmJSON.logoURL = firmLogoURL;
 		firmJSON.logoWidth = logoWidth;
 		firmJSON.logoheight = logoHeight;

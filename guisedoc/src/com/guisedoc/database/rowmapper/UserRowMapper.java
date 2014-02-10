@@ -28,6 +28,16 @@ public class UserRowMapper<Object> implements RowMapper<Object>{
 			user.setSettingsID(rs.getLong("settings_ID"));
 			user.setProfileID(rs.getLong("profile_ID"));
 			
+			try{
+				user.getProfile().setName(rs.getString("profileName"));
+			}catch(Exception x){}
+			try{
+				user.setTotalDeals(rs.getLong("totalDeals"));
+			}catch(Exception x){}
+			try{
+				user.setLastOnline(rs.getTimestamp("lastOnline"));
+			}catch(Exception x){}
+			
 			return (Object) user;
 		}
 		catch(Exception x){

@@ -19,7 +19,7 @@ public class Connector {
 	/*
 	 * makes the datasource
 	 */
-	private DataSource makeDatasource(){
+	private void makeDatasource(){
         try {
         	Context initContext = new InitialContext();
         	Context envContext  = (Context)initContext.lookup("java:/comp/env");
@@ -27,8 +27,6 @@ public class Connector {
         } catch (Exception x) {
             x.printStackTrace();
         }
-        
-        return datasource;
 	}
 	
 	/*
@@ -60,12 +58,14 @@ public class Connector {
 	 * return the datasource
 	 */
 	public DataSource getDatasource(){
-
+		System.out.println("-----");
+		System.out.println("datasrc is: "+datasource);
 		// remake the datasource, if it's null
 		if(datasource == null){
-			return makeDatasource();
+			System.out.println("making new");
+			makeDatasource();
 		}
-		
+		System.out.println("datasrc is: "+datasource);
 		return datasource;
 	}
 }

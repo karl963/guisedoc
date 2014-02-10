@@ -1,3 +1,10 @@
+var clientName;
+var contactPerson;
+var address;
+var additionalAddress;
+var phone;
+var email;
+
 $(document).ready(function(){
 	
 	makeSortable("clientSelectTable");
@@ -152,17 +159,28 @@ $(document).ready(function(){
 		
 		cell4.innerHTML = client.totalSum;
 	};
-	
-	/*
-	 * adds the selected client to the document
-	 */
-	var addSelectedClientToDocument = function(client){
-		$("#insertClientID").html(client.ID);
-		$("#insertClientName").val(client.name);
-		$("#insertContactPerson").val(client.contactPerson);
-		$("#insertClientAddress").val(client.address);
-		$("#insertClientAdditionalAddress").val(client.additionalAddress);
-		$("#insertClientPhone").val(client.phone);
-		$("#insertEmail").val(client.email);
-	};
 });
+
+/*
+ * adds the selected client to the document
+ */
+var addSelectedClientToDocument = function(client){
+	$("#insertClientID").html(client.ID);
+	$("#insert_name").val(client.name);
+	$("#insert_contactPerson").val(client.contactPerson);
+	$("#insert_address").val(client.address);
+	$("#insert_additionalAddress").val(client.additionalAddress);
+	$("#insert_phone").val(client.phone);
+	$("#insert_email").val(client.email);
+	
+	if(client.ID == 0){ // there's no actual client selected
+		$(".input_Client").hide();
+		$("#clientAlertDiv").show();
+	}
+	else{ // show the client input fields accordingly
+		var type = getCurrentDocType();
+		$("."+type+"_type_client").show();
+		$(".allTypes_client").show();
+		$("#clientAlertDiv").hide();
+	}
+};

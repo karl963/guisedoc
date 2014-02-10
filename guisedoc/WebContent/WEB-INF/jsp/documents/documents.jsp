@@ -19,10 +19,7 @@
 			<div class="productEnglishDiv hidden">Inglise nimetus</div>
 		</th>
 		<th class="documentsAmountTd tableBorderRight">Kogus</th>
-		<th class="documentsPriceTd tableBorderRight">
-			<div class="productEstonianDiv">Hind</div>
-			<div class="productEnglishDiv hidden">Ostu Hind</div>
-		</th>
+		<th class="documentsPriceTd tableBorderRight">Hind</th>
 		<th class="documentsUnitTd tableBorderRight">
 			<div class="productEstonianDiv">Ühik</div>
 			<div class="productEnglishDiv hidden">Inglise ühik</div>

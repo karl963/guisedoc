@@ -21,12 +21,15 @@ $(document).ready(function() {
 		if(activeLink == "documents"){
 			linkID = "menuBigLink1";
 		}
-		else if(activeLink == "manage-products" || activeLink == "clients" ||
-				activeLink == "manage-user-data"){
+		else if(activeLink == "products" || activeLink == "clients" ||
+				activeLink == "user-firm"){
 			linkID = "menuBigLink2";
 		}
 		else if(activeLink == "statistics"){
 			linkID = "menuBigLink3";
+		}
+		else if(activeLink == "settingsMy" || activeLink == "settingsUsers"){
+			linkID = "menuBigLink4";
 		}
 		
 		$(".topMenu").removeClass("selectedMenuLink");

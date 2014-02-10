@@ -21,6 +21,24 @@
 		<label><input type="checkBox" class="settingsInput" id="loadAllProductsOnOpenSetting" />${user.settings.getSettingDescription('loadAllProductsOnOpen')}</label>
 	</c:otherwise>
 </c:choose>
+<br>
+<c:choose>
+	<c:when test="${user.settings.getSettingValue('cleanProductSearchAfterAdd')==true}">
+		<label><input type="checkBox" class="settingsInput" id="cleanProductSearchAfterAddSetting" checked/>${user.settings.getSettingDescription('cleanProductSearchAfterAdd')}</label>
+	</c:when>
+	<c:otherwise>
+		<label><input type="checkBox" class="settingsInput" id="cleanProductSearchAfterAddSetting" />${user.settings.getSettingDescription('cleanProductSearchAfterAdd')}</label>
+	</c:otherwise>
+</c:choose>
+<br>
+<c:choose>
+	<c:when test="${user.settings.getSettingValue('focusProductCodeAfterAdd')==true}">
+		<label><input type="checkBox" class="settingsInput" id="focusProductCodeAfterAddSetting" checked/>${user.settings.getSettingDescription('focusProductCodeAfterAdd')}</label>
+	</c:when>
+	<c:otherwise>
+		<label><input type="checkBox" class="settingsInput" id="focusProductCodeAfterAdd"Setting />${user.settings.getSettingDescription('focusProductCodeAfterAdd')}</label>
+	</c:otherwise>
+</c:choose>
 
 <h2>Kliendid</h2>
 
@@ -32,9 +50,45 @@
 		<label><input type="checkBox" class="settingsInput" id="loadAllClientsOnOpenSetting" />${user.settings.getSettingDescription('loadAllClientsOnOpen')}</label>
 	</c:otherwise>
 </c:choose>
+<br>
+<c:choose>
+	<c:when test="${user.settings.getSettingValue('cleanClientSearchAfterAdd')==true}">
+		<label><input type="checkBox" class="settingsInput" id="cleanClientSearchAfterAddSetting" checked/>${user.settings.getSettingDescription('cleanClientSearchAfterAdd')}</label>
+	</c:when>
+	<c:otherwise>
+		<label><input type="checkBox" class="settingsInput" id="cleanClientSearchAfterAddSetting" />${user.settings.getSettingDescription('cleanClientSearchAfterAdd')}</label>
+	</c:otherwise>
+</c:choose>
+<br>
+<c:choose>
+	<c:when test="${user.settings.getSettingValue('focusClientNameAfterAdd')==true}">
+		<label><input type="checkBox" class="settingsInput" id="focusClientNameAfterAddSetting" checked/>${user.settings.getSettingDescription('focusClientNameAfterAdd')}</label>
+	</c:when>
+	<c:otherwise>
+		<label><input type="checkBox" class="settingsInput" id="focusClientNameAfterAddSetting" />${user.settings.getSettingDescription('focusClientNameAfterAdd')}</label>
+	</c:otherwise>
+</c:choose>
+
+<h2>Statistika</h2>
+<c:choose>
+	<c:when test="${user.settings.getSettingValue('loadStatisticsOnOpen')==true}">
+		<label><input type="checkBox" class="settingsInput" id="loadStatisticsOnOpenSetting" checked/>${user.settings.getSettingDescription('loadStatisticsOnOpen')}</label>
+	</c:when>
+	<c:otherwise>
+		<label><input type="checkBox" class="settingsInput" id="loadStatisticsOnOpenSetting" />${user.settings.getSettingDescription('loadStatisticsOnOpen')}</label>
+	</c:otherwise>
+</c:choose>
 
 <h2>Teised</h2>
-
+<c:choose>
+	<c:when test="${user.settings.getSettingValue('autoLogin')==true}">
+		<label><input type="checkBox" class="settingsInput" id="autoLoginSetting" checked/>${user.settings.getSettingDescription('autoLogin')}</label>
+	</c:when>
+	<c:otherwise>
+		<label><input type="checkBox" class="settingsInput" id="autoLoginSetting" />${user.settings.getSettingDescription('autoLogin')}</label>
+	</c:otherwise>
+</c:choose>
+<br>
 <c:choose>
 	<c:when test="${user.settings.getSettingValue('saveSearchResultType')==true}">
 		<label><input type="checkBox" class="settingsInput" id="saveSearchResultTypeSetting" checked/>${user.settings.getSettingDescription('saveSearchResultType')}</label>

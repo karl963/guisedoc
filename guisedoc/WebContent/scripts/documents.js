@@ -41,25 +41,21 @@ $(document).ready(function() {
 	 * changing the total sum of document depending on the language
 	 *************************************************************/
 	$(document).on("click","#productsInEstonian, #productsInEnglish",function(){
-
-		clickedEstonian = false;
-		if($(this) == $("#productsInEstonian")){
-			clickedEstonian = true;
-		}
-
+		
 		$(".productRow").each(function(){
 			if($(this).children(".calculateSumTd").html() == "true"){
+
 				var amount = $(this).children(".documentsAmountTd").html();
 				var price = 0;
 				var discount = $(this).children(".documentsDiscountTd").html();
 				
-				if(clickedEstonian){
+				if(getCurrentDocType() != "order"){
 					price = $(this).children(".documentsPriceTd").children(".documentsTablePriceDiv").html();
 				}
 				else{
 					price = $(this).children(".documentsPriceTd").children(".documentsTableOPriceDiv").html();
 				}
-	
+
 				var sum = calculateSum(amount,price,discount).toFixed(2);
 				$(this).children(".documentsSumTd").html(sum);
 			}
@@ -97,7 +93,7 @@ $(document).ready(function() {
 			}
 			productsJSON += "{"+
 				"'queueNumber':"+i+","+
-				"'ID':"+$(this).attr("id").replace("documentsProduct","")+
+				"'unitID':"+$(this).attr("id").replace("documentsProduct","")+
 			"}";
 				
 			i++;
@@ -121,7 +117,6 @@ $(document).ready(function() {
 	        	hideLoadingDiv();
 	        },
 	        error : function(e) {
-	        	hideLoadingDiv();
 	        	showErrorNotification("Viga serveriga ühendumisel");
 	        }
 	    });
@@ -241,7 +236,8 @@ $(document).ready(function() {
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/documents/import/select",
-	        data : {selectedDocumentType:"tab", selectedDocumentID: id, isEstonian:isEstonian, currentDocumentID:id},
+	        data : {selectedDocumentType:"tab", selectedDocumentID: id, 
+	        	isEstonian:isEstonian, currentDocumentID:0},
 	        success : function(responseJSON) {
 	        	
 	        	var documentJSON = jQuery.parseJSON(responseJSON);
@@ -299,7 +295,8 @@ $(document).ready(function() {
 	/*************************************************************
 	 * AUTOSAVING DOCUMENT DATA ON CHANGE
 	 *************************************************************/
-	$(document).on("blur","#documentsOptionsDiv input[type='text'], #documentsOptionsDiv input[type='date']", function(){
+	$(document).on("blur","#documentsOptionsDiv input[type='text']," +
+			" #documentsOptionsDiv input[type='date']", function(){
 
 		if(allowedChangeDocuments == "false"){
 			return;
@@ -308,15 +305,25 @@ $(document).ready(function() {
 		showLoadingDiv();
 		
 		var value = $(this).val();
-		var attributeName = $(this).attr("id").replace("insert","");
+		var attributeName = $(this).attr("id").replace("insert_","");
+		
+		var clientID = 0;
+		if($(this).hasClass("inputClient")){ // we change client's field
+			clientID = $("#insertClientID").html();
+		}
 
+		var type = "string";
+		if($(this).attr("type") == "date"){
+			type = "date";
+		}
+		
 		if(checkForInvalidStringCharacters(new Array(
 				new Array(value,$(this).attr("id"))
 				))){
 			return;
 		}
 		
-		changeDocumentDataPost(attributeName,value);
+		changeDocumentDataPost(attributeName,value,type,clientID);
 	});
 	
 	$(document).on("blur","#documentsOptionsDiv input[type='number']", function(){
@@ -328,15 +335,20 @@ $(document).ready(function() {
 		showLoadingDiv();
 		
 		var value = parseFloat($(this).val());
-		var attributeName = $(this).attr("id").replace("insert","");
-
+		var attributeName = $(this).attr("id").replace("insert_","");
+		var type = "number";
+		var clientID = 0;
+		if($(this).hasClass("inputClient")){ // we change client's field
+			clientID = $("#insertClientID").html();
+		}
+		
 		if(checkForInvalidNumberCharacters(new Array(
 				new Array(value.toString(),$(this).attr("id"))
 				))){
 			return;
 		}
 		
-		changeDocumentDataPost(attributeName,value);
+		changeDocumentDataPost(attributeName,value,type,clientID);
 	});
 	
 	$(document).on("click","#documentsOptionsDiv input[type='checkbox']", function(){
@@ -348,25 +360,38 @@ $(document).ready(function() {
 		showLoadingDiv();
 		
 		var value = $(this).is(":checked");
-		var attributeName = $(this).attr("id").replace("insert","");
+		var attributeName = $(this).attr("id").replace("insert_","");
+		var type = "boolean";
+		var clientID = 0;
+		if($(this).hasClass("inputClient")){ // we change client's field
+			clientID = $("#insertClientID").html();
+		}
 		
-		changeDocumentDataPost(attributeName,value);
+		changeDocumentDataPost(attributeName,value,type,clientID);
 	});
 	
 	/*
-	 * POSTS changed data
+	 * POSTS changed document data
 	 */
-	var changeDocumentDataPost = function(attributeName,value){
+	var changeDocumentDataPost = function(attributeName,value,type,clientID){
 
 		var id = getCurrentDocumentID();
-		
+
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/documents/save",
-	        data : {changedDocumentID:id, value: value, attributeName:attributeName},
+	        data : {changedDocumentID:id, value: value, 
+	        attributeName:attributeName, valueType:type,
+	        clientID:clientID},
 	        success : function(response) {
-	        	
+
 	        	if(response.split(";")[0]=="success"){
+
+	        		// we change the tab's number also
+	        		if(attributeName == "fullNumber"){
+	        			$(".selectedTab").children("span").eq(0).html(value);
+	        		}
+	        		
 	        		showSuccessNotification(response.split(";")[1]);
 	        	}
 	        	else{
@@ -381,6 +406,48 @@ $(document).ready(function() {
 	        }
 	    });
 	};
+	
+	/*************************************************************
+	 * NEW CLIENT MAKING
+	 *************************************************************/
+	/*
+	 * adding a new client
+	 */
+	$(document).on("click", "#addNewClientButton", function(){
+		
+		if(allowedChangeDocuments == "false"){
+			showErrorNotification(permissionDeniedMessage);
+			return;
+		}
+		
+		showLoadingDiv();
+
+		var documentID = getCurrentDocumentID();
+		
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/documents/client/add",
+	        data : {documentID: documentID},
+	        success : function(responseJson) {
+	        	
+	        	var response = jQuery.parseJSON(responseJson);
+	        	
+	        	if(response.response=="success"){
+	        		addSelectedClientToDocument(response.client);
+	        		showSuccessNotification(response.message);
+	        	}
+	        	else{
+	        		showErrorNotification(response.message);
+	        	}
+	        	
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
 	
 	
 	/*************************************************************
@@ -403,23 +470,28 @@ $(document).ready(function() {
 			return;
 		}
 		
+		var documentID = getCurrentDocumentID();
+		
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/documents/product/addInput",
-	        data : {productJSON: JSON.stringify(productJSON)},
-	        success : function(response) {
+	        data : {productJSON: JSON.stringify(productJSON),
+	        	documentID: documentID},
+	        success : function(responseJson) {
 	        	
-	        	if(response.split(";")[0]=="success"){
+	        	var response = jQuery.parseJSON(responseJson);
+	        	
+	        	if(response.response=="success"){
 
-	        		addProductToDocumentsTable(response.split(";")[2],productJSON);
+	        		addProductToDocumentsTable(response.ID,productJSON);
 	        		
 	        		cleanSearchInputAndResults();
 	        		calculateTotalSum();
 	        		
-	        		showSuccessNotification(response.split(";")[1]);
+	        		showSuccessNotification(response.message);
 	        	}
 	        	else{
-	        		showErrorNotification(response.split(";")[1]);
+	        		showErrorNotification(response.message);
 	        	}
 	        	
 	        	hideLoadingDiv();
@@ -519,7 +591,7 @@ $(document).ready(function() {
 		if(name == $("#documentsNameInput").data("default_val")){
 			name = "";
 		}
-		if(price == $("#documentsPriceInput").data("default_val") || price == null){
+		if(price == $("#documentsPriceInput").data("default_val") || price == ""){
 			price = 0.0;
 			includesPrice = false;
 		}
@@ -547,7 +619,8 @@ $(document).ready(function() {
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/documents/product/search",
-	        data : {code:code, name: name, price:price, unit:unit, isEstonian:isEstonian,includesPrice:includesPrice},
+	        data : {code:code, name: name, price:price, 
+	        	unit:unit, isEstonian:isEstonian,includesPrice:includesPrice},
 	        success : function(responseJSONString) {
 	        	
 	        	var responseJSON = jQuery.parseJSON(responseJSONString);
@@ -590,11 +663,15 @@ $(document).ready(function() {
 				))){
 			return;
 		}
-
+		
+		var documentID = getCurrentDocumentID();
+		var type = getCurrentDocType();
+		
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/documents/product/add",
-	        data : {productID:productID, isEstonian:isEstonian, amount:amount},
+	        data : {productID:productID, documentType:type, 
+	        	amount:amount, documentID : documentID},
 	        success : function(responseJSONString) {
 	        	
 	        	var responseJSON = jQuery.parseJSON(responseJSONString);
@@ -602,7 +679,7 @@ $(document).ready(function() {
 	        	if(responseJSON.response=="success"){
 	        		
 	        		addProductToDocumentsTable(responseJSON.product.unitID,responseJSON.product);
-	        		
+
 	        		if($("#cleanSearchCheckBox").is(":checked")){
 	        			cleanSearchInputAndResults();
 	        		}
@@ -716,7 +793,7 @@ $(document).ready(function() {
 	        success : function(responseJSONString) {
 	        	
 	        	var responseJSON = jQuery.parseJSON(responseJSONString.replace(/\n/g,"\\n")); // replace newline with newline
-	        	
+
 	        	if(responseJSON.response=="success"){
 	        		addDetailedDocumentsProductDataRow(rowIndex,responseJSON.product);
 	        		
@@ -784,7 +861,7 @@ $(document).ready(function() {
 		
 		var productJSON = {};
 		
-		productJSON.ID = ID;
+		productJSON.unitID = ID;
 		/*productJSON.code = code;
 		productJSON.name = name;
 		productJSON.e_name = e_name;
@@ -794,7 +871,7 @@ $(document).ready(function() {
 		productJSON.o_price= o_price;
 		productJSON.amount = amount;
 		productJSON.discount = discount;
-		productJSON.sum = sum;
+		productJSON.totalSum = sum;
 		productJSON.calculateSum = calculateSum;
 		productJSON.additional_info = additional_info;
 		productJSON.comments = comments;
@@ -810,19 +887,19 @@ $(document).ready(function() {
 		var productRow = $("#documentsProduct"+product.unitID);
 		
 		//productRow.children(".documentsCodeTd").html(product.code);
-		productRow.children(".documentsAmountTd").html(product.amount);
+		productRow.children(".documentsAmountTd").html(parseFloat(product.amount).toFixed(2));
 		productRow.children(".documentsDiscountTd").html(product.discount);
 		
 		//productRow.children(".documentsNameTd").children(".documentsTableNameDiv").html(product.name);
 		//productRow.children(".documentsNameTd").children(".documentsTableENameDiv").html(product.e_name);
 		
-		productRow.children(".documentsPriceTd").children(".documentsTablePriceDiv").html(product.price);
-		productRow.children(".documentsPriceTd").children(".documentsTableOPriceDiv").html(product.o_price);
+		productRow.children(".documentsPriceTd").children(".documentsTablePriceDiv").html(parseFloat(product.price).toFixed(2));
+		productRow.children(".documentsPriceTd").children(".documentsTableOPriceDiv").html(parseFloat(product.o_price).toFixed(2));
 		
 		//productRow.children(".documentsUnitTd").children(".documentsTableUnitDiv").html(product.unit);
 		//productRow.children(".documentsUnitTd").children(".documentsTableEUnitDiv").html(product.e_unit);
 		
-		productRow.children(".documentsSumTd").html(parseFloat(product.sum).toFixed(2));
+		productRow.children(".documentsSumTd").html(parseFloat(product.totalSum).toFixed(2));
 	};
 	
 	/*
@@ -834,9 +911,9 @@ $(document).ready(function() {
 		var row = table.insertRow(rowIndex+1);
 		var cell=row.insertCell(0);
 		
-		var price = product.o_price;
-		if(isEstonian){
-			price = product.price;
+		var price = product.price;
+		if(getCurrentDocType() == "order"){
+			price = product.o_price;
 		}
 		
 		var isSelectedCalculateSum = "";
@@ -846,7 +923,7 @@ $(document).ready(function() {
 			totalSum = calculateSum(product.amount,price,product.discount);
 		}
 		else{
-			totalSum = product.sum;
+			totalSum = product.totalSum;
 		}
 		
 		cell.innerHTML =
@@ -873,7 +950,7 @@ $(document).ready(function() {
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailENameDiv documentsDetailedNameDiv'>Inglise nimetus:</span>" +
 					//"<input type='text' id='documentsDetailENameInput' class='documentsDetailedInput' value='"+product.e_name+"' />" +
-					"<span class='documentsDetailedValue'>asdsadsaasddasdasd  asdsa asdsaddd adsa asdd adddasd asd asd"+product.e_name+"</span>"+
+					"<span class='documentsDetailedValue'>"+product.e_name+"</span>"+
 				"</div>" +
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
@@ -971,10 +1048,10 @@ $(document).ready(function() {
 		}
 		
 		
-		var name,price,unit,e_unit,e_name,o_price;
+		var name,price,unit,e_unit,e_name,o_price,totalSum;
 		var discount = 0.0;
 		
-		if(isEstonian){
+		if(getCurrentDocType() != "order"){
 			name = $("#documentsNameInput").val();
 			price = $("#documentsPriceInput").val();
 			unit = $("#documentsUnitInput").val();
@@ -992,6 +1069,8 @@ $(document).ready(function() {
 			if(unit == $("#documentsUnitInput").data("default_val")){
 				unit = "";
 			}
+			
+			totalSum = calculateSum(amount,price,discount);
 		}
 		else{
 			name = "";
@@ -1011,6 +1090,8 @@ $(document).ready(function() {
 			if(e_unit == $("#documentsUnitInput").data("default_val")){
 				e_unit = "";
 			}
+			
+			totalSum = calculateSum(amount,o_price,discount);
 		}
 		
 		/*
@@ -1043,6 +1124,7 @@ $(document).ready(function() {
 		productJSON.o_price= o_price;
 		productJSON.amount = amount;
 		productJSON.discount = discount;
+		productJSON.totalSum = totalSum;
 		
 		return productJSON;
 		
@@ -1061,7 +1143,7 @@ $(document).ready(function() {
 			if($(this).is(":checked")){
 				
 				productJSON = {};
-				productJSON.ID = $(this).closest(".productRow").attr("id").replace("documentsProduct","");
+				productJSON.unitID = $(this).closest(".productRow").attr("id").replace("documentsProduct","");
 				
 				productsArray.push(productJSON);
 			}
@@ -1119,13 +1201,13 @@ $(document).ready(function() {
 		var productDiv = document.createElement("div");
 		productDiv.className += "searchResult";
 		
-		var priceLabel = "O-Hind: ";
-		if(isEstonian){
-			priceLabel = "Hind: ";
+		var priceLabel = "Hind: ";
+		if(getCurrentDocType() == "order"){
+			priceLabel = "O-Hind: ";
 		}
 		
 		productDiv.innerHTML += 
-			"<div class='hidden productID'>"+product.unitID+"</div>"+
+			"<div class='hidden productID'>"+product.ID+"</div>"+
 			product.code+"<br>"+
 			product.name+"<br>"+
 			"<b>"+priceLabel+"</b>"+product.price+" / "+product.unit+"<br>"+
@@ -1179,7 +1261,7 @@ $(document).ready(function() {
 		}
 		
 		var price, amount, discount;
-		if(isEstonian){
+		if(getCurrentDocType() != "order"){
 			price = $("#documentsDetailPriceInput").val();
 			if(checkForInvalidNumberCharacters(new Array(
 					new Array(price,"documentsDetailPriceInput")
@@ -1248,18 +1330,10 @@ var addProductToDocumentsTable = function(id, product){
 	var cell6 = row.insertCell(5);
 	var cell7 = row.insertCell(6);
 	var cell8 = row.insertCell(7);
-	
+
 	var cell0 = row.insertCell(8);
 	cell0.innerHTML = product.calculateSum;
 	cell0.className = "hidden calculateSumTd";
-	
-	var sum;
-	if(product.calculatedSum == true || product.sum == undefined){
-		sum = 0;
-	}
-	else{
-		sum = product.sum;
-	}
 	
 	cell1.innerHTML = product.code;
 	cell1.className = "documentsCodeTd tableBorderRight productRowClickable";
@@ -1270,8 +1344,8 @@ var addProductToDocumentsTable = function(id, product){
 	var nameDivs = "<div class='documentsTableNameDiv productEstonianDiv'>"+product.name+"</div>"+
 					"<div class='documentsTableENameDiv productEnglishDiv'>"+product.e_name+"</div>";
 	
-	var priceDivs = "<div class='documentsTablePriceDiv productEstonianDiv'>"+parseFloat(product.price).toFixed(2)+"</div>"+
-					"<div class='documentsTableOPriceDiv productEnglishDiv'>"+parseFloat(product.o_price).toFixed(2)+"</div>";
+	var priceDivs = "<div class='documentsTablePriceDiv regularPriceDiv'>"+parseFloat(product.price).toFixed(2)+"</div>"+
+					"<div class='documentsTableOPriceDiv orderPriceDiv'>"+parseFloat(product.o_price).toFixed(2)+"</div>";
 	
 	var unitDivs = "<div class='documentsTableUnitDiv productEstonianDiv'>"+product.unit+"</div>"+
 					"<div class='documentsTableEUnitDiv productEnglishDiv'>"+product.e_unit+"</div>";
@@ -1283,12 +1357,12 @@ var addProductToDocumentsTable = function(id, product){
 	cell4.className = "documentsPriceTd tableBorderRight productRowClickable alignRightTd";
 	
 	cell5.innerHTML = unitDivs;
-	cell5.className = "documentsUnitTd tableBorderRight productRowClickable";
+	cell5.className = "documentsUnitTd tableBorderRight productRowClickable alignMiddleTd";
 	
 	cell6.innerHTML = product.discount;
 	cell6.className = "alignRightTd documentsDiscountTd tableBorderRight productRowClickable";
 	
-	cell7.innerHTML = parseFloat(sum).toFixed(2);
+	cell7.innerHTML = parseFloat(product.totalSum).toFixed(2);
 	cell7.className = "alignRightTd documentsSumTd tableBorderRight productRowClickable";
 	
 	cell8.innerHTML = "<label class='documentsDeleteCheckboxLabel'><input class='documentsDeleteCheckbox' type='checkbox'/></label>";
@@ -1334,6 +1408,10 @@ var calculateTotalSum = function(){
 */
 var getCurrentDocumentID = function(){
 	return $("#insertDocumentID").html();
+};
+
+var getCurrentDocType = function(){
+	return $("#insertDocumentType").html();
 };
 
 /*

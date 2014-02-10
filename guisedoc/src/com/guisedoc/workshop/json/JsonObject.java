@@ -30,7 +30,9 @@ public class JsonObject {
 			addObject(value);
 		}
 		catch(NotApplicableObjectException e){
-			
+			try {
+				addObject("");
+			} catch (NotApplicableObjectException e1) {}
 		}
 	}
 	

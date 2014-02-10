@@ -69,14 +69,13 @@ $(document).ready(function(){
 	 * SHOWING DETAILED VIEW of product ON CLICK
 	 */
 	$(document).on("click", ".productRowClickable", function() {
-
+		console.log("clicked");
 		showLoadingDiv();
 
 		var clickedRow = $(this).closest(".productTableRow"); // the row we clicked on
 		var rowIndex = clickedRow.index()+1;
 
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
-
 			closeDetailedDataDiv("productsTable", function(){
 			 	
 				if($(".detailedTr").index() < rowIndex){ // clicked after the opened row
@@ -104,7 +103,13 @@ $(document).ready(function(){
 	/*
 	 * POST: ADD NEW PRODUCT
 	 */
-	$("#addNewProduct").click(function() {
+	// on enter press
+	$(document).on("keypress",".productSearchInputField",function(e){
+		if(e.which == 13){
+			$("#addNewProduct").click();
+		}
+	});
+	$(document).on("click","#addNewProduct",function() {
 		
 		showLoadingDiv();
 		$(".productDetailedDataRow").remove();
@@ -127,15 +132,10 @@ $(document).ready(function(){
 	        				addProductJSON.e_unit,addProductJSON.price,
 	        				addProductJSON.o_price,addProductJSON.storage);
 	        		
-	        		$("#productCodeSearchInput").val(null);
-	        		$("#productNameSearchInput").val(null);
-	        		$("#productPriceSearchInput").val(null);
-	        		$("#productUnitSearchInput").val(null);
-	        		
-	        		$("#productCodeSearchInput").blur();
-	        		$("#productNameSearchInput").blur();
-	        		$("#productPriceSearchInput").blur();
-	        		$("#productUnitSearchInput").blur();
+	        		if(cleanProductSearchAfterAdd){
+		        		$(".productSearchInputField").val(null);
+		        		$(".productSearchInputField").blur();
+	        		}
 	        		
 	        		showSuccessNotification(response.split(";")[1]);
 	        		
@@ -143,6 +143,11 @@ $(document).ready(function(){
 	        			$("#productsInEnglish").trigger("click");
 	        		}
 
+	        		if(focusProductCodeAfterAdd){
+	        			$("#productCodeSearchInput").focus();
+	        		}
+	        		
+	        		showSuccessNotification(response.split(";")[1]);
 	        	}
 	        	else{
 	        		showErrorNotification(response.split(";")[1]);
@@ -164,12 +169,14 @@ $(document).ready(function(){
 		
 		if(!searchIsBeingProcessed){
 
+			$(".detailedTr").remove();
+			
 			showLoadingDiv();
 			
 			searchIsBeingProcessed = true;
 			$(".productTableRow").remove();
 			
-			var searchProductJSON = makeSearchProductJSON();
+			var searchProductJSON = makeAddProductJSON();//makeSearchProductJSON();
 			if(searchProductJSON == null){
 				return;
 			}
@@ -258,7 +265,10 @@ $(document).ready(function(){
 	 * delete selected products
 	 */
 	$(document).on("click","#deleteProductsButton",function(){
-		
+		showConfirmationDialog("Kustuta valitud tooted ?"
+				,deleteProducts);
+	});
+	var deleteProducts = function(){
 		showLoadingDiv();
 		
 		if($(".detailedTr").length != 0){// if we have an opened row already, then close it
@@ -293,7 +303,7 @@ $(document).ready(function(){
 	        	showErrorNotification("Viga serveriga ühendumisel");
 	        }
 	    });
-	});
+	};
 
 	/*
 	 * delete selected objects from table after post success

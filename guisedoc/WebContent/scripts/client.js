@@ -38,21 +38,19 @@ $(document).ready(function() {
 	/*
 	 * add client
 	 */
+	// on enter press
+	$(document).on("keypress",".clientSearchInputField",function(e){
+		if(e.which == 13){
+			$("#clientAddButton").click();
+		}
+	});
 	$(document).on("click","#clientAddButton",function(){
 		
-		var name = $("#clientSearchNameInput").val();
-		var contactPerson = $("#clientSearchContactPersonInput").val();
-		
-		if(checkForInvalidStringCharacters(new Array(
-				new Array(name,"clientSearchNameInput"),
-				new Array(contactPerson,"clientSearchContactPersonInput")
-				))){
+		var clientJSON = makeAddClientsJSON();
+		if(clientJSON == null){
+			hideLoadingDiv();
 			return;
 		}
-		
-		var clientJSON = {};
-		clientJSON.name = name;
-		clientJSON.contactPerson = contactPerson;
 		
 		$.ajax({
 	        type : "POST",
@@ -64,6 +62,15 @@ $(document).ready(function() {
 	        	
 	        	if(responseJSON.response=="success"){
 	        		addClientRowToTable(responseJSON.ID,clientJSON.name,clientJSON.contactPerson,0.0);
+	        		
+	        		if(cleanClientSearchAfterAdd){
+	        			$(".clientSearchInputField").val(null);
+	        			$(".clientSearchInputField").blur();
+	        		}
+	        		
+	        		if(focusClientNameAfterAdd){
+	        			$("#clientSearchNameInput").focus();
+	        		}
 	        		showSuccessNotification(responseJSON.message);
 	        	}
 	        	else{
@@ -80,9 +87,41 @@ $(document).ready(function() {
 	});
 	
 	/*
+	 * makes add client json
+	 */
+	var makeAddClientsJSON = function(){
+		var name = $("#clientSearchNameInput").val();
+		var contactPerson = $("#clientSearchContactPersonInput").val();
+
+		if(name == $("#clientSearchNameInput").data("default_val")){
+			name = "";
+		}
+		if(contactPerson == $("#clientSearchContactPersonInput").data("default_val")){
+			contactPerson = "";
+		}
+
+		if(checkForInvalidStringCharacters(new Array(
+				new Array(name,"clientSearchNameInput"),
+				new Array(contactPerson,"clientSearchContactPersonInput")
+				))){
+			return;
+		}
+		
+		var clientJSON = {};
+		clientJSON.name = name;
+		clientJSON.contactPerson = contactPerson;
+		
+		return clientJSON;
+	};
+	
+	/*
 	 * delete clients
 	 */
 	$(document).on("click","#deleteClientsButton",function(){
+		showConfirmationDialog("Kustuta valitud kliendid ?"
+				,deleteClients);
+	});
+	var deleteClients = function(){
 		
 		showLoadingDiv();
 		
@@ -116,7 +155,7 @@ $(document).ready(function() {
 	        	showErrorNotification("Viga serveriga ühendumisel");
 	        }
 	    });
-	});
+	};
 	
 	/*
 	 * delete selected objects from table after post success
@@ -194,14 +233,14 @@ $(document).ready(function() {
 	/*
 	 * Searching for clients documents with a number input
 	 */
-	$(document).on("input","#searchClientDetailNumber",function(){
-		
+	$(document).on("click","#searchDocumentsButton",function(){
 		showLoadingDiv();
 		
-		var number = $(this).val();
+		var id = $("#leftSideDetailDiv").children(".clientIDDiv").html();
+		var number = $("#searchClientDetailNumber").val();
 		
-		if(number == $(this).data("default_val")){
-			return;
+		if(number == $("#searchClientDetailNumber").data("default_val")){
+			number = "";
 		}
 		
 		if(checkForInvalidStringCharacters(new Array(
@@ -213,7 +252,7 @@ $(document).ready(function() {
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/clients/searchDocument",
-	        data : {documentNumber:number},
+	        data : {documentNumber:number, clientID:id},
 	        success : function(responseJSON) {
 	        	
 	        	var documentsJSON = jQuery.parseJSON(responseJSON);
@@ -325,7 +364,7 @@ $(document).ready(function() {
 		if(clientJSONString == null){
 			return;
 		}
-		
+
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/clients/save",
@@ -423,7 +462,7 @@ $(document).ready(function() {
 		if(name == $("#clientSearchNameInput").data("default_val")){
 			name = "";
 		}
-		if(contactPerson == $("#clientSearchNameInput").data("default_val")){
+		if(contactPerson == $("#clientSearchContactPersonInput").data("default_val")){
 			contactPerson = "";
 		}
 		
@@ -446,7 +485,7 @@ $(document).ready(function() {
 	
 	var makeClientDetailJSON = function(){
 		
-		var ID = $(".leftSideDetailDiv").children(".clientIDDiv").val();
+		var ID = $("#leftSideDetailDiv").children(".clientIDDiv").html();
 		var name = $("#clientDetailNameInput").val();
 		var phone = $("#clientDetailPhoneInput").val();
 		var contactPerson = $("#clientDetailContactPersonInput").val();
@@ -462,7 +501,6 @@ $(document).ready(function() {
 				))){
 			return;
 		}
-		
 		
 		var clientJSON = {};
 		
@@ -563,7 +601,14 @@ $(document).ready(function() {
 			"</div>"+
 			
 			"<div id='rightsideDetailDiv'>"+
-				"<div><input type='search' value='Otsi Numbriga' id='searchClientDetailNumber' class='clientSearchInputField defaultInputField searchInputField'/></div>"+
+				"<div>" +
+					"<span id='documentSearchInputDiv'>"+
+						"<input type='search' value='Otsi Numbriga' id='searchClientDetailNumber' class='documentSearchInputField defaultInputField searchInputField'/>" +
+					"</span>"+
+					"<span id='documentSearchButtonDiv'>"+
+						"<input type='button' class='defaultButton' id='searchDocumentsButton' value='Otsi'/>" +
+					"</span>"+
+				"</div>"+
 				"<div><small>Tehtud dokumendid (summa koos käibemaksuga)</small></div>"+
 				
 				"<div id='clientDetailNumbersDiv'>" +
@@ -582,9 +627,9 @@ $(document).ready(function() {
 		
 		row.className = "detailedTr";
 		
+		$("#searchClientDetailNumber").data("default_val",$("#searchClientDetailNumber").val());
+
 		updateClientDetailDocuments(clientJSON.documents);
-		
-		return row;
 	}
 	
 	function addAllClientsToTable(clientsJSON){
@@ -625,4 +670,8 @@ $(document).ready(function() {
 		cell4.className = "clientDeleteTd";
 	}
 
+	// load clients if user has set it true
+	if(loadAllClientsOnOpen){
+		$("#clientSearchButton").trigger("click");
+	}
 });

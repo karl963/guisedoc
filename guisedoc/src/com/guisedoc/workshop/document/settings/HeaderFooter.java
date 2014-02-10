@@ -98,15 +98,22 @@ public class HeaderFooter extends PdfPageEventHelper{
 
         	firstAdded = true;
         	
-        	if(!firm.getBankAccountNR().equals("")){
-        		thirdPhrase.add("a/a "+firm.getBankAccountNR());
-        		firstAdded = false;
-        	}
         	if(!firm.getBank().equals("")){
+        		thirdPhrase.add(firm.getBank());
+        	}
+        	if(!firm.getIban().equals("")){
         		if(!firstAdded){
         			thirdPhrase.add(" ");
         		}
-        		thirdPhrase.add(firm.getBank());
+        		thirdPhrase.add("IBAN "+firm.getIban());
+        		firstAdded = false;
+        	}
+        	if(!firm.getSwift().equals("")){
+        		if(!firstAdded){
+        			thirdPhrase.add(" ");
+        		}
+        		thirdPhrase.add("SWIFT "+firm.getSwift());
+        		firstAdded = false;
         	}
 
         	/*

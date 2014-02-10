@@ -18,6 +18,8 @@ public class StatisticsGet {
 	public Object getStatisticsView(HttpSession session, RedirectAttributes redirectAttributes, 
 			Model model){
 		
+		session.setAttribute("requestedPage", "statistics");
+		
 		if(UserValidator.validateLoggedUser(session)){
 			return UserValidator.directToLogin(session.getServletContext().getContextPath(),redirectAttributes);
 		}

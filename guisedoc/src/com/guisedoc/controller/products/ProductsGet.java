@@ -29,6 +29,8 @@ public class ProductsGet {
 	public Object getProductManageView(HttpSession session, RedirectAttributes redirectAttributes,
 			Model model){
 		
+		session.setAttribute("requestedPage", "products");
+		
 		if(UserValidator.validateLoggedUser(session)){
 			return UserValidator.directToLogin(session.getServletContext().getContextPath(),redirectAttributes);
 		}
@@ -39,9 +41,8 @@ public class ProductsGet {
 		// if the user wants the procuts to be loaded on page open
 		if(((User)session.getAttribute("user")).getSettings().getSettingValue("loadAllProductsOnOpen")){
 			
-			Object response = new ProductImpl(
-					((Connector)session.getAttribute("connector")).getDatasource()
-					).getAllProducts();
+			Object response = new ProductImpl(session)
+					.getAllProducts();
 			
 			if(response instanceof List){
 				products = (List<Product>)response;
