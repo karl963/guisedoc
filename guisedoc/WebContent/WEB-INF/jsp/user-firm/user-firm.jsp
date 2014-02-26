@@ -13,7 +13,7 @@
 </div>
 <div class="userDataDiv">
 	<span class="userDataDescription">Email</span>
-	<span class="userDataInput"><input id="userEmailInput" type="text" value="${user.email}" maxlength="45"/></span>
+	<span class="userDataInput"><input id="userEmailInput" type="text" value="${user.email}" maxlength="60"/></span>
 </div>
 <div class="userDataDiv">
 	<span class="userDataDescription">Telefon</span>
@@ -90,7 +90,7 @@
 </div>
 <div class="userDataDiv">
 	<span class="userDataDescription">E-mail</span>
-	<span class="userDataInput"><input id="firmEmailInput" type="text" value="${firm.email}" maxlength="45"/></span>
+	<span class="userDataInput"><input id="firmEmailInput" type="text" value="${firm.email}" maxlength="60"/></span>
 </div>
 <div class="userDataDiv">
 	<span class="userDataDescription">Pank</span>
@@ -108,13 +108,13 @@
 
 <div class="userDataDiv">
 	<span class="userDataDescription">Logo link</span>
-	<span class="userDataInput"><input id="firmLogoURLInput" type="text" value="${firm.logoURL}"/></span>
+	<span class="userDataInput"><input id="firmLogoURLInput" type="text" value="${firm.logoURL}" maxlength="200"/></span>
 </div>
 <div id="userDataDiv">
 	<span class="userDataDescription">Logo optimaalsed suurused:</span>
 	<br>
-	<span class="userDataInput">pikkus:<input id="firmLogoWidthInput" type="number" value="${firm.logoWidth}"/></span>
-	<span class="userDataInput">kõrgus:<input id="firmLogoHeightInput" type="number" value="${firm.logoHeight}"/></span>
+	<span class="userDataInput">pikkus:<input id="firmLogoWidthInput" type="number" value="${firm.logoWidth}" maxlength="10"/></span>
+	<span class="userDataInput">kõrgus:<input id="firmLogoHeightInput" type="number" value="${firm.logoHeight}" maxlength="10"/></span>
 </div>
 
 <br>

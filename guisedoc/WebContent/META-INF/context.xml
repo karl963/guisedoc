@@ -11,29 +11,45 @@
     maxActive="10" 
     maxIdle="10" 
     maxWait="10"
-    username="mainer" 
-    password="corenuke" 
+    username="main" 
+    password="password" 
     driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/main"
+    url="jdbc:mysql://karlbakatest.ccntx8zyuq8d.us-east-1.rds.amazonaws.com:3306/main"
     timeBetweenEvictionRunsMillis="30000"
     removeAbandonedTimeout="60000"
+	
 />
-               
+      <!--factory="org.apache.commons.dbcp.BasicDataSourceFactory"-->          
 <Resource
-	name="jdbc/bestroof"
-	auth="Container" 
+	name="jdbc/test"
+	auth="Container"
 	type="javax.sql.DataSource"
     maxActive="10" 
     maxIdle="10" 
     maxWait="10"
-    username="bestroof" 
-    password="bestroofer" 
+    username="test" 
+    password="password" 
     driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/bestroof"
+    url="jdbc:mysql://karlbakatest.ccntx8zyuq8d.us-east-1.rds.amazonaws.com:3306/test"
     timeBetweenEvictionRunsMillis="30000"
     removeAbandonedTimeout="60000"
+	
 />
- 
+<Resource
+	name="jdbc/test2"
+	auth="Container"
+	type="javax.sql.DataSource"
+    maxActive="10" 
+    maxIdle="10" 
+    maxWait="10"
+    username="test2" 
+    password="password" 
+    driverClassName="com.mysql.jdbc.Driver"
+    url="jdbc:mysql://karlbakatest.ccntx8zyuq8d.us-east-1.rds.amazonaws.com:3306/test2"
+    timeBetweenEvictionRunsMillis="30000"
+    removeAbandonedTimeout="60000"
+	
+/>
  
 
 </Context>

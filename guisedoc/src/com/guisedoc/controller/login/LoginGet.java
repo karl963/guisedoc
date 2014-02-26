@@ -75,4 +75,14 @@ public class LoginGet {
 		return "login";
 	}
 	
+	@RequestMapping(value="/loginError", method = RequestMethod.GET)
+	public String loginError(Model model){
+		
+		model.addAttribute("registerResponseBad","");
+		model.addAttribute("pageRequest","login");
+		model.addAttribute("errorMessage","Valed andmed sisse logimiseks !");
+		
+		return "login";
+	}
+	
 }

@@ -6,43 +6,59 @@
     id="WebApp_ID" version="3.0">
 
     <display-name>Guisedoc rakendus</display-name>
-    
-    <resource-ref>
-      <description>DB Connection</description>
-      <res-ref-name>jdbc/guisedoc</res-ref-name>
-      <res-type>javax.sql.DataSource</res-type>
-      <res-auth>Container</res-auth>
-    </resource-ref>
-    
-    <servlet>
+
+ 	<servlet>
         <servlet-name>guisedoc</servlet-name>
-        <servlet-class>
-            org.springframework.web.servlet.DispatcherServlet
-        </servlet-class>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+                <param-name>contextConfigLocation</param-name>
+                <param-value>/WEB-INF/guisedoc-servlet.xml</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+	<!--
+    <listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+	-->
+ 	<!-- Spring Security --> 
+ 	<!--
+ 	<filter>  
+  		<filter-name>springSecurityFilterChain</filter-name>  
+  		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>  
+ 	</filter>  
+  
+ 	<filter-mapping>  
+  		<filter-name>springSecurityFilterChain</filter-name>  
+  		<url-pattern>/*</url-pattern>  
+ 	</filter-mapping>
+    -->
+ 	<!-- welcome redirect -->
+ 	
+    <welcome-file-list>
+        <welcome-file>/WEB-INF/redirect.jsp</welcome-file>
+    </welcome-file-list>
+    
+    <!-- mappings -->
 
     <servlet-mapping>
         <servlet-name>guisedoc</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
     
-    
     <servlet-mapping>
         <servlet-name>jsp</servlet-name>
         <url-pattern>*.jsp</url-pattern>
     </servlet-mapping>
     
-    
 	<servlet-mapping>
   		<servlet-name>jsp</servlet-name>
   		<url-pattern>/WEB-INF/jsp/*</url-pattern>
 	</servlet-mapping>
- 
-    <welcome-file-list>
-        <welcome-file>/WEB-INF/redirect.jsp</welcome-file>
-    </welcome-file-list>
-    
+
     <!-- error -->
 	<error-page>
 		<error-code>500</error-code>
@@ -64,7 +80,14 @@
 
   	<resource-ref>
 		<description>MySQL database Bestroof</description>
-		<res-ref-name>jdbc/bestroof</res-ref-name>
+		<res-ref-name>jdbc/test</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+  	</resource-ref>
+  	
+  	  	<resource-ref>
+		<description>MySQL database Bestroof</description>
+		<res-ref-name>jdbc/test2</res-ref-name>
 		<res-type>javax.sql.DataSource</res-type>
 		<res-auth>Container</res-auth>
   	</resource-ref>

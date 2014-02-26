@@ -76,11 +76,10 @@ public class DocumentSelection {
 		return jsonObject.getJsonString();
 	}
 	
-	@RequestMapping(value="/select", method = RequestMethod.POST, params={"selectedDocumentType","selectedDocumentID","isEstonian","currentDocumentID"})
+	@RequestMapping(value="/select", method = RequestMethod.POST, params={"selectedDocumentID","currentDocumentID"})
 	@ResponseBody
 	public String getSelectedDocumentData(HttpSession session,
-			@RequestParam("selectedDocumentType")String type,
-			@RequestParam("selectedDocumentID")long selectedDocumentID,@RequestParam("isEstonian")boolean isEstonian,
+			@RequestParam("selectedDocumentID")long selectedDocumentID,
 			@RequestParam("currentDocumentID")long openedDocumentID){
 
 		JsonObject jsonObject = new JsonObject();

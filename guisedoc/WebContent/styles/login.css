@@ -99,7 +99,7 @@ li:before{
 	height: 400px;
 	overflow: hidden;
 	width: 100%;
-	margin-top:-20px;
+	margin-top:0px;
 	opacity:0.7;
 }
 #imagesDiv img, #imagesDiv div{

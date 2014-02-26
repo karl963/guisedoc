@@ -4,6 +4,7 @@ import java.sql.Connection;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+
 import javax.sql.DataSource;
 
 public class Connector {
@@ -58,14 +59,12 @@ public class Connector {
 	 * return the datasource
 	 */
 	public DataSource getDatasource(){
-		System.out.println("-----");
-		System.out.println("datasrc is: "+datasource);
+
 		// remake the datasource, if it's null
 		if(datasource == null){
-			System.out.println("making new");
 			makeDatasource();
 		}
-		System.out.println("datasrc is: "+datasource);
+
 		return datasource;
 	}
 }

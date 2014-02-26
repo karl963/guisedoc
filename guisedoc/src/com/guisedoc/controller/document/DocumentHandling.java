@@ -115,10 +115,10 @@ public class DocumentHandling {
 		}
 		else if(valueType.equals("date")){
 			try {
-				value = new Timestamp(DateFormats.HTML5_DATE_FORMAT().parse((String) value).getTime());
+				value = new Timestamp(DateFormats.HTML5_DATE_FORMAT().parse((String) value).getTime()).toString();
 			} catch (ParseException e) {
 				e.printStackTrace();
-				value = new Timestamp(new Date().getTime());
+				value = new Timestamp(new Date().getTime()).toString();
 			}
 		}
 		else if(valueType.equals("boolean")){

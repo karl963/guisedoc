@@ -1,5 +1,6 @@
 <%@ page import="net.tanesha.recaptcha.ReCaptcha" %>
 <%@ page import="net.tanesha.recaptcha.ReCaptchaFactory" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <div id="outerDiv">
 <div id="commercialDiv">
@@ -23,8 +24,8 @@
 		</div>
 		<div id="formDiv">
 		<form action="${pageContext.request.contextPath}/login/register" method="post">
-			<input type="text" name="registerName" class="searchInputField defaultInputField" value="Teie ees- ja perekonna nimi"/>
-			<input type="text" name="registerEmail" class="searchInputField defaultInputField" value="Teie email"/>
+			<input type="text" name="registerName" class="searchInputField defaultInputField" value="Teie ees- ja perekonna nimi" maxlength="45"/>
+			<input type="text" name="registerEmail" class="searchInputField defaultInputField" value="Teie email" maxlength="60"/>
 			<%
 	        ReCaptcha c = ReCaptchaFactory.newReCaptcha(
 	            "6LdSHe4SAAAAAI9lWK2XhBg5wHT7xvauG4satahj",
@@ -39,14 +40,19 @@
 	</div>
 </div>
 <div id="loginFormDiv">
-
-	<input type="text" value="kasutajanimi" class="defaultInputField searchInputField" id="inputUsername"/>
-	<br>
-	<input type="password" value="parool" class="defaultInputField searchInputField" id="inputPassword"/>
-	<br>
-	<input type="button" value="Logi sisse" class="defaultButton" id="loginButton"/>
-	
-	<div id="errorMessageDiv">${errorMessage}</div>
+	<!-- <form name="loginForm" action="/j_spring_security_check" method="POST">-->
+		<input type="text" value="kasutajanimi" class="defaultInputField searchInputField" id="inputUsername" maxlength="45"/>
+		<!--<input name="j_username" type="text" value="kasutajanimi" class="defaultInputField searchInputField" id="inputUsername" maxlength="45"/>-->
+		<br>
+		<input type="password" value="parool" class="defaultInputField searchInputField" id="inputPassword" maxlength="45"/>
+		<!--<input name="j_password" type="password" value="parool" class="defaultInputField searchInputField" id="inputPassword" maxlength="45"/>-->
+		<br>
+		<input type="button" value="Logi sisse" class="defaultButton" id="loginButton"/>
+		<!--<input type="submit" value="Logi sisse" class="defaultButton"/>-->
+	<!--</form>-->
+	<div id="errorMessageDiv">
+		${errorMessage}
+	</div>
 
 </div>
 </div>
@@ -58,12 +64,4 @@
 	<div id="image5"></div>
 	<div id="image6"></div>
 	<div id="image7"></div>
-<!--
-	<img style="display:block;" src="${pageContext.request.contextPath}/images/1.png" id="image1">
-	<img src="${pageContext.request.contextPath}/images/2.png" id="image2">
-	<img src="${pageContext.request.contextPath}/images/3.png" id="image3">
-	<img src="${pageContext.request.contextPath}/images/4.png" id="image4">
-	<img src="${pageContext.request.contextPath}/images/5.png" id="image5">
-	<img src="${pageContext.request.contextPath}/images/6.png" id="image6">
-	<img src="${pageContext.request.contextPath}/images/7.png" id="image7">-->
 </div>

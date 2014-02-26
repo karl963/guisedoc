@@ -6,8 +6,8 @@
 <c:if test="${user.profile.isAllowed('AddUsers') == true}">
 <tr>
 	<td colspan=4>
-		<input type="text" id="newUserName" class="searchInputField defaultInputField" value="nimi"/>
-		<input type="text" id="newUserPassword" class="searchInputField defaultInputField" value="parool"/>
+		<input type="text" id="newUserName" class="searchInputField defaultInputField" value="nimi" maxlength="45"/>
+		<input type="text" id="newUserPassword" class="searchInputField defaultInputField" value="parool" maxlength="45"/>
 		<input type="button" class="defaultButton" value="Lisa kasutaja" id="addUserButton"/>
 	</td>
 </tr>
@@ -42,7 +42,7 @@
 <c:if test="${user.profile.isAllowed('AddProfiles') == true}">
 <tr>
 	<td colspan=3>
-		<input type="text" id="newProfileName" class="searchInputField defaultInputField" value="Nimetus"/>
+		<input type="text" id="newProfileName" class="searchInputField defaultInputField" value="Nimetus" maxlength="45"/>
 		<input type="button" class="defaultButton" value="Lisa profiil" id="addProfileButton"/>
 	</td>
 </tr>

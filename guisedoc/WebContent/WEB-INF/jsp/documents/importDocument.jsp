@@ -14,7 +14,7 @@
 		<option value="delivery_note">Saateleht</option>
 		<option value="order">Order</option>
 	</select>
-	<span id="documentNumberInputDiv"><input type="search" class="defaultInputField searchInputField" id="documentSearchNumber" value="Number" /></span>
+	<span id="documentNumberInputDiv"><input type="search" class="defaultInputField searchInputField" id="documentSearchNumber" value="Number" maxlength="45"/></span>
 	<input type="button" id="closeImportDocument" class="defaultButton" value="Tagasi" />
 	
 	<div id="importDocumentTableDiv">

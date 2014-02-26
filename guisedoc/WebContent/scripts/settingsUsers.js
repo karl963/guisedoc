@@ -404,7 +404,7 @@ $(document).ready(function(){
 		cell.className = "profileDetailDiv";
 		
 		cell.innerHTML += "<div class='profileIDDiv hidden'>"+profile.ID+"</div>";
-		cell.innerHTML += "Profiili nimi: <input id='inputProfileName' type='text' value='"+profile.name+"' />";
+		cell.innerHTML += "Profiili nimi: <input id='inputProfileName' type='text' value='"+profile.name+"' maxlength='45'/>";
 		
 		var groups = [];
 		

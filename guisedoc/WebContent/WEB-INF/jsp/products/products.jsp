@@ -17,11 +17,11 @@
 		</td>
 		
 		<td class="productPriceTd">
-			<input type="search" id="productPriceSearchInput" class="productSearchInputField searchInputField defaultInputField" value="Otsitava hind"/>
+			<input type="search" id="productPriceSearchInput" class="productSearchInputField searchInputField defaultInputField" value="Otsitava hind" maxlength="20"/>
 		</td>
 		
 		<td class="productUnitTd">
-			<input type="search" id="productUnitSearchInput" class="productSearchInputField searchInputField defaultInputField" maxlength="20" value="Otsitava Ühik"/>
+			<input type="search" id="productUnitSearchInput" class="productSearchInputField searchInputField defaultInputField" maxlength="45" value="Otsitava Ühik"/>
 		</td>
 		<td class="buttonsTd">
 			<input type="button" value="Otsi" class="defaultButton" id="searchForProduct"/>

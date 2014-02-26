@@ -66,7 +66,7 @@ public class UserHandling {
 		    	// update the current user data
 		    	User user = (User)session.getAttribute("user");
 		    	user.setEmail(newUser.getEmail());
-		    	user.setName(newUser.getEmail());
+		    	user.setName(newUser.getName());
 		    	user.setPhone(newUser.getPhone());
 		    	user.setSkype(newUser.getSkype());
 		    	session.setAttribute("user", user);

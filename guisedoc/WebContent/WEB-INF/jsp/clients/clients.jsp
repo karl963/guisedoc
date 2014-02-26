@@ -11,8 +11,12 @@
 <table id="clientsTable">
 	<thead>
 	<tr>
-		<td class="clientNameTd"><input type="search" class="clientSearchInputField searchInputField defaultInputField" id="clientSearchNameInput" value="Nimi"/></td>
-		<td class="clientContactPersonTd"><input type="search" id="clientSearchContactPersonInput" class="clientSearchInputField searchInputField defaultInputField" value="Kontaktisik"/></td>
+		<td class="clientNameTd">
+			<input type="search" class="clientSearchInputField searchInputField defaultInputField" id="clientSearchNameInput" value="Nimi" maxlength="45"/>
+		</td>
+		<td class="clientContactPersonTd">
+			<input type="search" id="clientSearchContactPersonInput" class="clientSearchInputField searchInputField defaultInputField" value="Kontaktisik" maxlength="45"/>
+		</td>
 		<td class="clientTotalBoughtForTd">
 			<input type="button" class="defaultButton" id="clientSearchButton" value="otsi"/>
 			<input type="button" class="defaultButton" id="clientAddButton" value="lisa"/>

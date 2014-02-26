@@ -590,7 +590,7 @@ $(document).ready(function() {
 					
 					"<div>" +
 						"<span class='clientDetailNameDiv'>Email</span>" +
-						"<span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailEmailInput' value='"+clientJSON.email+"' /> </span>" +
+						"<span class='clientDetailInputDiv'> <input type='text' maxlength='60' id='clientDetailEmailInput' value='"+clientJSON.email+"' /> </span>" +
 					"</div>" +
 					
 					"<div>" +
@@ -603,7 +603,7 @@ $(document).ready(function() {
 			"<div id='rightsideDetailDiv'>"+
 				"<div>" +
 					"<span id='documentSearchInputDiv'>"+
-						"<input type='search' value='Otsi Numbriga' id='searchClientDetailNumber' class='documentSearchInputField defaultInputField searchInputField'/>" +
+						"<input type='search' value='Otsi Numbriga' id='searchClientDetailNumber' class='documentSearchInputField defaultInputField searchInputField' maxlength='45'/>" +
 					"</span>"+
 					"<span id='documentSearchButtonDiv'>"+
 						"<input type='button' class='defaultButton' id='searchDocumentsButton' value='Otsi'/>" +

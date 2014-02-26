@@ -5,7 +5,7 @@
 #documentsTabsDiv{
 	position: relative;
 	width:100%;
-	
+
 	/*background-color:#84978F;*/
 }
 .documentsTab{
@@ -68,8 +68,9 @@
 */
 
 #documentsTableDiv{
+	display:none;
 	position: relative;
-	display:inline-block;
+	
 	float:left;
 	
 	height:100%;
@@ -129,10 +130,11 @@
 */
 
 #documentsSearchResultsDiv{
+	display:none;
 	position: relative;
 	
 	width:15%;
-	display:inline-block;
+
 	float:right;
 	
 	font-size:12px;
@@ -168,6 +170,7 @@
 */
 
 #documentsOptionsDiv{
+	display:none;
 	position: relative;
 	float:left;
 	width:100%;

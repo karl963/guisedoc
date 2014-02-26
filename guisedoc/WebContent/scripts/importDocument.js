@@ -90,7 +90,6 @@ $(document).ready(function(){
 		
 		var id = $(this).children(".documentNumberTd").children(".documentID").html();
 		var currentID = $("#insertDocumentID").html();
-		var type = $("#documentTypeSelect").val();
 
 		// check if we had no document opened or selected to open an existing one
 		if(currentID == undefined || $("#newDocumentSelect").val() == "existing"){
@@ -100,8 +99,7 @@ $(document).ready(function(){
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/documents/import/select",
-	        data : {selectedDocumentID:id, selectedDocumentType:type, 
-	        	isEstonian:isEstonian,currentDocumentID:currentID},
+	        data : {selectedDocumentID:id,currentDocumentID:currentID},
 	        success : function(response) {
 	        	
 	        	var responseJSON = jQuery.parseJSON(response);
@@ -113,7 +111,7 @@ $(document).ready(function(){
 	        			return;
 	        		}
 	        		
-	        		addSelectedDocumentData(responseJSON.document);
+	        		addSelectedDocumentData(responseJSON.document,true);
 	        		$("#importDocumentDiv").hide();
 	        		calculateTotalSum();
 	        	
@@ -172,15 +170,14 @@ $(document).ready(function(){
 /*
  * adds the selected document to the document
  */
-var addSelectedDocumentData = function(document){
+var addSelectedDocumentData = function(document,importingDocument){
 
 	// if we are selecting document to open, not importing
 	if(!importingDocument){
 		makeNewTabAndOpenIt(document.ID,document.fullNumber);
+		$("#insertDocumentID").html(document.ID);
+		$("#insertDocumentType").html(document.type);
 	}
-
-	$("#insertDocumentID").html(document.ID);
-	$("#insertDocumentType").html(document.type);
 
 	$("#insert_fullNumber").val(document.fullNumber);
 	$("#insert_validDue").val(document.validDue);
@@ -222,4 +219,11 @@ var addSelectedDocumentData = function(document){
 	else{
 		$("#productsInEnglish").click();
 	}
+	
+	// hide loading div and show all the data divs
+	hideLoadingDiv();
+
+	$("#documentsOptionsDiv").show();
+	$("#documentsTableDiv").show();
+	$("#documentsSearchResultsDiv").show();
 };

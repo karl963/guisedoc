@@ -52,8 +52,7 @@ $(document).ready(function(){
 	 */
 	$(window).resize(function(){
 		$("#loginFormDiv").css("top",(
-				$("#commercialDiv").height()+
-				$("#commercialDiv").css("padding")				
+				$("#commercialDiv").height()+20 // default padding is 10, top+bottom=20
 			)+"px");
 	});
 	

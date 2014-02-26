@@ -652,7 +652,7 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 			
 			"<div class='productDetailDataPieceDiv'>" +
 				"<span class='productDetailUnitDiv'>Ühik</span>" +
-				"<input type='text' maxlength='20' id='productDetailUnitInput' value='"+productJSON.unit+"' />" +
+				"<input type='text' maxlength='45' id='productDetailUnitInput' value='"+productJSON.unit+"' />" +
 			"</div>" +
 
 			"<br>"+
@@ -669,7 +669,7 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 			
 			"<div class='productDetailDataPieceDiv'>" +
 				"<span class='productDetailEUnitDiv'>Inglise ühik</span>" +
-				"<input type='text' maxlength='20' id='productDetailEUnitInput' value='"+productJSON.e_unit+"' />" +
+				"<input type='text' maxlength='45' id='productDetailEUnitInput' value='"+productJSON.e_unit+"' />" +
 			"</div>"+
 			
 			"<br>"+
@@ -684,44 +684,7 @@ function addProductDetailedDataRow(rowIndex,productJSON){
 		"</div>"+
 			
 		"<div class='rightSideProductDetailViewDiv'>"+
-			"<div class='productDetailDataPieceDiv'>" +
-				"<span class='productDetailCodeDiv'>Code</span>" +
-				"<input type='text' maxlength='45' class='productDetailCodeInput' value='"+productJSON.code+"' />" +
-			"</div>" +
 			
-			"<div class='productDetailDataPieceDiv'>" +
-				"<span class='productDetailNameDiv'>Nimi</span>" +
-				"<input type='text' maxlength='100' class='productDetailNameInput' value='"+productJSON.name+"' />" +
-			"</div>" +
-			
-			"<div class='productDetailDataPieceDiv'>" +
-				"<span class='productDetailPriceDiv'>Hind</span>" +
-				"<input type='text' maxlength='45' class='productDetailPriceInput' value='"+productJSON.price+"' />" +
-			"</div>" +
-			
-			"<div class='productDetailDataPieceDiv'>" +
-				"<span class='productDetailUnitDiv'>Ühik</span>" +
-				"<input type='text' maxlength='20' class='productDetailUnitInput' value='"+productJSON.unit+"' />" +
-			"</div>" +
-			
-			
-			"<br>"+
-			
-			"<div class='productDetailDataPieceDiv'>" +
-				"<span class='productDetailENameDiv'>Inglise nimi</span>" +
-				"<input type='text' maxlength='100' class='productDetailENameInput' value='"+productJSON.e_name+"' />" +
-			"</div>" +
-			
-			"<div class='productDetailDataPieceDiv'>" +
-				"<span class='productDetailOPriceDiv'>Ostu hind</span>" +
-				"<input type='text' maxlength='45' class='productDetailOPriceInput' value='"+productJSON.o_price+"' />" +
-			"</div>" +
-			
-			"<div class='productDetailDataPieceDiv'>" +
-				"<span class='productDetailEUnitDiv'>Inglise ühik</span>" +
-				"<input type='text' maxlength='20' class='productDetailEUnitInput' value='"+productJSON.e_unit+"' />" +
-			"</div>"+
-	
 		"</div>";
 			
 	cell.colSpan = "6";

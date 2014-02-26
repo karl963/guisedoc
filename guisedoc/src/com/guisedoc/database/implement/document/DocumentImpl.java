@@ -317,14 +317,9 @@ public class DocumentImpl extends JdbcTemplate {
 						+ "price, o_price FROM document_products "
 						+ "WHERE document_ID = "+oldDocument.getID();
 				
-				int productResponse = update(productQuery);
+				update(productQuery);
 				
-				if(productResponse != 0){
-					return ErrorType.SUCCESS;
-				}
-				else{
-					return ErrorType.DATABASE_QUERY;
-				}
+				return ErrorType.SUCCESS;
 			}
 			else{
 				return ErrorType.NOTHING_TO_UPDATE;

@@ -1,5 +1,4 @@
 var isEstonian = true;
-var importingDocument = false;
 
 $(document).ready(function() {
 	$.cookie("downloadStarted","");
@@ -124,7 +123,8 @@ $(document).ready(function() {
 	
 	$("#documentsTable tbody").sortable({
 	    helper: fixHelperModified,
-	    stop: updateQueueNumbers
+	    stop: updateQueueNumbers,
+	    items: ".productRow"
 	}).disableSelection();
 	
 	/*************************************************************
@@ -136,14 +136,11 @@ $(document).ready(function() {
 	$(document).on("change", "#newDocumentSelect", function(){
 		
 		var type = $(this).val();
-		
+
 		if(type == "existing"){ // selected the old/existing document
-			importingDocument = false;
 			$("#importDocumentDiv").show();
 		}
 		else if(type != "-" && type != "default"){ // selected new document
-			
-			importingDocument = true;
 			showLoadingDiv();
 			
 			$.ajax({
@@ -236,8 +233,7 @@ $(document).ready(function() {
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/documents/import/select",
-	        data : {selectedDocumentType:"tab", selectedDocumentID: id, 
-	        	isEstonian:isEstonian, currentDocumentID:0},
+	        data : {selectedDocumentID: id, currentDocumentID:0},
 	        success : function(responseJSON) {
 	        	
 	        	var documentJSON = jQuery.parseJSON(responseJSON);
@@ -266,8 +262,7 @@ $(document).ready(function() {
 		tab.addClass("selectedTab");
 		
 		$(".productRow").remove();
-		importingDocument = true;
-		addSelectedDocumentData(documentJSON.document);
+		addSelectedDocumentData(documentJSON.document,false);
 		calculateTotalSum();
 	};
 	
@@ -926,7 +921,7 @@ $(document).ready(function() {
 			totalSum = product.totalSum;
 		}
 		
-		cell.innerHTML =
+		cell.innerHTML +=
 		
 			"<div class='leftSideDiv'>"+
 		
@@ -935,7 +930,6 @@ $(document).ready(function() {
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailCodeDiv documentsDetailedNameDiv'>Kood:</span>" +
-					//"<input type='text' maxlength='45' id='documentsDetailCodeInput' class='documentsDetailedInput' value='"+product.code+"' />" +
 					"<span class='documentsDetailedValue'>"+product.code+"</span>"+
 				"</div>" +
 				
@@ -943,25 +937,21 @@ $(document).ready(function() {
 	
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailNameDiv documentsDetailedNameDiv'>Nimetus:</span>" +
-					//"<input type='text' id='documentsDetailNameInput' class='documentsDetailedInput' value='"+product.name+"' />" +
 					"<span class='documentsDetailedValue'>"+product.name+"</span>"+
 				"</div>" +
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailENameDiv documentsDetailedNameDiv'>Inglise nimetus:</span>" +
-					//"<input type='text' id='documentsDetailENameInput' class='documentsDetailedInput' value='"+product.e_name+"' />" +
 					"<span class='documentsDetailedValue'>"+product.e_name+"</span>"+
 				"</div>" +
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailUnitDiv documentsDetailedNameDiv'>Ühik:</span>" +
-					//"<input type='text' id='documentsDetailUnitInput' class='documentsDetailedInput' value='"+product.unit+"' />" +
 					"<span class='documentsDetailedValue'>"+product.unit+"</span>"+
 				"</div>" +
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailEUnitDiv documentsDetailedNameDiv'>Inglise ühik:</span>" +
-					//"<input type='text' id='documentsDetailEUnitInput' class='documentsDetailedInput' value='"+product.e_unit+"' />" +
 					"<span class='documentsDetailedValue'>"+product.e_unit+"</span>"+
 				"</div>" +
 				
@@ -969,27 +959,27 @@ $(document).ready(function() {
 	
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailOPriceDiv documentsDetailedNameDiv'>Ostu hind</span>" +
-					"<input type='text' id='documentsDetailOPriceInput' class='documentsDetailedInput priceCalculation' value='"+product.o_price+"' />" +
+					"<input type='text' id='documentsDetailOPriceInput' class='documentsDetailedInput priceCalculation' value='"+product.o_price+"' maxlength='20'/>" +
 				"</div>" +
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailPriceDiv documentsDetailedNameDiv'>Hind</span>" +
-					"<input type='text' id='documentsDetailPriceInput' class='documentsDetailedInput priceCalculation' value='"+product.price+"' />" +
+					"<input type='text' id='documentsDetailPriceInput' class='documentsDetailedInput priceCalculation' value='"+product.price+"' maxlength='20'/>" +
 				"</div>" +
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailAmountDiv documentsDetailedNameDiv'>Kogus</span>" +
-					"<input type='text' id='documentsDetailAmountInput' class='documentsDetailedInput priceCalculation' value='"+product.amount+"' />" +
+					"<input type='text' id='documentsDetailAmountInput' class='documentsDetailedInput priceCalculation' value='"+product.amount+"' maxlength='20'/>" +
 				"</div>" +
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailDiscountDiv documentsDetailedNameDiv'>Allahindlus (%)</span>" +
-					"<input type='text' id='documentsDetailDiscountInput' class='documentsDetailedInput priceCalculation' value='"+product.discount+"' />" +
+					"<input type='text' id='documentsDetailDiscountInput' class='documentsDetailedInput priceCalculation' value='"+product.discount+"' maxlength='20'/>" +
 				"</div>" +
 					
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<span class='documentsDetailSumDiv documentsDetailedNameDiv'>Summa</span>" +
-					"<input type='text' id='documentsDetailSumInput' class='documentsDetailedInput' value='"+totalSum+"' />" +
+					"<input type='text' id='documentsDetailSumInput' class='documentsDetailedInput' value='"+totalSum+"' maxlength='20'/>" +
 				"</div>" +
 				
 				"<div >" +
@@ -1004,12 +994,12 @@ $(document).ready(function() {
 			
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<div>Lisainfo</div>" +
-					"<textarea id='documentsDetailInfoInput' >"+product.additional_info+"</textarea>" +
+					"<textarea id='documentsDetailInfoInput' maxlength='200'>"+product.additional_info+"</textarea>" +
 				"</div>" +
 				
 				"<div class='documentsDetailDataPieceDiv'>" +
 					"<div>Märkused</div>" +
-					"<div><textarea id='documentsDetailCommentInput' >"+product.comments+"</textarea></div>" +
+					"<div><textarea id='documentsDetailCommentInput' maxlength='200'>"+product.comments+"</textarea></div>" +
 				"</div>" +
 			
 			"</div>";
