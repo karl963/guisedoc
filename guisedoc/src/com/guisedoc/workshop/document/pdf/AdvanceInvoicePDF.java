@@ -167,7 +167,7 @@ public class AdvanceInvoicePDF {
 			
 			Phrase contactPersonPhrase = new Phrase("",TR_10);
 			contactPersonPhrase.add(new Phrase(language.get("contactPerson")+":",TR_10_B));
-			contactPersonPhrase.add(new Phrase(" "+DOC.getClient().getContactPerson(),TR_10));
+			contactPersonPhrase.add(new Phrase(" "+DOC.getClient().getSelectedContactPerson().getName(),TR_10));
 			buyerParagraph.add(contactPersonPhrase);
 			buyerParagraph.add(Chunk.NEWLINE);
 			

@@ -28,7 +28,7 @@
 	overflow: hidden;
 }
 
-.clientDeleteLabel{
+.clientDeleteLabel,.contactPersonLabel{
 	width: 100%;
 	display: block;
 	height: auto !important;
@@ -103,7 +103,7 @@
 #clientDetailNumbersDiv{
 	overflow:auto;
 	background:#ffffff;
-	height:180px;
+	height:290px;
 }
 #documentSearchInputDiv{
 	display:inline-block;
@@ -113,6 +113,35 @@
 	display:inline-block;
 	width:20%;
 	min-width:40px;
+}
+.contactDeleteTd{
+	width: 70px;
+	text-align: center;
+	overflow: hidden;
+}
+
+/*
+* contact person in detailed row
+*/
+#contactPersonInputDiv{
+	display:inline-block;
+	width:80%;
+}
+#contactAddButtonDiv{
+	display: inline-block;
+	width: 20%;
+	min-width: 40px;
+}
+#contactPersonsTable{
+	margin-left: 1%;
+	width: 98%;
+}
+#contactPersonsTableDiv{
+	overflow: auto;
+	background: #ffffff;
+	height: 130px;
+	margin-left:2%;
+	width:96%;
 }
 
 /*

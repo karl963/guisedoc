@@ -21,6 +21,7 @@ import com.guisedoc.enums.ErrorType;
 import com.guisedoc.messages.ClientMessages;
 import com.guisedoc.messages.ErrorMessages;
 import com.guisedoc.object.Client;
+import com.guisedoc.object.ContactPerson;
 import com.guisedoc.workshop.json.JsonArray;
 import com.guisedoc.workshop.json.JsonObject;
 
@@ -43,7 +44,7 @@ public class ClientSearch {
 
     	Client searchClient = new Client();
     	searchClient.setName((String)map.get("name"));
-    	searchClient.setContactPerson((String)map.get("contactPerson"));
+    	searchClient.setSelectedContactPerson(new ContactPerson((String)map.get("contactPerson")));
 		
     	boolean sellers = (Boolean)map.get("sellers");
     	boolean nonBuyers = (Boolean)map.get("nonBuyers");
@@ -51,7 +52,7 @@ public class ClientSearch {
     	
     	// find the clients
 		Object responseObject = new ClientImpl(session)
-				.searchForTypeClients(searchClient,nonBuyers,realBuyers,sellers);
+				.searchForTypeClients(searchClient,nonBuyers,realBuyers,sellers,true);
 		
 		if(responseObject instanceof Object[]){
 			
@@ -64,7 +65,17 @@ public class ClientSearch {
 
 				clientObj.addElement("ID", c.getID());
 				clientObj.addElement("name", c.getName());
-				clientObj.addElement("contactPerson", c.getContactPerson());
+				
+				// add the contactpersons
+				JsonArray contactPersons = new JsonArray();
+				for(ContactPerson contactPerson : c.getContactPersons()){
+					JsonObject contPers = new JsonObject();
+					contPers.addElement("name", contactPerson.getName());
+					
+					contactPersons.addElement(contPers);
+				}
+				clientObj.addElement("contactPersons", contactPersons);
+				
 				clientObj.addElement("totalBoughtFor", c.getTotalBoughtFor());
 				
 				clients.addElement(clientObj);

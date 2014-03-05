@@ -16,11 +16,14 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import com.guisedoc.database.Connector;
+import com.guisedoc.database.implement.client.ClientImpl;
 import com.guisedoc.database.rowmapper.ClientRowMapper;
+import com.guisedoc.database.rowmapper.ContactPersonRowMapper;
 import com.guisedoc.database.rowmapper.DocumentRowMapper;
 import com.guisedoc.database.rowmapper.ProductRowMapper;
 import com.guisedoc.enums.ErrorType;
 import com.guisedoc.object.Client;
+import com.guisedoc.object.ContactPerson;
 import com.guisedoc.object.Document;
 import com.guisedoc.object.Product;
 import com.guisedoc.object.User;
@@ -84,11 +87,14 @@ public class DocumentImpl extends JdbcTemplate {
 			
 			Long result = queryForObject(checkQuery,Long.class);
 			
-			if(result == null || result == 0){
+			if(result == null || result == 0){ // the document was not opened yet
 				String openQuery = "INSERT INTO opened_documents (user_ID, document_ID) "
 						+ "VALUES("+userID+","+documentID+")";
 				
 				update(openQuery);
+			}
+			else{
+				return ErrorType.DOCUMENT_ALREADY_OPENED;
 			}
 
 			return ErrorType.SUCCESS;
@@ -111,15 +117,27 @@ public class DocumentImpl extends JdbcTemplate {
 					Document document = (Document)documentResponse.get(0);
 					
 					// get the client if exists
-					String clientQuery = "SELECT * FROM clients WHERE ID = "+document.getClientID();
-					List<Object> clientResponse = query(clientQuery, new ClientRowMapper<Object>());
-					
-					if(clientResponse.size() > 0){
-						if(clientResponse.get(0) instanceof Client){
-							document.setClient((Client)clientResponse.get(0));
+					Object clientResponse = new ClientImpl(this.getDataSource()).getClientByID(document.getClientID());
+
+					if(clientResponse instanceof Object[]){
+						Client client = (Client)((Object[])clientResponse)[0];
+						
+						// also get the selected contactperson
+						String contactQuery = "SELECT * FROM contact_persons WHERE ID="+document.getClient().getSelectedContactPerson().getID();
+						
+						List<ContactPerson> contactResponse = query(contactQuery,new ContactPersonRowMapper<ContactPerson>());
+
+						if(contactResponse.size() > 0){ // if there is a selected contactperson, otherwise no need to add, leave default
+							((Client) client).setSelectedContactPerson((ContactPerson)contactResponse.get(0));
+						}
+						document.setClient((Client)client);
+					}
+					else if(clientResponse instanceof ErrorType){
+						if((ErrorType)clientResponse == ErrorType.NONE_FOUND){ // deleted client
+							// leave default client
 						}
 						else{
-							return ErrorType.DATABASE_QUERY;
+							return (ErrorType)clientResponse;
 						}
 					}
 
@@ -180,7 +198,8 @@ public class DocumentImpl extends JdbcTemplate {
 				
 				ErrorType addResponse = openDocument(documentID,userID);
 				
-				if(addResponse == ErrorType.SUCCESS){
+				if(addResponse == ErrorType.SUCCESS || 
+						addResponse == ErrorType.DOCUMENT_ALREADY_OPENED){
 					return (Document)response;
 				}
 				else{
@@ -223,10 +242,31 @@ public class DocumentImpl extends JdbcTemplate {
 		}
 	}
 	
+	public ErrorType changeDocumentContactPerson(long documentID, long contactID){
+		try{
+			
+			String query = "UPDATE documents SET contact_person_ID = "+contactID+" "
+					+ "WHERE ID = "+documentID;
+			
+			int response = update(query);
+			
+			if(response > 0){
+				return ErrorType.SUCCESS;
+			}
+			else{
+				return ErrorType.NOTHING_TO_UPDATE;
+			}
+		}
+		catch(Exception x){
+			x.printStackTrace();
+			return ErrorType.DATABASE_QUERY;
+		}
+	}
+	
 	public Object importDocument(long openedID, long importedID){
 		try{
 			
-			Object response  = getDocumentByID(importedID);
+			Object response = getDocumentByID(importedID);
 			
 			if(response instanceof Document){
 				
@@ -276,7 +316,8 @@ public class DocumentImpl extends JdbcTemplate {
 			String query = "UPDATE documents SET orderNR = ?, "
 					+ "shipmentTime = ?, shipmentAddress = ?, shipmentPlace = ?, CeSpecification = ?, "
 					+ "paymentRequirement = ?, validDue = ?, advance = ?, paydInCash = ?, "
-					+ "showDiscount = ?, addToStatistics = ?, showCE = ?, client_ID = ? "
+					+ "showDiscount = ?, addToStatistics = ?, showCE = ?, client_ID = ?, "
+					+ "contact_person_ID = ? "
 					+ "WHERE ID=?";
 			
 			Object[] objects = new Object[]{
@@ -293,14 +334,14 @@ public class DocumentImpl extends JdbcTemplate {
 					oldDocument.isAddToStatistics(),
 					oldDocument.isShowCE(),
 					oldDocument.getClient().getID(),
+					oldDocument.getClient().getSelectedContactPerson().getID(),
 					newDocumentID
 			};
 			int[] types = new int[]{
-					Types.VARCHAR,
 					Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,Types.VARCHAR,
-					Types.VARCHAR,Types.BIGINT,Types.DOUBLE,Types.BOOLEAN,
+					Types.VARCHAR,Types.VARCHAR,Types.BIGINT,Types.DOUBLE,
 					Types.BOOLEAN,Types.BOOLEAN,Types.BOOLEAN,Types.BOOLEAN,
-					Types.BIGINT
+					Types.BIGINT,Types.BIGINT,Types.BIGINT
 			};
 			
 			int rowsAffected = update(query,objects,types);
@@ -417,7 +458,7 @@ public class DocumentImpl extends JdbcTemplate {
 		try{
 			List<Document> documents = new ArrayList<Document>();
 			String query = "select document_ID as ID, "
-					+ "fullNumber "
+					+ "fullNumber, verified "
 					+ "from documents, opened_documents "
 					+ "where opened_documents.user_ID = 1 "
 					+ "AND opened_documents.document_ID = documents.ID "
@@ -448,13 +489,68 @@ public class DocumentImpl extends JdbcTemplate {
 		}
 	}
 
-	public ErrorType closeDocument(long userID,long documentID){
+	public ErrorType checkAndCloseDocument(long userID,long documentID){
 		try{
+
+			String query = "SELECT verified FROM documents WHERE "
+					+ "ID = "+documentID;
 			
-			String query = "DELETE FROM opened_documents WHERE "
-					+ "user_ID = "+userID+" AND document_ID = "+documentID;
+			Boolean verified = queryForObject(query,Boolean.class);
+
+			if(!verified){ // document was not verified, so we delete it
+				
+				return deleteDocument(userID,documentID);
+				
+			}
+			else{ // just close the document
+				return closeDocument(userID,documentID);
+			}
+		}
+		catch(Exception x){
+			x.printStackTrace();
+			return ErrorType.DATABASE_QUERY;
+		}
+	}
+	
+	public ErrorType deleteDocument(long userID, long documentID){
+		try{
+
+			String productsQuery = "DELETE FROM document_products WHERE "
+					+ "document_ID = "+documentID;
+			
+			update(productsQuery);
+			
+			String openQuery = "DELETE FROM opened_documents WHERE "
+					+ "document_ID = "+documentID+" AND "
+					+ "user_ID = "+userID;
+			
+			update(openQuery);
+
+			String query = "DELETE FROM documents WHERE "
+					+ "ID = "+documentID;
 			
 			int response = update(query);
+				
+			if(response > 0){ // the document was deleted
+				
+				return ErrorType.SUCCESS;
+			}
+			else{
+				return ErrorType.DATABASE_QUERY;
+			}
+		}
+		catch(Exception x){
+			x.printStackTrace();
+			return ErrorType.DATABASE_QUERY;
+		}
+	}
+	
+	public ErrorType closeDocument(long userID,long documentID){
+		try{
+			String queryw = "DELETE FROM opened_documents WHERE "
+					+ "user_ID = "+userID+" AND document_ID = "+documentID;
+			
+			int response = update(queryw);
 			
 			if(response == 1){
 				return ErrorType.SUCCESS;

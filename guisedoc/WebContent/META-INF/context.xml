@@ -17,7 +17,7 @@
     url="jdbc:mysql://karlbakatest.ccntx8zyuq8d.us-east-1.rds.amazonaws.com:3306/main"
     timeBetweenEvictionRunsMillis="30000"
     removeAbandonedTimeout="60000"
-	
+	factory="org.apache.commons.dbcp.BasicDataSourceFactory"
 />
       <!--factory="org.apache.commons.dbcp.BasicDataSourceFactory"-->          
 <Resource
@@ -33,7 +33,7 @@
     url="jdbc:mysql://karlbakatest.ccntx8zyuq8d.us-east-1.rds.amazonaws.com:3306/test"
     timeBetweenEvictionRunsMillis="30000"
     removeAbandonedTimeout="60000"
-	
+	factory="org.apache.commons.dbcp.BasicDataSourceFactory"
 />
 <Resource
 	name="jdbc/test2"
@@ -48,7 +48,7 @@
     url="jdbc:mysql://karlbakatest.ccntx8zyuq8d.us-east-1.rds.amazonaws.com:3306/test2"
     timeBetweenEvictionRunsMillis="30000"
     removeAbandonedTimeout="60000"
-	
+	factory="org.apache.commons.dbcp.BasicDataSourceFactory"
 />
  
 

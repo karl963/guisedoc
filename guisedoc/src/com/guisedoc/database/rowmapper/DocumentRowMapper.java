@@ -57,6 +57,10 @@ public class DocumentRowMapper<Object> implements RowMapper<Object> {
 			}catch(Exception x){}
 			try{document.setAddToStatistics(rs.getBoolean("addToStatistics"));
 			}catch(Exception x){}
+			try{document.setVerified(rs.getBoolean("verified"));
+			}catch(Exception x){}
+			try{document.getClient().getSelectedContactPerson().setID(rs.getLong("contact_person_ID"));
+			}catch(Exception x){}
 			
 			try{document.getClient().setName(rs.getString("clientName"));
 			}catch(Exception x){}

@@ -30,7 +30,7 @@ $(document).ready(function(){
 	/*
 	 * typing the name into the search field
 	 */
-	$(document).on("input", "#clientSearchName", function(){
+	$(document).on("blur", "#clientSearchName", function(){
 		if($("#clientTypeSelect").val() == "default" ||
 				$("#clientTypeSelect").val()==null){ // the type isn't selected
 			return;
@@ -147,12 +147,20 @@ $(document).ready(function(){
 		var cell3 = row.insertCell(2);
 		var cell4 = row.insertCell(3);
 		
+		var contactPersonsHTML = "";
+		for(var i = 0; i < client.contactPersons.length; i++){
+			if(i>0){ // not the first person
+				contactPersonsHTML += ", ";
+			}
+			contactPersonsHTML += client.contactPersons[i].name;
+		}
+
 		cell1.className += "tableBorderRight clientNameTd";
 		cell1.innerHTML = "<div>"+client.name+"</div>";
 		cell1.innerHTML += "<div class='clientID hidden'>"+client.ID+"</div>";
 		
 		cell2.className += "tableBorderRight";
-		cell2.innerHTML = client.contactPerson;
+		cell2.innerHTML = contactPersonsHTML;
 		
 		cell3.className += "tableBorderRight";
 		cell3.innerHTML = client.totalDeals;
@@ -167,11 +175,42 @@ $(document).ready(function(){
 var addSelectedClientToDocument = function(client){
 	$("#insertClientID").html(client.ID);
 	$("#insert_name").val(client.name);
-	$("#insert_contactPerson").val(client.contactPerson);
 	$("#insert_address").val(client.address);
 	$("#insert_additionalAddress").val(client.additionalAddress);
 	$("#insert_phone").val(client.phone);
 	$("#insert_email").val(client.email);
+	
+	// remove old contactpersons and add all new's
+	$(".contactPersonOption").remove();
+	if(client.contactPersons != undefined){ // if there are contactpersons
+		for(var i = 0; i < client.contactPersons.length ; i++){
+			$("#contactPersonSelect")
+				.append($("<option class='contactPersonOption'></option>")
+				.attr("value",client.contactPersons[i].ID)
+				.text(client.contactPersons[i].name));
+		}
+	}
+
+	// check if a person is selected and add it
+	if(client.selectedContactPerson != undefined){
+		if(client.selectedContactPerson.ID == 0){
+			$("#insert_contactPersonName").prop("disabled",true);
+			$("#contactPersonID").html("0");
+			$("#insert_contactPersonName").val("");
+		}
+		else{
+			$("#contactPersonSelect").val(client.selectedContactPerson.ID);
+			$("#contactPersonID").html(client.selectedContactPerson.ID);
+			$("#insert_contactPersonName").val(client.selectedContactPerson.name);
+			$("#insert_contactPersonName").prop("disabled",false);
+		}
+	}
+	else{
+		// add default contactperson name and ID
+		$("#contactPersonID").html("0");
+		$("#insert_contactPersonName").val("");
+		$("#insert_contactPersonName").prop("disabled",true);
+	}
 	
 	if(client.ID == 0){ // there's no actual client selected
 		$(".input_Client").hide();

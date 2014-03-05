@@ -17,6 +17,7 @@ import com.guisedoc.database.implement.document.DocumentImpl;
 import com.guisedoc.enums.DocumentType;
 import com.guisedoc.enums.ErrorType;
 import com.guisedoc.object.Client;
+import com.guisedoc.object.ContactPerson;
 import com.guisedoc.object.Document;
 import com.guisedoc.object.Product;
 import com.guisedoc.object.User;
@@ -119,20 +120,42 @@ public class DocumentSelection {
 	    	documentObj.addElement("showDiscount", document.isShowDiscount());
 	    	documentObj.addElement("paydInCash", document.isPaydInCash());
 	    	documentObj.addElement("showCE", document.isShowCE());
+	    	documentObj.addElement("verified", document.isVerified());
 	    	
+	    	// add client
 			Client c = document.getClient();
 			JsonObject client = new JsonObject();
 			
 			client.addElement("ID", c.getID());
-			client.addElement("contactPerson", c.getContactPerson());
+			// add the contactpersons
+			JsonArray contactPersons = new JsonArray();
+			for(ContactPerson contactPerson : c.getContactPersons()){
+				JsonObject contPers = new JsonObject();
+				contPers.addElement("ID", contactPerson.getID());
+				contPers.addElement("name", contactPerson.getName());
+				
+				contactPersons.addElement(contPers);
+			}
+			client.addElement("contactPersons", contactPersons);
+
 			client.addElement("name", c.getName());
 			client.addElement("address", c.getAddress());
 			client.addElement("additionalAddress", c.getAdditionalAddress());
 			client.addElement("phone", c.getPhone());
 			client.addElement("email", c.getEmail());
 			
+			// add selected contactperson
+			ContactPerson selectedContPers = document.getClient().getSelectedContactPerson();
+			JsonObject selectedContactPerson = new JsonObject();
+			
+			selectedContactPerson.addElement("ID", selectedContPers.getID());
+			selectedContactPerson.addElement("name", selectedContPers.getName());
+
+			client.addElement("selectedContactPerson", selectedContactPerson);
+			
 			documentObj.addElement("client", client);
-			 
+			
+			// add products
 			JsonArray productArray = new JsonArray();
 		    for(Product pro : document.getProducts()){
 	
@@ -168,7 +191,7 @@ public class DocumentSelection {
 	    jsonObject.addElement("document", documentObj);
 	    jsonObject.addElement("response", response);
 	    jsonObject.addElement("message", message);
-	    
+
 		return jsonObject.getJsonString();
 	}
 }

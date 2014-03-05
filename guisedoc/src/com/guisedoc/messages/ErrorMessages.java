@@ -19,7 +19,8 @@ public class ErrorMessages {
 	public static String NOTHING_TO_DELETE = "Pole midagi kustutada !";
 	public static String NOTHING_TO_UPDATE = "Pole midagi uuendada !";
 	public static String FAILURE = "Tegevus ebaõnnestus !";
-	
+	public static String DOCUMENT_ALREADY_OPENED = "Dokument on juba avatud !";
+
 	static{
 		errors.put(ErrorType.DATABASE_CONNECTION, DATABASE_CONNECTION);
 		errors.put(ErrorType.DATABASE_QUERY, DATABASE_QUERY);
@@ -31,6 +32,7 @@ public class ErrorMessages {
 		errors.put(ErrorType.NOTHING_TO_UPDATE, NOTHING_TO_UPDATE);
 		errors.put(ErrorType.USER_ALREADY_EXISTS, USER_ALREADY_EXISTS);
 		errors.put(ErrorType.FAILURE, FAILURE);
+		errors.put(ErrorType.DOCUMENT_ALREADY_OPENED, DOCUMENT_ALREADY_OPENED);
 	}
 	
 	public synchronized static String getMessage(ErrorType error){

@@ -83,7 +83,7 @@ public class DocumentHandling {
 		String response = null;
 		
 		ErrorType responseObject = new DocumentImpl(session)
-				.closeDocument(((User)session.getAttribute("user")).getID(),documentID);
+				.checkAndCloseDocument(((User)session.getAttribute("user")).getID(),documentID);
 		
 		if(responseObject == ErrorType.SUCCESS){
 			response = "success";

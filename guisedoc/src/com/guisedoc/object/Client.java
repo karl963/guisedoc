@@ -1,7 +1,9 @@
 package com.guisedoc.object;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 import com.guisedoc.workshop.document.settings.DateFormats;
@@ -19,8 +21,6 @@ public class Client {
 	private String name;
 	@SerializedName("phone")
 	private String phone;
-	@SerializedName("contactPerson")
-	private String contactPerson;
 	@SerializedName("address")
 	private String address;
 	@SerializedName("additionalAddress")
@@ -34,6 +34,10 @@ public class Client {
 	
 	private String lastDealNR;
 	private Date lastDealDate;
+	private List<ContactPerson> contactPersons;
+	
+	@SerializedName("selectedContactPerson")
+	private ContactPerson selectedContactPerson;
 	
 	/*
 	 * CONSTRUCTORS
@@ -43,7 +47,6 @@ public class Client {
 		ID = Client.DEFAULT_LONG; 
 		name = Client.DEFAULT_STRING;
 		phone = Client.DEFAULT_STRING;
-		contactPerson = Client.DEFAULT_STRING;
 		address = Client.DEFAULT_STRING;
 		additionalAddress = Client.DEFAULT_STRING;
 		email = Client.DEFAULT_STRING;
@@ -51,6 +54,8 @@ public class Client {
 		totalBoughtFor = Client.DEFAULT_DOUBLE;
 		lastDealNR = Client.DEFAULT_STRING;
 		lastDealDate = new Date();
+		contactPersons = new ArrayList<ContactPerson>();
+		setSelectedContactPerson(new ContactPerson());
 	}
 	
 	/*
@@ -90,12 +95,12 @@ public class Client {
 		this.phone = phone;
 	}
 
-	public String getContactPerson() {
-		return contactPerson;
+	public List<ContactPerson> getContactPersons() {
+		return contactPersons;
 	}
 
-	public void setContactPerson(String contactPerson) {
-		this.contactPerson = contactPerson;
+	public void setContactPersons(List<ContactPerson> contactPersons) {
+		this.contactPersons = contactPersons;
 	}
 
 	public String getAddress() {
@@ -152,5 +157,13 @@ public class Client {
 
 	public void setLastDealDate(Date lastDealDate) {
 		this.lastDealDate = lastDealDate;
+	}
+
+	public ContactPerson getSelectedContactPerson() {
+		return selectedContactPerson;
+	}
+
+	public void setSelectedContactPerson(ContactPerson selectedContactPerson) {
+		this.selectedContactPerson = selectedContactPerson;
 	}
 }

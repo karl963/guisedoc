@@ -90,10 +90,14 @@ $(document).ready(function(){
 		
 		var id = $(this).children(".documentNumberTd").children(".documentID").html();
 		var currentID = $("#insertDocumentID").html();
-
+		var openedDocument = false;
+		var selectedDocument = false;
+		
 		// check if we had no document opened or selected to open an existing one
 		if(currentID == undefined || $("#newDocumentSelect").val() == "existing"){
 			currentID = 0;
+			openedDocument = true;
+			selectedDocument = true;
 		}
 
 		$.ajax({
@@ -111,7 +115,8 @@ $(document).ready(function(){
 	        			return;
 	        		}
 	        		
-	        		addSelectedDocumentData(responseJSON.document,true);
+	        		addSelectedDocumentData(responseJSON.document,
+	        				selectedDocument,openedDocument);
 	        		$("#importDocumentDiv").hide();
 	        		calculateTotalSum();
 	        	
@@ -170,15 +175,18 @@ $(document).ready(function(){
 /*
  * adds the selected document to the document
  */
-var addSelectedDocumentData = function(document,importingDocument){
+var addSelectedDocumentData = function(document,selectedDocument,openedDocument){
 
 	// if we are selecting document to open, not importing
-	if(!importingDocument){
-		makeNewTabAndOpenIt(document.ID,document.fullNumber);
+	if(selectedDocument){
 		$("#insertDocumentID").html(document.ID);
 		$("#insertDocumentType").html(document.type);
 	}
-
+	// if the document wasn't opened before
+	if(openedDocument){
+		makeNewTabAndOpenIt(document.ID,document.fullNumber,document.verified);
+	}
+	
 	$("#insert_fullNumber").val(document.fullNumber);
 	$("#insert_validDue").val(document.validDue);
 	$("#insert_advance").val(document.advance);
@@ -193,7 +201,8 @@ var addSelectedDocumentData = function(document,importingDocument){
 	$("#insert_showDiscount").attr("checked",document.showDiscount);
 	$("#insert_paydInCash").attr("checked",document.paydInCash);
 	$("#insert_showCE").attr("checked",document.showCE);
-	
+
+	$("#insert_verified").attr("checked",document.verified);
 	/*
 	 * only show input that the document needs
 	 */

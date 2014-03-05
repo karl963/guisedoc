@@ -48,6 +48,8 @@ public class Document {
 	private boolean addToStatistics;
 	@SerializedName("showCE")
 	private boolean showCE;
+	@SerializedName("verified")
+	private boolean verified;
 
 	@SerializedName("date")
 	private Date date;
@@ -88,6 +90,7 @@ public class Document {
 		this.CeSpecification = Document.DEFAULT_STRING;
 		this.setClientID(Document.DEFAULT_LONG);
 		this.totalSum = Document.DEFAULT_DOUBLE;
+		this.verified = Document.DEFAULT_BOOLEAN;
 	}
 	
 	/*
@@ -312,5 +315,13 @@ public class Document {
 	
 	public void setTotalSum(Double sum) {
 		totalSum = sum;
+	}
+	
+	public boolean isVerified() {
+		return verified;
+	}
+
+	public void setVerified(boolean verified) {
+		this.verified = verified;
 	}
 }

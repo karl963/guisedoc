@@ -60,11 +60,6 @@
 	</servlet-mapping>
 
     <!-- error -->
-	<error-page>
-		<error-code>500</error-code>
-  		<location>/error</location>
- 	</error-page>
- 
  	<error-page>
   		<location>/error</location>
  	</error-page>

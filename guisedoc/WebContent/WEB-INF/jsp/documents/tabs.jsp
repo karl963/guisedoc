@@ -3,7 +3,14 @@
 <div id="documentsTabsDiv">
 
 	<c:forEach items="${documents}" var="document">
-		<span class="documentsTab selectableDocumentTab"><span>${document.fullNumber}</span><span class="tabDocumentID hidden">${document.ID}</span></span>
+		<c:choose>
+			<c:when test="${document.verified}">
+				<span class="documentsTab selectableDocumentTab"><span>${document.fullNumber}</span><span class="tabDocumentID hidden">${document.ID}</span><span></span></span>
+			</c:when>
+			<c:otherwise>
+				<span class="documentsTab selectableDocumentTab"><span>${document.fullNumber}</span><span class="tabDocumentID hidden">${document.ID}</span><span> (kinnitamata)</span></span>
+			</c:otherwise>
+		</c:choose>
 	</c:forEach>
 	<span class="documentsTab" id="newDocumentTab">
 		Uus dokument: 

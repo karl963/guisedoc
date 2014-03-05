@@ -194,7 +194,7 @@ public class DeliveryNotePDF {
 			languageContactPerson.setBorder(Rectangle.NO_BORDER);
 			clientShipmentTable.addCell(languageContactPerson);
 			
-			PdfPCell contactPersonCell = new PdfPCell(new Phrase(DOC.getClient().getContactPerson(),TR_10_B));
+			PdfPCell contactPersonCell = new PdfPCell(new Phrase(DOC.getClient().getSelectedContactPerson().getName(),TR_10_B));
 			contactPersonCell.setBorder(Rectangle.NO_BORDER);
 			clientShipmentTable.addCell(contactPersonCell);
 			

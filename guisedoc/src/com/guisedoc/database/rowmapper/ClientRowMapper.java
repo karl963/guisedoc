@@ -23,7 +23,6 @@ public class ClientRowMapper<Object> implements RowMapper<Object> {
 			client.setName(rs.getString("name"));
 			client.setPhone(rs.getString("phone"));
 			client.setAddress(rs.getString("address"));
-			client.setContactPerson(rs.getString("contactPerson"));
 			client.setEmail(rs.getString("email"));
 			client.setAdditionalAddress(rs.getString("additionalAddress"));
 			

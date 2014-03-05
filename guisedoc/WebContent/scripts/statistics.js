@@ -208,7 +208,7 @@ $(document).ready(function() {
 			.val("0");
 		
 		for(var i = 0; i < clients.length; i++){
-			var option = $('<option value="'+clients[i].ID+'">'+clients[i].name+' ('+clients[i].contactPerson+')</option>');
+			var option = $('<option value="'+clients[i].ID+'">'+clients[i].name+'</option>');
 			$('#clientsSelectBox').append(option);
 		}
 	};

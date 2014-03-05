@@ -21,13 +21,14 @@ import com.guisedoc.messages.ClientMessages;
 import com.guisedoc.messages.DocumentMessages;
 import com.guisedoc.messages.ErrorMessages;
 import com.guisedoc.object.Client;
+import com.guisedoc.object.ContactPerson;
 import com.guisedoc.workshop.document.settings.DateFormats;
 import com.guisedoc.workshop.json.JsonArray;
 import com.guisedoc.workshop.json.JsonObject;
 
 @Controller
 @RequestMapping("/documents/client")
-public class DocumentClientSelection {
+public class DocumentClientHandling {
 	
 	@RequestMapping(value="/search", method = RequestMethod.POST, params={"clientType","clientName"})
 	@ResponseBody
@@ -60,7 +61,7 @@ public class DocumentClientSelection {
 		
 		// get clients
 		Object responseObject = new ClientImpl(session)
-				.searchForTypeClients(searchClient,nonBuyer,realBuyer,seller);
+				.searchForTypeClients(searchClient,nonBuyer,realBuyer,seller,false);
 		
 		if(responseObject instanceof Object[]){
 			
@@ -69,7 +70,15 @@ public class DocumentClientSelection {
 				
 				JsonObject clientObj = new JsonObject();
 				clientObj.addElement("ID",client.getID());
-				clientObj.addElement("contactPerson",client.getContactPerson());
+
+				JsonArray contactPersons = new JsonArray();
+				for(ContactPerson contactPerson : client.getContactPersons()){
+					JsonObject contPers = new JsonObject();
+					contPers.addElement("name", contactPerson.getName());
+					
+					contactPersons.addElement(contPers);
+				}
+				clientObj.addElement("contactPersons", contactPersons);
 				clientObj.addElement("name",client.getName());
 				clientObj.addElement("totalDeals",client.getTotalDeals());
 				clientObj.addElement("totalSum",client.getTotalBoughtFor());
@@ -115,7 +124,16 @@ public class DocumentClientSelection {
 			
 			if(addResponse == ErrorType.SUCCESS){
 				clientObj.addElement("ID",client.getID());
-				clientObj.addElement("contactPerson",client.getContactPerson());
+
+				JsonArray contactPersons = new JsonArray();
+				for(ContactPerson contactPerson : client.getContactPersons()){
+					JsonObject contPers = new JsonObject();
+					contPers.addElement("name", contactPerson.getName());
+					
+					contactPersons.addElement(contPers);
+				}
+				clientObj.addElement("contactPersons", contactPersons);
+				
 				clientObj.addElement("name",client.getName());
 				clientObj.addElement("address",client.getAddress());
 				clientObj.addElement("additionalAddress",client.getAdditionalAddress());
@@ -161,7 +179,6 @@ public class DocumentClientSelection {
 					.saveDocumentAttribute("client_ID", (Long)responseObject, documentID);
 			if(clientToDocument == ErrorType.SUCCESS){
 				clientObj.addElement("ID", (Long)responseObject);
-				clientObj.addElement("contactPerson", "");
 				clientObj.addElement("name", "");
 				clientObj.addElement("address", "");
 				clientObj.addElement("additionalAddress", "");

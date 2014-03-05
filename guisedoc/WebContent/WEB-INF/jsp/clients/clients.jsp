@@ -26,7 +26,7 @@
 	
 	<tr class="tableHeaderRow">
 		<th class="clientNameTd tableBorderRight">Klient</th>
-		<th class="clientContactPersonTd tableBorderRight">Kontaktisik</th>
+		<th class="clientContactPersonTd tableBorderRight">Kontaktisikud</th>
 		<th class="clientTotalBoughtForTd tableBorderRight numberColumn">Summa</th>
 		<th class="clientDeleteTd">
 		<c:if test="${user.profile.isAllowed('DeleteClients') == true}">

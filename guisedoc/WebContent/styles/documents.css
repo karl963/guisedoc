@@ -219,9 +219,13 @@
 	width:100%;
 	display:inline-block;
 }
-.optionSubDiv span{
+.optionSubDiv > span{
 	display:inline-block;
 	padding:2px;
+	border: dashed 1px #DDE4E4;
+}
+.optionSubDiv > span:hover{
+	border: dashed 1px #bcb8ad;
 }
 
 #insertClientAddress, #insertShipmentAddress, #insertShipmentTime,#insertPaymentRequirement{

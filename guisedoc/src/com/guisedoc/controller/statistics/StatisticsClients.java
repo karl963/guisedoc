@@ -49,7 +49,7 @@ public class StatisticsClients {
 		}
 		
 		Object responseObject = new ClientImpl(session)
-				.searchForTypeClients(new Client(), nonBuyers, realBuyers, sellers);
+				.searchForTypeClients(new Client(), nonBuyers, realBuyers, sellers,false);
 		
 		if(responseObject instanceof Object[]){
 			
@@ -60,7 +60,6 @@ public class StatisticsClients {
 				JsonObject clientObj = new JsonObject();
 				clientObj.addElement("ID", client.getID());
 				clientObj.addElement("name", client.getName());
-				clientObj.addElement("contactPerson", client.getContactPerson());
 				
 				clientArray.addElement(clientObj);
 			}

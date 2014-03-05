@@ -134,7 +134,7 @@ $(document).ready(function() {
 	 * making a new document by selecting the type from selectBox
 	 */
 	$(document).on("change", "#newDocumentSelect", function(){
-		
+		console.log("changed");
 		var type = $(this).val();
 
 		if(type == "existing"){ // selected the old/existing document
@@ -153,7 +153,7 @@ $(document).ready(function() {
 		        		if(response.split(";")[3] == "1"){ // it was the first document, reload page
 		        			window.location = contextPath+"/documents";
 		        		}
-		        		makeNewTabAndOpenIt(response.split(";")[4],response.split(";")[2]);
+		        		makeNewTabAndOpenIt(response.split(";")[4],response.split(";")[2],false);
 		        	}
 		        	else{
 		        		showErrorNotification(response.split(";")[1]);
@@ -262,7 +262,7 @@ $(document).ready(function() {
 		tab.addClass("selectedTab");
 		
 		$(".productRow").remove();
-		addSelectedDocumentData(documentJSON.document,false);
+		addSelectedDocumentData(documentJSON.document,true,false);
 		calculateTotalSum();
 	};
 	
@@ -296,7 +296,10 @@ $(document).ready(function() {
 		if(allowedChangeDocuments == "false"){
 			return;
 		}
-		
+		if($(this).attr("id") == "insert_contactPersonName"){ // contactperson name, doesn't belong to update with doc
+			return;
+		}
+
 		showLoadingDiv();
 		
 		var value = $(this).val();
@@ -362,6 +365,27 @@ $(document).ready(function() {
 			clientID = $("#insertClientID").html();
 		}
 		
+		// check if the changeable was a verification
+		if(attributeName == "verified"){
+			$(".selectableDocumentTab").each(function(){
+				
+				// change the right tab's html accordingly
+				
+				if(value){ // we verified the document
+					if($(this).children("span").eq(1).html() == getCurrentDocumentID()){
+						$(this).children("span").eq(2).html(""); // empty it
+						return false;
+					}
+				}
+				else{
+					if($(this).children("span").eq(1).html() == getCurrentDocumentID()){
+						$(this).children("span").eq(2).html(" (kinnitamata)"); // add the ending
+						return false;
+					}
+				}
+			});
+		}
+		
 		changeDocumentDataPost(attributeName,value,type,clientID);
 	});
 	
@@ -403,7 +427,7 @@ $(document).ready(function() {
 	};
 	
 	/*************************************************************
-	 * NEW CLIENT MAKING
+	 * CLIENT AND CONTACTPERSON HANDLING
 	 *************************************************************/
 	/*
 	 * adding a new client
@@ -444,6 +468,155 @@ $(document).ready(function() {
 	    });
 	});
 	
+	/*
+	 * choosing contactperson from select
+	 */
+	$(document).on("change","#contactPersonSelect",function(){
+		
+		if($(this).val() == "default"){
+			return;
+		}
+		
+		showLoadingDiv();
+		
+		var contactID = $(this).val();
+		var documentID = getCurrentDocumentID();
+		
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/clients/contacts/change/document",
+	        data : {documentID: documentID,contactID:contactID},
+	        success : function(responseJson) {
+	        	
+	        	var response = jQuery.parseJSON(responseJson);
+	        	
+	        	if(response.response=="success"){
+	        		changeContactPersonData(contactID,$("#contactPersonSelect option:selected").text());
+	        		showSuccessNotification(response.message);
+	        	}
+	        	else{
+	        		showErrorNotification(response.message);
+	        	}
+	        	
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	/*
+	 * changes contactperson for document
+	 */
+	var changeContactPersonData = function(id,name){
+		$("#insert_contactPersonName").prop("disabled",false);
+		$("#contactPersonID").html(id);
+		$("#insert_contactPersonName").val(name);
+	};
+	
+	/*
+	 * changing current contact name
+	 */
+	$(document).on("blur","#insert_contactPersonName",function(){
+		
+		showLoadingDiv();
+		
+		var name = $(this).val();
+		
+		if(checkForInvalidStringCharacters(new Array(
+				new Array(name,"insert_contactPersonName")
+				))){
+			return;
+		}
+		
+		var contactID = $("#contactPersonID").html();
+
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/clients/contacts/change/name",
+	        data : {contactID: contactID,name:name},
+	        success : function(responseJson) {
+	        	
+	        	var response = jQuery.parseJSON(responseJson);
+	        	
+	        	if(response.response=="success"){
+	        		changeContactPersonName(contactID,name);
+	        		showSuccessNotification(response.message);
+	        	}
+	        	else{
+	        		showErrorNotification(response.message);
+	        	}
+	        	
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	/*
+	 * changes contactperson name in select
+	 */
+	var changeContactPersonName = function(id,name){
+		$("#contactPersonSelect option[value='"+id+"'").text(name);
+	};
+	
+	/*
+	 * making new contactperson
+	 */
+	$(document).on("click","#addNewContactPerson",function(){
+
+		showLoadingDiv();
+		
+		var clientID = $("#insertClientID").html();
+		
+		if(clientID == 0){
+			showErrorNotification("Klient on veel valimata !");
+		}
+		
+		var name = ""; // default name for contact person
+		
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/clients/contacts/add",
+	        data : {clientID:clientID,name:name},
+	        success : function(responseJson) {
+	        	
+	        	var response = jQuery.parseJSON(responseJson);
+	        	
+	        	if(response.response=="success"){
+	        		addContactPerson(response.ID,name);
+	        		showSuccessNotification(response.message);
+	        	}
+	        	else{
+	        		showErrorNotification(response.message);
+	        	}
+	        	
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	/*
+	 * adds new contactperson to select
+	 */
+	var addContactPerson = function(id,name){
+		$("#contactPersonSelect")
+		.append($("<option class='contactPersonOption'></option>")
+		.attr("value",id)
+		.text(name)).val(id);
+
+		$("#insert_contactPersonName").val(name);
+		$("#contactPersonID").html(id);
+	};
 	
 	/*************************************************************
 	 * PRODUCTS HANDLING
@@ -1407,11 +1580,17 @@ var getCurrentDocType = function(){
 /*
  * makes a new tab of selected doument and loads it
  */
-var makeNewTabAndOpenIt = function(id,number){
+var makeNewTabAndOpenIt = function(id,number,verified){
+
+	var verifiedHTML = "";
+	if(!verified){ // not verified, then add the note
+		verifiedHTML = " (kinnitamata)";
+	}
 	
 	var tabHTML = "<span class='documentsTab selectableDocumentTab'>"+
 		"<span>"+number+"</span>"+
 		"<span class='tabDocumentID hidden'>"+id+"</span>"+
+		"<span>"+verifiedHTML+"</span>"+
 	"</span>";
 	
 	$(tabHTML).insertBefore("#newDocumentTab"); // insert it before the newTab span

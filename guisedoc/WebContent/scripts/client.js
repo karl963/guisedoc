@@ -61,7 +61,8 @@ $(document).ready(function() {
 	        	responseJSON = jQuery.parseJSON(response);
 	        	
 	        	if(responseJSON.response=="success"){
-	        		addClientRowToTable(responseJSON.ID,clientJSON.name,clientJSON.contactPerson,0.0);
+	        		addClientRowToTable(responseJSON.ID,clientJSON.name,
+	        				clientJSON.selectedContactPerson.contactPerson,0.0);
 	        		
 	        		if(cleanClientSearchAfterAdd){
 	        			$(".clientSearchInputField").val(null);
@@ -87,29 +88,73 @@ $(document).ready(function() {
 	});
 	
 	/*
+	 * add contactperson for client
+	 */
+	$(document).on("click","#contactPersonAddButton",function(){
+		
+		var name = $("#addContactPersonInput").val();
+		
+		if(checkForInvalidStringCharacters(new Array(
+				new Array(name,"addContactPersonInput")
+				))){
+			return;
+		}
+		if(name == $("#addContactPersonInput").data("default_val")){
+			name = "";
+		}
+		
+		var clientID = $(this).closest("#leftSideDetailDiv").children(".clientIDDiv").html();
+
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/clients/contacts/add",
+	        data : {name:name, clientID:clientID},
+	        success : function(response) {
+
+	        	responseJSON = jQuery.parseJSON(response);
+	        	
+	        	if(responseJSON.response=="success"){
+	        		addContacctPersonToTable(responseJSON.ID,name);
+	        		showSuccessNotification(responseJSON.message);
+	        	}
+	        	else{
+	        		showErrorNotification(responseJSON.message);
+	        	}
+	        	
+	        	hideLoadingDiv();
+	        },
+	        error : function(e) {
+	        	hideLoadingDiv();
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	});
+	
+	/*
 	 * makes add client json
 	 */
 	var makeAddClientsJSON = function(){
 		var name = $("#clientSearchNameInput").val();
-		var contactPerson = $("#clientSearchContactPersonInput").val();
+		var contactPersonName = $("#clientSearchContactPersonInput").val();
 
 		if(name == $("#clientSearchNameInput").data("default_val")){
 			name = "";
 		}
-		if(contactPerson == $("#clientSearchContactPersonInput").data("default_val")){
-			contactPerson = "";
+		if(contactPersonName == $("#clientSearchContactPersonInput").data("default_val")){
+			contactPersonName = "";
 		}
 
 		if(checkForInvalidStringCharacters(new Array(
 				new Array(name,"clientSearchNameInput"),
-				new Array(contactPerson,"clientSearchContactPersonInput")
+				new Array(contactPersonName,"clientSearchContactPersonInput")
 				))){
 			return;
 		}
 		
 		var clientJSON = {};
 		clientJSON.name = name;
-		clientJSON.contactPerson = contactPerson;
+		clientJSON.selectedContactPerson = {};
+		clientJSON.selectedContactPerson.name = contactPersonName;
 		
 		return clientJSON;
 	};
@@ -145,7 +190,44 @@ $(document).ready(function() {
 	        	
 	        	if(response.split(";")[0]=="success"){
 	        		showSuccessNotification(response.split(";")[1]);
-	        		deleteSelectedObjectsFromTable();
+	        		deleteSelectedClientsFromTable();
+	        	}
+	        	else{
+	        		showErrorNotification(response.split(";")[1]);
+	        	}
+	        },
+	        error : function(e) {
+	        	showErrorNotification("Viga serveriga ühendumisel");
+	        }
+	    });
+	};
+	
+	/*
+	 * delete contact persons
+	 */
+	$(document).on("click","#deleteContactPersonsButton",function(){
+		showConfirmationDialog("Kustuta valitud kontaktisikud ?"
+				,deleteContacts);
+	});
+	var deleteContacts = function(){
+		
+		showLoadingDiv();
+
+		var forDeleteJSON = makeDeleteContactsJSON();
+		if(forDeleteJSON == null){
+			hideLoadingDiv();
+			return;
+		}
+
+		$.ajax({
+	        type : "POST",
+	        url : contextPath+"/clients/contacts/delete",
+	        data : {forDeleteJSON: JSON.stringify(forDeleteJSON)},
+	        success : function(response) {
+	        	
+	        	if(response.split(";")[0]=="success"){
+	        		showSuccessNotification(response.split(";")[1]);
+	        		deleteSelectedContactsFromTable();
 	        	}
 	        	else{
 	        		showErrorNotification(response.split(";")[1]);
@@ -160,7 +242,7 @@ $(document).ready(function() {
 	/*
 	 * delete selected objects from table after post success
 	 */
-	function deleteSelectedObjectsFromTable(){
+	function deleteSelectedClientsFromTable(){
 		$(".clientDeleteCheckbox").each(function(){
 			if($(this).is(":checked")){
 				$(this).closest(".clientRow").remove();
@@ -168,8 +250,16 @@ $(document).ready(function() {
 		});
 	}
 	
+	function deleteSelectedContactsFromTable(){
+		$(".contactPersonCheckbox").each(function(){
+			if($(this).is(":checked")){
+				$(this).closest(".contactRow").remove();
+			}
+		});
+	}
+	
 	/*
-	 * deleteable objects json
+	 * deleteable clients json
 	 */
 	var makeDeleteClientsJSON = function(){
 		
@@ -181,6 +271,32 @@ $(document).ready(function() {
 
 				var object = {};
 				object.ID = $(this).closest(".clientRow").attr("id").replace("clientRow","");
+				
+				objects.push(object);
+			}
+			
+		});
+
+		if(objects.length == 0){ // there were no objects selected, no need to post
+			return;
+		}
+
+		return objects;
+	};
+	
+	/*
+	 * deleteable contact persons json
+	 */
+	var makeDeleteContactsJSON = function(){
+		
+		var objects = [];
+		
+		$(".contactPersonCheckbox").each(function(){
+
+			if($(this).is(":checked")){
+
+				var object = {};
+				object.ID = $(this).closest(".contactRow").attr("id").replace("contactRow","");
 				
 				objects.push(object);
 			}
@@ -488,14 +604,12 @@ $(document).ready(function() {
 		var ID = $("#leftSideDetailDiv").children(".clientIDDiv").html();
 		var name = $("#clientDetailNameInput").val();
 		var phone = $("#clientDetailPhoneInput").val();
-		var contactPerson = $("#clientDetailContactPersonInput").val();
 		var email = $("#clientDetailEmailInput").val();
 		var address = $("#clientDetailAddressInput").val();
-		
+
 		if(checkForInvalidStringCharacters(new Array(
 				new Array(name,"clientDetailNameInput"),
 				new Array(phone,"clientDetailPhoneInput"),
-				new Array(contactPerson,"clientDetailContactPersonInput"),
 				new Array(email,"clientDetailEmailInput"),
 				new Array(address,"clientDetailAddressInput")
 				))){
@@ -507,7 +621,6 @@ $(document).ready(function() {
 		clientJSON.ID = ID;
 		clientJSON.name = name;
 		clientJSON.phone = phone;
-		clientJSON.contactPerson = contactPerson;
 		clientJSON.email = email;
 		clientJSON.address = address;
 		
@@ -565,6 +678,38 @@ $(document).ready(function() {
 			saveButton = "<input type='button' class='clientDetailSaveButton defaultButton' value='Salvesta'/>";
 		}
 		
+		// make the contact persons html
+		var contactPersonsHTML = "<div>" +
+			"<span id='contactPersonInputDiv'>"+
+				"<input type='search' value='Kontaktisiku nimi' id='addContactPersonInput' class='documentSearchInputField defaultInputField searchInputField' maxlength='45'/>" +
+			"</span>"+
+			"<span id='contactAddButtonDiv'>"+
+				"<input type='button' class='defaultButton' id='contactPersonAddButton' value='Lisa'/>" +
+			"</span>"+
+		"</div>"+
+		"<div id='contactPersonsTableDiv'>";
+		
+		contactPersonsHTML += "<table id='contactPersonsTable'><thead>" +
+				"<tr class='tableHeaderRow'>" +
+					"<th>Nimi</th>" +
+					"<th class='contactDeleteTd'>" +
+						"<input type='button' value='Kustuta' class='defaultButton' id='deleteContactPersonsButton'/>" +
+					"</th>" +
+				"</tr>" +
+				"</thead><tbody>";
+		
+		for(var i = 0; i < clientJSON.contactPersons.length; i++){
+			contactPersonsHTML += "<tr id='contactRow"+clientJSON.contactPersons[i].ID+"' class='contactRow'>" +
+					"<td class='tableBorderRight'>"+clientJSON.contactPersons[i].name+"</td>" +
+					"<td class='contactDeleteTd'>" +
+						"<label class='contactPersonLabel'><input type='checkbox' class='contactPersonCheckbox'/></label>" +
+					"</td>" +
+				"</tr>";
+		}
+		
+		contactPersonsHTML += "</tbody></table></div>";
+		
+		// make the html
 		cell.innerHTML = "<div class='clientDetailedDataDiv'>" +
 		
 			"<div id='leftSideDetailDiv'>"+
@@ -576,11 +721,6 @@ $(document).ready(function() {
 					"<div>" +
 						"<span class='clientDetailNameDiv'>Nimi</span>" +
 						"<span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailNameInput' value='"+clientJSON.name+"'/> </span>" +
-					"</div>" +
-				
-					"<div>" +
-						"<span class='clientDetailNameDiv'>Kontaktisik</span>" +
-						"<span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailContactPersonInput' value='"+clientJSON.contactPerson+"' /> </span>" +
 					"</div>" +
 		
 					"<div>" +
@@ -596,7 +736,9 @@ $(document).ready(function() {
 					"<div>" +
 						"<span class='clientDetailNameDiv'>Aadress</span>" +
 						"<span class='clientDetailInputDiv'> <input type='text' maxlength='45' id='clientDetailAddressInput' value='"+clientJSON.address+"'/> </span>" +
-					"</div>" +
+					"</div><br>" +
+					
+					contactPersonsHTML+
 					
 			"</div>"+
 			
@@ -636,12 +778,22 @@ $(document).ready(function() {
 		
 		for(var i = 0;i < clientsJSON.clients.length ; i++){
 			
-			var ID = clientsJSON.clients[i].ID;
-			var name = clientsJSON.clients[i].name;
-			var contactPerson = clientsJSON.clients[i].contactPerson;
-			var totalBoughtFor = clientsJSON.clients[i].totalBoughtFor;
+			var client = clientsJSON.clients[i];
 			
-			addClientRowToTable(ID,name,contactPerson,totalBoughtFor);
+			var ID = client.ID;
+			var name = client.name;
+			// make contactpersons string
+			var contactPersons = "";
+			for(var i = 0; i < client.contactPersons.length; i++){
+				if(i>0){ // not the first person
+					contactPersons += ", ";
+				}
+				contactPersons += client.contactPersons[i].name;
+			}
+			
+			var totalBoughtFor = client.totalBoughtFor;
+			
+			addClientRowToTable(ID,name,contactPersons,totalBoughtFor);
 		}
 	}
 	

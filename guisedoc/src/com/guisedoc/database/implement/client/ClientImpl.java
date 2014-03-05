@@ -19,10 +19,12 @@ import org.springframework.jdbc.support.KeyHolder;
 import com.guisedoc.database.Connector;
 import com.guisedoc.database.rowmapper.ClientDocumentRowMapper;
 import com.guisedoc.database.rowmapper.ClientRowMapper;
+import com.guisedoc.database.rowmapper.ContactPersonRowMapper;
 import com.guisedoc.database.rowmapper.ProductRowMapper;
 import com.guisedoc.enums.ErrorType;
 import com.guisedoc.object.Client;
 import com.guisedoc.object.ClientDocument;
+import com.guisedoc.object.ContactPerson;
 import com.guisedoc.object.Product;
 import com.guisedoc.object.User;
 
@@ -30,6 +32,10 @@ public class ClientImpl extends JdbcTemplate {
 	
 	public ClientImpl(HttpSession session){
 		super(((Connector)session.getAttribute("connector")).getDatasource());
+	}
+	
+	public ClientImpl(DataSource ds){
+		super(ds);
 	}
 	
 	public Object getClientByID(long id){
@@ -54,7 +60,15 @@ public class ClientImpl extends JdbcTemplate {
 
 			if(clients.size() > 0){
 				if(clients.get(0) instanceof Client){
+
+					// get the contact persons
+					String contactQuery = "SELECT * FROM contact_persons WHERE "
+							+ "client_ID = "+id;
 					
+					List<ContactPerson> contactPersons = query(contactQuery,new ContactPersonRowMapper<ContactPerson>());
+					((Client) clients.get(0)).setContactPersons(contactPersons);
+
+					// get the documents
 					Object documents = getClientDocuments(id,"");
 					
 					if(documents instanceof List){
@@ -62,6 +76,7 @@ public class ClientImpl extends JdbcTemplate {
 								clients.get(0),
 								documents
 						};
+
 					}
 					else{
 						return ErrorType.DATABASE_QUERY;
@@ -122,24 +137,91 @@ public class ClientImpl extends JdbcTemplate {
 				public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 					
 					String query = "INSERT INTO clients ("
-							+ "name, contactPerson, address, additionalAddress,"
+							+ "name, address, additionalAddress,"
 							+ " email, phone"
-							+ ") VALUES (?,?,?,?,?,?)";
+							+ ") VALUES (?,?,?,?,?)";
 					
 					PreparedStatement stmt = connection.prepareStatement(query, new String[]{"ID"});
 
 					stmt.setString(1, client.getName());
-					stmt.setString(2, client.getContactPerson());
-					stmt.setString(3, client.getAddress());
-					stmt.setString(4, client.getAdditionalAddress());
-					stmt.setString(5, client.getEmail());
-					stmt.setString(6, client.getPhone());
+					stmt.setString(2, client.getAddress());
+					stmt.setString(3, client.getAdditionalAddress());
+					stmt.setString(4, client.getEmail());
+					stmt.setString(5, client.getPhone());
 
 					return stmt;
 				}
 			}, keyHolder);
+			
+			long ID = keyHolder.getKey().longValue();
+			
+			// add the contactperson if it's specified
+			if(!client.getSelectedContactPerson().getName().equals("")){
+				String contactQuery = "INSERT INTO contact_persons (name,client_ID)"
+						+ " VALUES ('"+client.getSelectedContactPerson().getName()+"',"+ID+")";
+				update(contactQuery);
+			}
 
+			return ID;
+		}
+		catch(Exception x){
+			x.printStackTrace();
+			return ErrorType.DATABASE_QUERY;
+		}
+	}
+	
+	public Object addNewContactPerson(final String name, final long clientID){
+		try{
+			
+			// insert and get the generated (ID) key back
+			KeyHolder keyHolder = new GeneratedKeyHolder();
+			update(new PreparedStatementCreator() {
+				public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+					
+					String query = "INSERT INTO contact_persons ("
+							+ "name, client_ID) "
+							+ "VALUES (?,?)";
+					
+					PreparedStatement stmt = connection.prepareStatement(query, new String[]{"ID"});
+
+					stmt.setString(1, name);
+					stmt.setLong(2, clientID);
+
+
+					return stmt;
+				}
+			}, keyHolder);
+			
 			return keyHolder.getKey().longValue();
+		}
+		catch(Exception x){
+			x.printStackTrace();
+			return ErrorType.DATABASE_QUERY;
+		}
+	}
+	
+	public ErrorType changeContactPersonName(long contactID, String name){
+		try{
+			String query = "UPDATE contact_persons SET name = ? "
+					+ "WHERE ID=?";
+			
+			Object[] objects = new Object[]{
+					name,
+					contactID,
+			};
+			int[] types = new int[]{
+					Types.VARCHAR,
+					Types.BIGINT
+			};
+
+			int response = update(query,objects,types);
+
+			if(response > 0){
+				return ErrorType.SUCCESS;
+			}
+			else{
+				return ErrorType.NOTHING_TO_UPDATE;
+			}
 		}
 		catch(Exception x){
 			x.printStackTrace();
@@ -174,23 +256,53 @@ public class ClientImpl extends JdbcTemplate {
 		}
 	}
 	
+	public ErrorType deleteContactPersons(List<ContactPerson> contactPerson){
+		try{
+			String query = "DELETE FROM contact_persons WHERE ID IN (";
+			String documentsQuery = "UPDATE documents SET contact_person_ID = 0 WHERE contact_person_ID IN (";
+					
+			boolean wasBefore = false;
+			for(ContactPerson c: contactPerson){
+				if(wasBefore){
+					query += ",";
+					documentsQuery += ",";
+				}
+				
+				query+= c.getID();
+				documentsQuery += c.getID();
+				
+				wasBefore = true;
+			}
+			
+			query += ")";
+			documentsQuery += ")";
+			
+			update(query);
+			update(documentsQuery);
+			
+			return ErrorType.SUCCESS;
+		}
+		catch(Exception x){
+			x.printStackTrace();
+			return ErrorType.DATABASE_QUERY;
+		}
+	}
+	
 	public ErrorType saveClient(Client client){
 		try{
-			String query = "UPDATE clients SET name = ?, phone = ?, contactPerson = ?,"
+			String query = "UPDATE clients SET name = ?, phone = ?, "
 					+ "address = ?, additionalAddress = ?, email = ?"
 					+ " WHERE ID=?";
 			
 			Object[] objects = new Object[]{
 					client.getName(),
 					client.getPhone(),
-					client.getContactPerson(),
 					client.getAddress(),
 					client.getAdditionalAddress(),
 					client.getEmail(),
 					client.getID(),
 			};
 			int[] types = new int[]{
-					Types.VARCHAR,
 					Types.VARCHAR,
 					Types.VARCHAR,
 					Types.VARCHAR,
@@ -209,9 +321,13 @@ public class ClientImpl extends JdbcTemplate {
 		}
 	}
 	
-	public Object searchForTypeClients(Client client,
-			boolean nonBuyers,boolean realBuyers, boolean sellers){
+	public Object searchForTypeClients(Client searchClient,
+			boolean nonBuyers,boolean realBuyers, boolean sellers,
+			boolean filterWithName){
 		try{
+			
+			Object[] returnable = null;
+			
 			// make the query accordingly
 			
 			String typesQuery = "";
@@ -246,8 +362,7 @@ public class ClientImpl extends JdbcTemplate {
 					+ "(SELECT COUNT(*) FROM documents WHERE client_ID = clients.ID "+typesQuery+")"
 					+ ",0) AS totalDeals "
 					+ "FROM clients WHERE "
-					+ "name LIKE '%"+client.getName()+"%' AND "
-					+ "contactPerson LIKE '%"+client.getContactPerson()+"%'";
+					+ "name LIKE '%"+searchClient.getName()+"%'";
 
 			// get the clients
 			List<Client> clients = query(query,new ClientRowMapper<Client>());
@@ -255,7 +370,30 @@ public class ClientImpl extends JdbcTemplate {
 			// get the total products
 			long totalClients = queryForObject("SELECT COUNT(*) FROM clients",Long.class);
 			
-			Object[] returnable = new Object[]{totalClients,clients};
+			// sort out the clients with contact-persons, if added to search
+			String nameFilter = "";
+			if(filterWithName){
+				nameFilter = "AND name LIKE '%"+searchClient.getSelectedContactPerson().getName()+"%'";
+			}
+			
+			List<Client> resultClients = new ArrayList<Client>();
+			
+			for(Client client : clients){
+				
+				String contactQuery = "SELECT * FROM contact_persons WHERE "
+						+ "client_ID = "+client.getID()+" "
+						+ nameFilter;
+				
+				List<ContactPerson> contactPersons = query(contactQuery,new ContactPersonRowMapper<ContactPerson>());
+
+				if(contactPersons.size() > 0){
+					client.setContactPersons(contactPersons);
+					resultClients.add(client);
+				}
+			}
+			
+			returnable = new Object[]{totalClients,resultClients};
+			
 			return returnable;
 		}
 		catch(Exception x){

@@ -22,6 +22,7 @@ import com.guisedoc.messages.ClientMessages;
 import com.guisedoc.messages.ErrorMessages;
 import com.guisedoc.object.Client;
 import com.guisedoc.object.ClientDocument;
+import com.guisedoc.object.ContactPerson;
 import com.guisedoc.object.Product;
 import com.guisedoc.workshop.document.settings.DateFormats;
 import com.guisedoc.workshop.json.JsonArray;
@@ -53,10 +54,20 @@ public class ClientHandling {
 			jsonObject.addElement("phone", client.getPhone());
 			jsonObject.addElement("email", client.getEmail());
 			jsonObject.addElement("address", client.getAddress());
-			jsonObject.addElement("contactPerson", client.getContactPerson());
 			jsonObject.addElement("lastDealNR", client.getLastDealNR());
 			jsonObject.addElement("totalDeals", client.getTotalDeals());
 			jsonObject.addElement("lastDealDate", client.getLastDealDateString());
+			
+			JsonArray contactPersons = new JsonArray();
+			for(ContactPerson contactPerson : client.getContactPersons()){
+				JsonObject contPers = new JsonObject();
+				
+				contPers.addElement("ID", contactPerson.getID());
+				contPers.addElement("name", contactPerson.getName());
+				
+				contactPersons.addElement(contPers);
+			}
+			jsonObject.addElement("contactPersons", contactPersons);
 			
 			List<ClientDocument> clientDocuments = 
 					(List<ClientDocument>)((Object[])responseObject)[1];
@@ -166,7 +177,7 @@ public class ClientHandling {
 
 		Object responseObject = new ClientImpl(session)
 				.addNewClient(client);
-		
+		System.out.println(client.getSelectedContactPerson().getName());
 		if(responseObject instanceof Long){
 			ID = (Long)responseObject;
 			
@@ -197,8 +208,8 @@ public class ClientHandling {
 		Gson gson = new Gson();
 
 		com.google.gson.JsonArray productArray = new JsonParser().parse(forDeleteJSON).getAsJsonArray();
-	    for(JsonElement productElement : productArray){
-	    	clients.add(gson.fromJson(productElement, Client.class));
+	    for(JsonElement clientElement : productArray){
+	    	clients.add(gson.fromJson(clientElement, Client.class));
 	    }
 	    
 		ErrorType responseObject = new ClientImpl(session)

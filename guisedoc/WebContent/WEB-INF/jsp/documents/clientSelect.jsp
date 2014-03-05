@@ -19,7 +19,7 @@
 			<thead>
 			<tr>
 				<th class="tableHeaderRow">Nimi</th>
-				<th class="tableHeaderRow">Kontaktisik</th>
+				<th class="tableHeaderRow">Kontaktisikud</th>
 				<th class="tableHeaderRow">Tehinguid</th>
 				<th class="tableHeaderRow">Summa</th>
 			</tr>

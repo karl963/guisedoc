@@ -139,11 +139,11 @@ public class QuotationPDF {
 			
 			// client name cell
 			String fullClientName;
-			if(DOC.getClient().getContactPerson().equals("")){
+			if(DOC.getClient().getSelectedContactPerson().getID() == 0){ // contact person is not selected
 				fullClientName = DOC.getClient().getName();
 			}
 			else{
-				fullClientName = DOC.getClient().getName()+", "+DOC.getClient().getContactPerson();
+				fullClientName = DOC.getClient().getName()+", "+DOC.getClient().getSelectedContactPerson().getName();
 			}
 			PdfPCell clientNameCell = new PdfPCell(new Phrase(fullClientName,TR_10_B));
 			clientNameCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
