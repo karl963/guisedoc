@@ -3,15 +3,15 @@
 <c:if test="${user.profile.isAllowed('ViewUsers') == true}">
 <table id="usersTable">
 <thead>
-<c:if test="${user.profile.isAllowed('AddUsers') == true}">
 <tr>
+<c:if test="${user.profile.isAllowed('AddUsers') == true}">
 	<td colspan=4>
 		<input type="text" id="newUserName" class="searchInputField defaultInputField" value="nimi" maxlength="45"/>
 		<input type="text" id="newUserPassword" class="searchInputField defaultInputField" value="parool" maxlength="45"/>
 		<input type="button" class="defaultButton" value="Lisa kasutaja" id="addUserButton"/>
 	</td>
-</tr>
 </c:if>
+</tr>
 <tr class="tableHeaderRow">
 	<th class="tableBorderRight">Kasutajanimi</th>
 	<th class="tableBorderRight dateColumn lastLoginTd dateColumn">Viimane sisselogimine</th>
@@ -39,14 +39,14 @@
 <c:if test="${user.profile.isAllowed('ViewProfiles') == true}">
 <table id="profilesTable">
 <thead>
-<c:if test="${user.profile.isAllowed('AddProfiles') == true}">
 <tr>
+<c:if test="${user.profile.isAllowed('AddProfiles') == true}">
 	<td colspan=3>
 		<input type="text" id="newProfileName" class="searchInputField defaultInputField" value="Nimetus" maxlength="45"/>
 		<input type="button" class="defaultButton" value="Lisa profiil" id="addProfileButton"/>
 	</td>
-</tr>
 </c:if>
+</tr>
 <tr class="tableHeaderRow">
 	<th class="tableBorderRight">Profiili nimi</th>
 	<th class="tableBorderRight numberColumn">Lubatud tegevusi</th>

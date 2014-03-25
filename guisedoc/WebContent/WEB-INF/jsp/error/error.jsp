@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <div id="userInformation">
-	<h1>Kahjuks läks midagi katki, veateade on haldajale saadetud.</h1>
+	<h1>Kahjuks läks midagi katki.</h1>
 	Soovituslikud lingid edasi minekuks:<br>
 	<a href="${pageContext.request.contextPath}/documents">dokumendid</a><br>
 	<a href="${pageContext.request.contextPath}/products">tooted</a><br>

@@ -15,7 +15,7 @@
 			<li>Statistika</li>
 			<li>Vali enda kasutajale sobivad seaded</li>
 		</ul>
-	</div>
+	</div><!--
 	<div id="rightDiv">
 		<input type="button" value="Taotle oma firmale proovikasutus" class="defaultButton" id="showRegister"/>
 		<div id="registerResponseDiv">
@@ -37,7 +37,7 @@
 			<input type="submit" value="Saada taotlus" class="defaultButton"/>
 		</form>
 		</div>
-	</div>
+	</div> -->
 </div>
 <div id="loginFormDiv">
 	<!-- <form name="loginForm" action="/j_spring_security_check" method="POST">-->

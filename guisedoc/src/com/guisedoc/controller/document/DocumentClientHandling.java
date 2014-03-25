@@ -54,7 +54,7 @@ public class DocumentClientHandling {
 		else if(type.equals("seller")){
 			seller = true;
 		}
-		
+
 		// make the client
 		Client searchClient = new Client();
 		searchClient.setName(name);
@@ -129,6 +129,7 @@ public class DocumentClientHandling {
 				for(ContactPerson contactPerson : client.getContactPersons()){
 					JsonObject contPers = new JsonObject();
 					contPers.addElement("name", contactPerson.getName());
+					contPers.addElement("ID", contactPerson.getID());
 					
 					contactPersons.addElement(contPers);
 				}

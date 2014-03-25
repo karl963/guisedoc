@@ -225,8 +225,8 @@ $(document).ready(function() {
 		firmJSON.swift = firmSwift;
 		firmJSON.logoURL = firmLogoURL;
 		firmJSON.logoWidth = logoWidth;
-		firmJSON.logoheight = logoHeight;
-		
+		firmJSON.logoHeight = logoHeight;
+
 		return firmJSON;
 	};
 	

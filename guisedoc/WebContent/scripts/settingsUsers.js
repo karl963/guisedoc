@@ -32,6 +32,8 @@ $(document).ready(function(){
 			return;
 		}
 		
+		showLoadingDiv();
+		
 		$.ajax({
 	        type : "POST",
 	        url : contextPath+"/settingsUsers/user/add",
@@ -85,6 +87,10 @@ $(document).ready(function(){
 	 * detail data
 	 */
 	$(document).on("click",".userRow",function(){
+		if(allowedChangeUsers == "false"){
+			return;
+		}
+		
 		var id = $(this).children("td").children(".userIDDiv").html();
 		var rowIndex = $(this).index()+1; // the row we clicked on
 		
@@ -342,6 +348,7 @@ $(document).ready(function(){
 	 * profile detail data
 	 */
 	$(document).on("click",".profileRow",function(){
+		
 		var id = $(this).children("td").children(".profileIDDiv").html();
 		var rowIndex = $(this).index()+1; // the row we clicked on
 
@@ -474,6 +481,9 @@ $(document).ready(function(){
 	 * on change of profile rule, we update it by clicking checkboxes
 	 */
 	$(document).on("click",".profileRuleCheckbox",function(){
+		if(allowedChangeProfiles == "false"){
+			return;
+		}
 		
 		showLoadingDiv();
 		
@@ -515,7 +525,7 @@ $(document).ready(function(){
 		var countRow = $("#profilesTable tbody").children(".profileRow").eq(index)
 				.children("td").eq(1);
 		
-		countRow.html(countRow.html()+count);
+		countRow.html(parseFloat(countRow.html())+count);
 	};
 	
 	/*

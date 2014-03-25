@@ -356,6 +356,7 @@ $(document).ready(function(){
 		row.children(".productUnitTd").children("div").eq(1).html($("#productDetailEUnitInput").val());
 		row.children(".productPriceTd").children("div").eq(0).html($("#productDetailPriceInput").val());
 		row.children(".productPriceTd").children("div").eq(1).html($("#productDetailOPriceInput").val());
+		row.children(".storageTd").html($("#productDetailStorageInput").val());
 	};
 	
 	/*

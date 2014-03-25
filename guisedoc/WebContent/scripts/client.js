@@ -62,7 +62,7 @@ $(document).ready(function() {
 	        	
 	        	if(responseJSON.response=="success"){
 	        		addClientRowToTable(responseJSON.ID,clientJSON.name,
-	        				clientJSON.selectedContactPerson.contactPerson,0.0);
+	        				clientJSON.selectedContactPerson.name,0.0);
 	        		
 	        		if(cleanClientSearchAfterAdd){
 	        			$(".clientSearchInputField").val(null);
@@ -92,6 +92,8 @@ $(document).ready(function() {
 	 */
 	$(document).on("click","#contactPersonAddButton",function(){
 		
+		showLoadingDiv();
+		
 		var name = $("#addContactPersonInput").val();
 		
 		if(checkForInvalidStringCharacters(new Array(
@@ -114,7 +116,7 @@ $(document).ready(function() {
 	        	responseJSON = jQuery.parseJSON(response);
 	        	
 	        	if(responseJSON.response=="success"){
-	        		addContacctPersonToTable(responseJSON.ID,name);
+	        		addContactPersonToTable(responseJSON.ID,name);
 	        		showSuccessNotification(responseJSON.message);
 	        	}
 	        	else{
@@ -129,6 +131,22 @@ $(document).ready(function() {
 	        }
 	    });
 	});
+	
+	var addContactPersonToTable = function(id,name){
+		var table = document.getElementById("contactPersonsTable").getElementsByTagName("tbody")[0];
+		var row = table.insertRow(0);
+		var cell1 = row.insertCell(0);
+		var cell2 = row.insertCell(1);
+
+		row.className = "contactRow";
+		row.setAttribute("id","contactRow"+id);
+		
+		cell1.innerHTML = name;
+		cell1.className = "tableBorderRight";
+		
+		cell2.innerHTML = "<label class='contactPersonLabel' ><input type='checkBox' class='contactPersonCheckbox'/></label>";
+		cell2.className = "contactDeleteTd";
+	};
 	
 	/*
 	 * makes add client json
@@ -679,7 +697,7 @@ $(document).ready(function() {
 		}
 		
 		// make the contact persons html
-		var contactPersonsHTML = "<div>" +
+		var contactPersonsHTML = "<div id='cntactSearchPanelDiv'>" +
 			"<span id='contactPersonInputDiv'>"+
 				"<input type='search' value='Kontaktisiku nimi' id='addContactPersonInput' class='documentSearchInputField defaultInputField searchInputField' maxlength='45'/>" +
 			"</span>"+
@@ -770,25 +788,25 @@ $(document).ready(function() {
 		row.className = "detailedTr";
 		
 		$("#searchClientDetailNumber").data("default_val",$("#searchClientDetailNumber").val());
-
+		$("#addContactPersonInput").data("default_val",$("#addContactPersonInput").val());
+		
 		updateClientDetailDocuments(clientJSON.documents);
 	}
 	
 	function addAllClientsToTable(clientsJSON){
-		
 		for(var i = 0;i < clientsJSON.clients.length ; i++){
 			
 			var client = clientsJSON.clients[i];
-			
+
 			var ID = client.ID;
 			var name = client.name;
 			// make contactpersons string
 			var contactPersons = "";
-			for(var i = 0; i < client.contactPersons.length; i++){
-				if(i>0){ // not the first person
+			for(var j = 0; j < client.contactPersons.length; j++){
+				if(j>0){ // not the first person
 					contactPersons += ", ";
 				}
-				contactPersons += client.contactPersons[i].name;
+				contactPersons += client.contactPersons[j].name;
 			}
 			
 			var totalBoughtFor = client.totalBoughtFor;

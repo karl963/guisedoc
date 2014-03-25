@@ -177,7 +177,7 @@ public class ClientHandling {
 
 		Object responseObject = new ClientImpl(session)
 				.addNewClient(client);
-		System.out.println(client.getSelectedContactPerson().getName());
+
 		if(responseObject instanceof Long){
 			ID = (Long)responseObject;
 			

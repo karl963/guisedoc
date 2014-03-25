@@ -40,7 +40,7 @@ var RecaptchaOptions = {
 	<c:when test="${requestScope['javax.servlet.forward.servlet_path'] == '/documents' 
 						|| requestScope['javax.servlet.forward.servlet_path'] == '/documents/'}">
 		<script>
-			var allowedChangeDocuments = "${user.profile.isAllowed('DownloadDocuments')}";
+			var allowedChangeDocuments = "${user.profile.isAllowed('ChangeDocuments')}";
 		</script>
 		<script src="${pageContext.request.contextPath}/scripts/jquery/jquery-ui-1.10.3.js" type="text/javascript" ></script>
 		<script src="${pageContext.request.contextPath}/scripts/documents.js" type="text/javascript" ></script>
@@ -93,6 +93,8 @@ var RecaptchaOptions = {
 		<script>
 			var allowedDeleteUsers = "${user.profile.isAllowed('DeleteUsers')}";
 			var allowedDeleteProfiles = "${user.profile.isAllowed('DeleteProfiles')}";
+			var allowedChangeUsers = "${user.profile.isAllowed('ChangeUsers')}";
+			var allowedChangeProfiles = "${user.profile.isAllowed('ChangeProfiles')}";
 		</script>
 		<script src="${pageContext.request.contextPath}/scripts/settingsUsers.js" type="text/javascript" ></script>
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/styles/settingsUsers.css" type="text/css" />

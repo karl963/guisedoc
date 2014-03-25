@@ -457,10 +457,10 @@ public class DocumentImpl extends JdbcTemplate {
 	public Object getAllOpenedDocuments(User user){
 		try{
 			List<Document> documents = new ArrayList<Document>();
-			String query = "select document_ID as ID, "
+			String query = "SELECT document_ID AS ID, "
 					+ "fullNumber, verified "
 					+ "from documents, opened_documents "
-					+ "where opened_documents.user_ID = 1 "
+					+ "WHERE opened_documents.user_ID = "+user.getID()+" "
 					+ "AND opened_documents.document_ID = documents.ID "
 					+ "AND opened_documents.user_ID = "+user.getID();
 			

@@ -42,7 +42,7 @@ public class loginHandle {
 		String response = null;
 		
 		String[] responseObject = new LoginImpl(new Connector("main"))
-				.tryLogin(username, password, session);
+				.tryLogin(username, password, session, false);
 		
 		response = responseObject[0];
 		message = responseObject[1];

@@ -38,10 +38,24 @@ public class StatisticsSummary {
 	 */
 
 	public String getSummaryName(){
-		String name = "Kokkuvõte "+
-				DateFormats.DOT_DATE_FORMAT().format(startDate)+
-				"-"+
-				DateFormats.DOT_DATE_FORMAT().format(endDate);
+		String start = "";
+		String end = "";
+		// make start
+		if(startDate.getTime() == Long.MIN_VALUE){
+			start = "algus";
+		}
+		else{
+			start = DateFormats.DOT_DATE_FORMAT().format(startDate);
+		}
+		// make end
+		if(endDate.getTime() == Long.MAX_VALUE){
+			end = "lõpp";
+		}
+		else{
+			end = DateFormats.DOT_DATE_FORMAT().format(endDate);
+		}
+		
+		String name = "Kokkuvõte " + start + "-" + end;
 
 		if(!clientName.equals("")){
 			name += "("+clientName+")";
@@ -51,9 +65,24 @@ public class StatisticsSummary {
 	}
 	
 	public String getFormatedDatePeriod(){
-		return DateFormats.DOT_DATE_FORMAT().format(startDate)+
-				" - "+
-				DateFormats.DOT_DATE_FORMAT().format(endDate);
+		String start = "";
+		String end = "";
+		// make start
+		if(startDate.getTime() == Long.MIN_VALUE){
+			start = "algus";
+		}
+		else{
+			start = DateFormats.DOT_DATE_FORMAT().format(startDate);
+		}
+		// make end
+		if(endDate.getTime() == Long.MAX_VALUE){
+			end = "lõpp";
+		}
+		else{
+			end = DateFormats.DOT_DATE_FORMAT().format(endDate);
+		}
+		
+		return start + " - " + end;
 	}
 	
 	/*

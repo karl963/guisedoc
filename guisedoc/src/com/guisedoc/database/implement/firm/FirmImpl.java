@@ -74,6 +74,7 @@ public class FirmImpl extends JdbcTemplate{
 	}
 	
 	public ErrorType saveFirm(Firm firm){
+
 		try{
 			String query = "UPDATE firm SET name = ?, address = ?, regNR = ?,"
 					+ "kmkr = ?, phone = ?, email = ?, bank = ?, iban = ?,"

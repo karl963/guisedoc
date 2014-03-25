@@ -1,25 +1,19 @@
 $(document).ready(function() {
 
-	var clientType = "";
-	var startDate = "";
-	var endDate = "";
-	var clientName = "";
-	var code = "";
-	
 	/*
 	 * fill in search history on a page load
 	 */
 	if(localStorage.getItem("statisticsClient") != null){
-		$(":radio[value='"+localStorage.getItem("statisticsClient")+"']").prop("checked", true);
+		$(":radio[value="+localStorage.getItem("statisticsClient")+"]").prop("checked", true);
 	}
 	if(localStorage.getItem("statisticsProduct") != null){
 		$(":radio[value='"+localStorage.getItem("statisticsProduct")+"']").prop("checked", true);
 	}
 	if(localStorage.getItem("statisticsClientName") != null){
-		$("#statisticsClientInput").focus(); // for change of default input class
-		$("#statisticsClientInput").val(localStorage.getItem("statisticsClientName"));
-		$("#statisticsClientInput").blur(); // for unFocus
-		$("#clientIDDiv").html(localStorage.getItem("statisticsClientID")); // for change of default input class
+		if($("#clientsSelectBox option[value='"+localStorage.getItem("statisticsClientID")+"']").length != 0){ // the value exists
+			$("#clientsSelectBox").val(localStorage.getItem("statisticsClientID"));
+			$("#clientsSelectBox").change();
+		}
 	}
 	if(localStorage.getItem("statisticsCode") != null){
 		$("#statisticsCodeInput").focus(); // for change of default input class
@@ -228,7 +222,6 @@ $(document).ready(function() {
 	 */
 	$(document).on("change","#clientsSelectBox",function(){
 		$("#clientIDDiv").html($("#clientsSelectBox option:selected").val());
-		//$("#statisticsClientInput").focus();
 		$("#statisticsClientInput").val($("#clientsSelectBox option:selected").text());
 	});
 	

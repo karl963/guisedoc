@@ -28,10 +28,13 @@ public class LoginImpl extends JdbcTemplate{
 		super(connector.getDatasource());
 	}
 
-	public Object checkUserValid(String username, String password){
+	public Object checkUserValid(String username, String password, boolean autoLogin){
 		try{
 			
-			String query = "SELECT dbSchema FROM users WHERE userName='"+username+"' AND password='"+password+"'";
+			String query = "SELECT dbSchema FROM users WHERE userName='"+username+"'";
+			if(!autoLogin){
+				query+= " AND password=PASSWORD('"+password+"')";
+			}
 			
 			try{
 				String response = queryForObject(query,String.class);
@@ -65,7 +68,7 @@ public class LoginImpl extends JdbcTemplate{
 					if(response != null && response.get("username") != null){
 						
 						String[] loginResponse = tryLogin((String)response.get("username")
-								,(String)response.get("password"),session);
+								,"",session,true);
 						
 						if(loginResponse[0].equals("success")){
 							return ErrorType.SUCCESS;
@@ -93,12 +96,12 @@ public class LoginImpl extends JdbcTemplate{
 		}
 	}
 	
-	public String[] tryLogin(String username, String password, HttpSession session){
+	public String[] tryLogin(String username, String password, HttpSession session, boolean autoLogin){
 		String message = null;
 		String response = null;
 
 		// get the schema in response
-		Object validationResponse = checkUserValid(username, password);
+		Object validationResponse = checkUserValid(username, password, autoLogin);
 		if(validationResponse instanceof String){
 			
 			Connector connector = new Connector((String)validationResponse);

@@ -134,7 +134,7 @@ $(document).ready(function() {
 	 * making a new document by selecting the type from selectBox
 	 */
 	$(document).on("change", "#newDocumentSelect", function(){
-		console.log("changed");
+
 		var type = $(this).val();
 
 		if(type == "existing"){ // selected the old/existing document

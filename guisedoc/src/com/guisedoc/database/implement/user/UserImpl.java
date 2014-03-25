@@ -347,7 +347,7 @@ public class UserImpl extends JdbcTemplate{
 	
 	public ErrorType saveUserPassword(User user){
 		try{
-			String query = "UPDATE users SET password = ? WHERE userName = ?";
+			String query = "UPDATE users SET password = PASSWORD(?) WHERE userName = ?";
 			
 			Object[] objects = new Object[]{
 					user.getPassword(),
@@ -396,7 +396,7 @@ public class UserImpl extends JdbcTemplate{
 			String query = "INSERT INTO users ("
 					+ "userName, password, dbSchema)"
 					+ " VALUES ('"+user.getUserName()+"',"
-					+ "'"+user.getPassword()+"',"
+					+ "PASSWORD('"+user.getPassword()+"'),"
 					+ "'"+schema+"')";
 			
 			int response = update(query);
@@ -416,14 +416,31 @@ public class UserImpl extends JdbcTemplate{
 	
 	public Object addNewUser(final User user){
 		try{
+			
+			// add a profile for the user
+			KeyHolder pkeyHolder = new GeneratedKeyHolder();
+			update(new PreparedStatementCreator() {
+				public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+					
+					String query = "INSERT INTO settings (autoLogin) "
+							+ "VALUES (0)";
+					
+					PreparedStatement stmt = connection.prepareStatement(query, new String[]{"ID"});
+
+					return stmt;
+				}
+			}, pkeyHolder);
+
+			final long settingsID = pkeyHolder.getKey().longValue();
+			
 			// insert and get the generated (ID) key back
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 			update(new PreparedStatementCreator() {
 				public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 					
 					String query = "INSERT INTO users ("
-							+ "userName, name, phone, email, skype, lastOnline) "
-							+ "VALUES (?,?,?,?,?,NULL)";
+							+ "userName, name, phone, email, skype, settings_ID, lastOnline) "
+							+ "VALUES (?,?,?,?,?,?,NULL)";
 					
 					PreparedStatement stmt = connection.prepareStatement(query, new String[]{"ID"});
 
@@ -432,16 +449,13 @@ public class UserImpl extends JdbcTemplate{
 					stmt.setString(3, user.getPhone());
 					stmt.setString(4, user.getEmail());
 					stmt.setString(5, user.getSkype());
+					stmt.setLong(6, settingsID);
 
 					return stmt;
 				}
 			}, keyHolder);
 
 			long ID = keyHolder.getKey().longValue();
-			
-			// add a profile for the user
-			String settingsQuery = "INERT INTO settings (user_ID) VALUES("+ID+")";
-			update(settingsQuery);
 			
 			Object newUser = getUser(ID,true,true,false,true);
 			

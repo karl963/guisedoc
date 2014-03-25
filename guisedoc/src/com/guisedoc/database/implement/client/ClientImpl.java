@@ -323,7 +323,7 @@ public class ClientImpl extends JdbcTemplate {
 	
 	public Object searchForTypeClients(Client searchClient,
 			boolean nonBuyers,boolean realBuyers, boolean sellers,
-			boolean filterWithName){
+			boolean filterWithContactName){
 		try{
 			
 			Object[] returnable = null;
@@ -364,22 +364,28 @@ public class ClientImpl extends JdbcTemplate {
 					+ "FROM clients WHERE "
 					+ "name LIKE '%"+searchClient.getName()+"%'";
 
+			// if we specified a type, we only want the real ones
+			// as they have actually at least 1 deal as this type
+			if(nonBuyers || realBuyers || sellers){
+				query = "SELECT * FROM ("+query+") result WHERE totalDeals > 0";
+			}
+			
 			// get the clients
 			List<Client> clients = query(query,new ClientRowMapper<Client>());
-			
+
 			// get the total products
 			long totalClients = queryForObject("SELECT COUNT(*) FROM clients",Long.class);
 			
 			// sort out the clients with contact-persons, if added to search
 			String nameFilter = "";
-			if(filterWithName){
+			if(filterWithContactName){
 				nameFilter = "AND name LIKE '%"+searchClient.getSelectedContactPerson().getName()+"%'";
 			}
 			
 			List<Client> resultClients = new ArrayList<Client>();
 			
 			for(Client client : clients){
-				
+
 				String contactQuery = "SELECT * FROM contact_persons WHERE "
 						+ "client_ID = "+client.getID()+" "
 						+ nameFilter;
@@ -390,8 +396,12 @@ public class ClientImpl extends JdbcTemplate {
 					client.setContactPersons(contactPersons);
 					resultClients.add(client);
 				}
+				else if(searchClient.getSelectedContactPerson().getName().equals("")){ // found0, but it was searched by all or no name
+					resultClients.add(client);
+				}
+				
 			}
-			
+
 			returnable = new Object[]{totalClients,resultClients};
 			
 			return returnable;

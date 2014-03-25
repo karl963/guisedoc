@@ -197,7 +197,7 @@ input:not([type="button"]):not([type="checkbox"]):not([type="radio"]):focus,text
 * Loading div
 */
 #fullPageLoadingDiv{
-	display:none;
+	/*display:none;*/
 	z-index:999;
 	top:50%;
     left:50%;

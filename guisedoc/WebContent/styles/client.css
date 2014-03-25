@@ -114,11 +114,6 @@
 	width:20%;
 	min-width:40px;
 }
-.contactDeleteTd{
-	width: 70px;
-	text-align: center;
-	overflow: hidden;
-}
 
 /*
 * contact person in detailed row
@@ -140,6 +135,16 @@
 	overflow: auto;
 	background: #ffffff;
 	height: 130px;
+	margin-left:2%;
+	width:96%;
+}
+
+.contactDeleteTd{
+	width: 70px;
+	text-align: center;
+	overflow: hidden;
+}
+#cntactSearchPanelDiv{
 	margin-left:2%;
 	width:96%;
 }

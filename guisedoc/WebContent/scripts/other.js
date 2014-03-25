@@ -1,5 +1,7 @@
 $(document).ready(function(){
 	
+	$("#fullPageLoadingDiv").hide(); // hide the loading, because page is loaded
+	
 	/*
 	 * Changing shown language fields
 	 */
