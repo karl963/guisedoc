@@ -253,7 +253,6 @@ public class StatisticsImpl extends JdbcTemplate{
 			int[] types = new int[]{
 					Types.DOUBLE,
 					Types.DOUBLE,
-					Types.BINARY,
 					Types.BIGINT
 			};
 			

@@ -19,7 +19,7 @@
 		<span class="invoice_type">
 			Ettemaks: <input type="number" id="insert_advance" step="any" value="0" maxlength="20"/></span>
 		<span class="quotation_type order_confirmation_type">
-			Maksetingimus: <input type="text" id="insert_paymentRequirement" step="any" value="0" maxlength="45"/></span>
+			Maksetingimus: <input type="text" id="insert_paymentRequirement" maxlength="45"/></span>
 		<span class="quotation_type order_confirmation_type order_type">
 			Tarneaeg: <input type="text" id="insert_shipmentTime" maxlength="45"/></span>
 		<span class="quotation_type order_confirmation_type order_type">
@@ -64,9 +64,9 @@
 			<label><input type="checkbox" id="insert_showDiscount" /> Näita allahindlust</label></span>
 		<span class="invoice_type">
 			<label><input type="checkbox" id="insert_paydInCash" /> Tasutud sularahas</label></span>
-		<span class="order_confirmation_type order_type delivery_note_type">
+		<span class="order_confirmation_type quotation_type delivery_note_type">
 			<label><input type="checkbox" id="insert_showCE" /> Näita CE tähist</label></span>
-		<span class="order_confirmation_type delivery_note_type quotation_type">
+		<span class="order_confirmation_type quotation_type delivery_note_type">
 			- CE täpsustus: <input type="text" id="insert_CeSpecification" maxlength="45"/></span>
 	</span>
 	<div class="separator"></div>
@@ -88,4 +88,4 @@
 	</span>
 </div>
 
-<div id="hideOrShowDocumentsOptionDiv">Peida dokumendi andmed</div>
+<div id="hideOrShowDocumentsOptionDiv">Ava/Peida dokumendi andmed</div>

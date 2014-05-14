@@ -111,7 +111,7 @@ public class DocumentHandling {
 			value = String.valueOf(value);
 		}
 		else if(valueType.equals("number")){
-			value = String.valueOf(value).replace(",", ".");
+			value = Integer.parseInt(String.valueOf(value).replace(",", "."));
 		}
 		else if(valueType.equals("date")){
 			try {

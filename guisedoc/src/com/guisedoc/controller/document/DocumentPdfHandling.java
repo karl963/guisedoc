@@ -38,8 +38,6 @@ import com.guisedoc.workshop.document.DocumentBuilder;
 @RequestMapping("/documents/pdf")
 public class DocumentPdfHandling {
 	
-	Document document;
-	
 	@RequestMapping(value="/download",method = RequestMethod.GET, params={"ID"})
 	@ResponseBody
 	public Object downloadPDF(HttpSession session,@RequestParam("ID")long ID, RedirectAttributes redirectAttributes,
@@ -55,7 +53,7 @@ public class DocumentPdfHandling {
 					.getDocumentByID(ID);
 
 			if(responseObject instanceof Document){
-				document = (Document)responseObject;
+				Document document = (Document)responseObject;
 				
 		        Firm firm = (Firm) new FirmImpl(session)
 		        		.getFirmData();
@@ -67,10 +65,11 @@ public class DocumentPdfHandling {
 				header.setContentType(new MediaType("application", "pdf"));
 			    header.set("Content-Disposition",
 			    		"attachment; filename=" + document.getFullNumber().replace(" ", "_"));
+
 			    header.setContentLength(bytes.length);
 		
 			    response.addCookie(new Cookie("documentsDownload","true"));
-			    
+
 			    return new HttpEntity<byte[]>(bytes, header);
 			}
 			else{
@@ -98,8 +97,8 @@ public class DocumentPdfHandling {
 					.getDocumentByID(ID);
 
 			if(responseObject instanceof Document){
-				document = (Document)responseObject;
-				response.sendRedirect("preview/"+document.getFullNumber().replace(" ", "_")+".pdf");
+				session.setAttribute("document",(Document)responseObject);
+				response.sendRedirect("preview/"+((Document)responseObject).getFullNumber().replace(" ", "_")+".pdf");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -121,16 +120,18 @@ public class DocumentPdfHandling {
         try{
         	Firm firm = (Firm) new FirmImpl(session)
         			.getFirmData();
-        	byte[] bytes = DocumentBuilder.build(document,firm,(User)session.getAttribute("user"));
+        	byte[] bytes = DocumentBuilder.build((Document)session.getAttribute("document"),firm,(User)session.getAttribute("user"));
         	
 			HttpHeaders header = new HttpHeaders();
 			header.setContentType(new MediaType("application", "pdf"));
 			header.setContentLength(bytes.length);
 			header.set("Content-Disposition",
-		    		"inline; filename=" + document.getFullNumber().replace(" ", "_"));
+		    		"inline; filename=" + ((Document)session.getAttribute("document")).getFullNumber().replace(" ", "_"));
+			session.removeAttribute("document");
 			response.getOutputStream().write(bytes);
 		
 		} catch (IOException e) {
+			session.removeAttribute("document");
 			e.printStackTrace();
 		}
         

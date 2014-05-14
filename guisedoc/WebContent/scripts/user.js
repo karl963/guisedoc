@@ -151,7 +151,7 @@ $(document).ready(function() {
 		userJSON.email = userEmail;
 		userJSON.skype = userSkype;
 		userJSON.password = userPassword;
-		
+
 		return userJSON;
 	};
 	

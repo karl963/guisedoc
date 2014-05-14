@@ -10,8 +10,8 @@ public class ErrorMessages {
 	public static Map<ErrorType,String> errors = new HashMap<ErrorType,String>();
 	
 	public static String DATABASE_CONNECTION = "Viga andmebaasiga ühendumisel !";
-	public static String DATABASE_QUERY = "Viga andmebaasist pärimisel  !";
-	public static String INVALID_LOGIN = "Valed login andmed  !";
+	public static String DATABASE_QUERY = "Viga andmebaasist pärimisel !";
+	public static String INVALID_LOGIN = "Valed sisse logimise andmed !";
 	public static String SUCCESS = "Edukas päring !";
 	public static String NONE_FOUND = "Ühtegi objekti ei leitud !";
 	public static String USER_NOT_EXISTING = "Kasutaja ei eksisteeri !";

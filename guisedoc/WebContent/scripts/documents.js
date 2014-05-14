@@ -66,6 +66,11 @@ $(document).ready(function() {
 	 * DRAG N DROP for changing product queue number
 	 *************************************************************/
 	var fixHelperModified = function(e, tr) {
+
+		closeDetailedDataDiv("documentsTable", function(){
+			$(".detailedTr").remove(); // remove detailed row if opened
+		});
+		
 	    var $originals = tr.children();
 	    var $helper = tr.clone();
 	    $helper.children().each(function(index) {
@@ -345,7 +350,7 @@ $(document).ready(function() {
 				))){
 			return;
 		}
-		
+
 		changeDocumentDataPost(attributeName,value,type,clientID);
 	});
 	
@@ -393,7 +398,7 @@ $(document).ready(function() {
 	 * POSTS changed document data
 	 */
 	var changeDocumentDataPost = function(attributeName,value,type,clientID){
-
+		
 		var id = getCurrentDocumentID();
 
 		$.ajax({
@@ -1398,7 +1403,6 @@ $(document).ready(function() {
 		else{
 			$('#documentsOptionsDiv').slideUp(200, function(){
 				
-				$("#hideOrShowDocumentsOptionDiv").html("Ava dokumendi andmed");
 				$("#hideOrShowDocumentsOptionDiv").addClass("isHidden");
 				localStorage.setItem("documentsOptionsOpened","false");
 			});
@@ -1460,11 +1464,10 @@ $(document).ready(function() {
 	 * loading saved options from localstorage
 	 */
 	if(localStorage.getItem("cleanDocumentsSearch") == "true"){
-		$("#cleanSearchCheckBox").attr("checked",true);
+		$("#cleanSearchCheckBox").prop("checked",true);
 	}
 	if(localStorage.getItem("documentsOptionsOpened") == "false"){ // hide the div fast
 		$('#documentsOptionsDiv').slideUp(0, function(){
-			$("#hideOrShowDocumentsOptionDiv").html("Ava dokumendi andmed");
 			$("#hideOrShowDocumentsOptionDiv").addClass("isHidden");
 		});
 	}

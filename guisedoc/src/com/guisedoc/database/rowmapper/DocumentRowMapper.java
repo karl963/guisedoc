@@ -33,7 +33,7 @@ public class DocumentRowMapper<Object> implements RowMapper<Object> {
 			}catch(Exception x){}
 			try{document.setPaymentRequirement(rs.getString("paymentRequirement"));
 			}catch(Exception x){}
-			try{document.setValidDue(rs.getLong("valudDue"));
+			try{document.setValidDue(rs.getLong("validDue"));
 			}catch(Exception x){}
 			try{document.setAdvance(rs.getDouble("advance"));
 			}catch(Exception x){}

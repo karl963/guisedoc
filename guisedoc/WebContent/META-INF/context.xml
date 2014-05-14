@@ -5,18 +5,18 @@
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
 
 <Resource
-	name="jdbc/main"
+	name="jdbc/main" 
 	auth="Container" 
-	type="javax.sql.DataSource"
+	type="javax.sql.DataSource" 
     maxActive="10" 
     maxIdle="10" 
-    maxWait="10"
+    maxWait="10" 
     username="main" 
     password="password" 
-    driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://karlbakatest.ccntx8zyuq8d.us-east-1.rds.amazonaws.com:3306/main"
-    timeBetweenEvictionRunsMillis="30000"
-    removeAbandonedTimeout="60000"
+    driverClassName="com.mysql.jdbc.Driver" 
+    url="jdbc:mysql://karlbakatest.ccntx8zyuq8d.us-east-1.rds.amazonaws.com:3306/main" 
+    timeBetweenEvictionRunsMillis="30000" 
+    removeAbandonedTimeout="60000" 
 	factory="org.apache.commons.dbcp.BasicDataSourceFactory"
 />
       <!--factory="org.apache.commons.dbcp.BasicDataSourceFactory"-->          

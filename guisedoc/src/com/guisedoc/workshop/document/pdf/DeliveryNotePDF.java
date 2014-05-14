@@ -393,6 +393,7 @@ public class DeliveryNotePDF {
 					blackBoard.close();
 					blackBoard = new com.itextpdf.text.Document();
 
+					try{temporaryByteStream.close();}catch(Exception x){} // close right after done for memory release
 					temporaryByteStream = new ByteArrayOutputStream();
 					writer = PdfWriter.getInstance(blackBoard,temporaryByteStream);
 					pageEvent.resetPagesTotal();
@@ -488,6 +489,7 @@ public class DeliveryNotePDF {
 
             try{blackBoard.close();}catch(Exception x){}
     		reader = new PdfReader(temporaryByteStream.toByteArray());
+    		try{temporaryByteStream.close();}catch(Exception x){} // close right after done for memory release
     		int pageNumberAfterFinalEnd = reader.getNumberOfPages();
 
 			/*
@@ -523,6 +525,7 @@ public class DeliveryNotePDF {
 		}
 		finally{
 			try{temporaryByteStream.close();}catch(Exception x){}
+			try{byteOutputStream.close();}catch(Exception x){}
 			try{blackBoard.close();}catch(Exception x){}
 			try{finalDocument.close();}catch(Exception x){}
 		}

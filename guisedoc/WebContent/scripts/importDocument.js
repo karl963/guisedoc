@@ -190,19 +190,19 @@ var addSelectedDocumentData = function(document,selectedDocument,openedDocument)
 	$("#insert_fullNumber").val(document.fullNumber);
 	$("#insert_validDue").val(document.validDue);
 	$("#insert_advance").val(document.advance);
-	$("#insert_paymentRequirement").val(document.paymentRequirement);
+	$("#insert_paymentRequirement").val(document.payment_requirement);
 	$("#insert_shipmentTime").val(document.shipmentTime);
 	$("#insert_shipmentAddress").val(document.shipmentAddress);
 	$("#insert_shipmentPlace").val(document.shipmentPlace);
 	$("#insert_orderNumber").val(document.orderNumber);
-	
-	$("#insert_documentDate").val(document.html5FormatedDate);
-	$("#insert_addToStatistics").attr("checked",document.addToStatistics);
-	$("#insert_showDiscount").attr("checked",document.showDiscount);
-	$("#insert_paydInCash").attr("checked",document.paydInCash);
-	$("#insert_showCE").attr("checked",document.showCE);
 
-	$("#insert_verified").attr("checked",document.verified);
+	$("#insert_documentDate").val(document.html5FormatedDate);
+	$("#insert_addToStatistics").prop("checked",document.addToStatistics);
+	$("#insert_showDiscount").prop("checked",document.showDiscount);
+	$("#insert_paydInCash").prop("checked",document.paydInCash);
+	$("#insert_showCE").prop("checked",document.showCE);
+
+	$("#insert_verified").prop("checked",document.verified);
 	/*
 	 * only show input that the document needs
 	 */

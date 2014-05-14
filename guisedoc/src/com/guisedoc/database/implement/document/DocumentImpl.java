@@ -226,7 +226,7 @@ public class DocumentImpl extends JdbcTemplate {
 			
 			String query = "UPDATE documents SET "+key+" = "+valueQuery+" "
 					+ "WHERE ID = "+documentID;
-			
+
 			int response = update(query);
 			
 			if(response == 1){

@@ -19,9 +19,15 @@
 		<br>
 		<label><input type="radio" name="statisticsClientGroup" value="seller" />Müüjad</label>
 		<br>
-		<input type="text" id="statisticsClientInput" disabled value="Kliendi nimi" class="searchInputField defaultInputField" />
-		<select id="clientsSelectBox">
-		</select>
+		<span>
+			Otsitava kliendi nimi:
+			<input type="text" id="statisticsClientInput" disabled value="Kliendi nimi" class="searchInputField defaultInputField" />
+		</span>
+		<span>
+			Valige teine klient:
+			<select id="clientsSelectBox">
+			</select>
+		</span>
 		<span id="clientIDDiv" class="hidden">0</span>
 	</span>
 	<span class="separateOptionDiv">

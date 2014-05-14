@@ -39,8 +39,6 @@ import com.guisedoc.workshop.document.DocumentBuilder;
 @RequestMapping("/statistics/pdf")
 public class StatisticsPdfHandling {
 	
-	private StatisticsSummary summary;
-		
 	@RequestMapping(value="/download",method = RequestMethod.GET, params={"statisticsJSON"})
 	@ResponseBody
 	public Object downloadPDF(HttpSession session,RedirectAttributes redirectAttributes,
@@ -60,16 +58,15 @@ public class StatisticsPdfHandling {
 					.getStatisticsSummary(map);
 
 			if(responseObject instanceof StatisticsSummary){
-				
-				summary = (StatisticsSummary)responseObject;
-				
+
 				Firm firm = (Firm) new FirmImpl(session).getFirmData();
-				byte[] bytes = DocumentBuilder.build(summary,firm,(User)session.getAttribute("user"));
+				byte[] bytes = DocumentBuilder.build((StatisticsSummary)responseObject,firm,(User)session.getAttribute("user"));
 		
 				HttpHeaders header = new HttpHeaders();
 				header.setContentType(new MediaType("application", "pdf"));
 			    header.set("Content-Disposition",
-			    		"attachment; filename=" + summary.getSummaryName().replace(" ", "_")+".pdf");
+			    		"attachment; filename=" + ((StatisticsSummary)responseObject).getSummaryName().replace(" ", "_")+".pdf");
+
 			    header.setContentLength(bytes.length);
 		
 			    response.addCookie(new Cookie("statisticsDownload","true"));
@@ -104,8 +101,8 @@ public class StatisticsPdfHandling {
 					.getStatisticsSummary(map);
 
 			if(responseObject instanceof StatisticsSummary){
-				summary = (StatisticsSummary)responseObject;
-				response.sendRedirect("preview/"+summary.getSummaryName().replace(" ", "_")+".pdf");
+				session.setAttribute("summary", (StatisticsSummary)responseObject);
+				response.sendRedirect("preview/"+((StatisticsSummary)responseObject).getSummaryName().replace(" ", "_")+".pdf");
 			}
 			else{
 				return null;
@@ -129,19 +126,23 @@ public class StatisticsPdfHandling {
         try{
 
         	Firm firm = (Firm) new FirmImpl(session).getFirmData();
-    		byte[] bytes = DocumentBuilder.build(summary,firm,(User)session.getAttribute("user"));
+    		byte[] bytes = DocumentBuilder.build((StatisticsSummary)session.getAttribute("summary"),firm,(User)session.getAttribute("user"));
 	
 			HttpHeaders header = new HttpHeaders();
 			header.setContentType(new MediaType("application", "pdf"));
 			header.setContentLength(bytes.length);
 		    header.set("Content-Disposition",
-		    		"inline; filename=" + summary.getSummaryName().replace(" ", "_"));
+		    		"inline; filename=" + ((StatisticsSummary)session.getAttribute("summary")).getSummaryName().replace(" ", "_"));
+		    
+		    session.removeAttribute("summary");
+		    
 			response.getOutputStream().write(bytes);
 	    
 		} catch (IOException e) {
+			session.removeAttribute("summary");
 			e.printStackTrace();
 		}
-        
+
 		return null;
 	}
 	
